@@ -1,0 +1,9 @@
+[/]
+tools.staticdir.root = "/PATH/TO/radio/web/static"
+
+[/js]
+tools.staticdir.dir = "js"
+
+[/swf]
+tools.staticdir.dir = "swf"
+

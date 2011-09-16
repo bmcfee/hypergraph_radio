@@ -13,3 +13,4 @@ data/*
 *~
 *.sav
 *.old
+*.ini
