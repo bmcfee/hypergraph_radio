@@ -1,5 +1,5 @@
 import cherrypy
-import rdio
+import rdioapi
 import ConfigParser
 import cjson as json
 
@@ -12,7 +12,7 @@ class Root(object):
         self.state = {}
 
         # initialize rdio object
-        self.r = rdio.Rdio(self.config.get('rdio', 'api_key'), self.config.get('rdio', 'secret'), self.state)
+        self.r = rdioapi.Rdio(self.config.get('rdio', 'api_key'), self.config.get('rdio', 'secret'), self.state)
 
         # get a playback token
         self.token = self.r.call('getPlaybackToken')
@@ -20,7 +20,7 @@ class Root(object):
 
     @cherrypy.expose
     def index(self):
-#         return json.encode({'playbackToken': self.token})
-        return json.encode({'playbackToken': "GAlNi78J_____zlyYWs5ZG02N2pkaHlhcWsyOWJtYjkyN2xvY2FsaG9zdEbwl7EHvbylWSWFWYMZwfc="})
+        return json.encode({'playbackToken': self.token})
+#         return json.encode({'playbackToken': "GAlNi78J_____zlyYWs5ZG02N2pkaHlhcWsyOWJtYjkyN2xvY2FsaG9zdEbwl7EHvbylWSWFWYMZwfc="})
         pass
 
