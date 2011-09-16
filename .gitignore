@@ -13,5 +13,5 @@ data/*
 *~
 *.sav
 *.old
-*.ini
+server.ini
 *.pyc

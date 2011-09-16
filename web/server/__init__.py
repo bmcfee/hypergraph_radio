@@ -1,27 +1,44 @@
 import cherrypy
+from cherrypy.lib.static import serve_file
+
 import rdioTalker
 import playlist
 
+from ConfigParser import SafeConfigParser
+
 import pprint
 
-class Root(object):
+
+class Root:
+
+
+    def __init__(self, serverIni):
+
+        self.config     = SafeConfigParser()
+        self.config.read(serverIni)
+
+        self._playlist  = playlist.Root()
+
+        self._rdio      = rdioTalker.Root(  self.config.get('rdio', 'api_key'), 
+                                            self.config.get('rdio', 'secret'),
+                                            self.config.get('rdio', 'domain'))
+        
+        self._cp_config = { 'tools.staticdir.on': True,
+                            'tools.staticdir.dir' : self.config.get('server', 'root') }
+        pass
+
+    @cherrypy.expose
+    def rdio(self):
+        return self._rdio.index()
+        pass
+
+    @cherrypy.expose
+    def playlist(self):
+        return self._playlist.index()
+        pass
+
     @cherrypy.expose
     def index(self):
-        return "Hello World!"
-
-
-# cherrypy.config.update({'log.screen': True})
-pprint.pprint(cherrypy.config)
-# conf = {'/': {      'tools.staticdir.on': True,
-#                     'tools.staticdir.dir': '/home/bmcfee/git/radio/web/static',
-#                     'tools.staticdir.content_types': {  'html': 'text/html',
-#                                                         'swf': 'application/x-shockwave-flash',
-#                                                         'js': 'text/javascript'}}}
-root            = Root()
-root.rdio       = rdioTalker.Root('rdio.ini')
-root.playlist   = playlist.Root()
-# app             = cherrypy.tree.mount(root, script_name='/', config=conf)
-app             = cherrypy.tree.mount(root, script_name='/')
-
-cherrypy.server.start()
+        return serve_file(self.config.get('server', 'root') + '/player.html', content_type='text/html')
+        pass
 

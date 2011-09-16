@@ -1,26 +1,19 @@
-import cherrypy
 import rdioapi
-import ConfigParser
 import cjson as json
 
 class Root(object):
 
-    def __init__(self, rdioConfig):
-        # Load the rdio config
-        self.config = ConfigParser.SafeConfigParser()
-        self.config.read(rdioConfig)
+    def __init__(self, api_key, secret, domain):
         self.state = {}
 
         # initialize rdio object
-        self.r = rdioapi.Rdio(self.config.get('rdio', 'api_key'), self.config.get('rdio', 'secret'), self.state)
+        self.r = rdioapi.Rdio(api_key, secret, self.state)
 
         # get a playback token
-        self.token = self.r.call('getPlaybackToken')
+        self.token = self.r.call('getPlaybackToken', domain=domain)
         pass
 
-    @cherrypy.expose
     def index(self):
-#         return json.encode({'playbackToken': self.token})
-        return json.encode({'playbackToken': "GAlNi78J_____zlyYWs5ZG02N2pkaHlhcWsyOWJtYjkyN2xvY2FsaG9zdEbwl7EHvbylWSWFWYMZwfc="})
+        return json.encode({'playbackToken': self.token})
         pass
 
