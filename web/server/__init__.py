@@ -17,7 +17,8 @@ conf = {'/': {      'tools.staticdir.on': True,
 root            = Root()
 root.rdio       = rdioTalker.Root('rdio.ini')
 root.playlist   = playlist.Root()
-app             = cherrypy.tree.mount(root, script_name='/', config=conf)
+# app             = cherrypy.tree.mount(root, script_name='/', config=conf)
+app             = cherrypy.tree.mount(root, script_name='/')
 
 cherrypy.server.start()
 
