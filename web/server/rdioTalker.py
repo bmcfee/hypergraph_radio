@@ -20,7 +20,7 @@ class Root(object):
 
     @cherrypy.expose
     def index(self):
-        return json.encode({'playbackToken': self.token})
-#         return json.encode({'playbackToken': "GAlNi78J_____zlyYWs5ZG02N2pkaHlhcWsyOWJtYjkyN2xvY2FsaG9zdEbwl7EHvbylWSWFWYMZwfc="})
+#         return json.encode({'playbackToken': self.token})
+        return json.encode({'playbackToken': "GAlNi78J_____zlyYWs5ZG02N2pkaHlhcWsyOWJtYjkyN2xvY2FsaG9zdEbwl7EHvbylWSWFWYMZwfc="})
         pass
 
