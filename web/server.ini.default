@@ -1,5 +1,7 @@
 [server]
-root=/PATH/TO/radio/web/static
+root=/PATH/TO/radio/web
+static=static
+text_index=data/index
 
 [rdio]
 api_key=YOUR_API_KEY
