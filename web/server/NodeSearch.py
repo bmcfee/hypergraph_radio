@@ -15,7 +15,7 @@ class Root(object):
             for r in results:
                 output.append({     'title':    r['title'],
                                     'artist':   r['artist'],
-                                    'track_id': r['track_id'],
+                                    'song_id':  r['song_id'],
                                     'release':  r['release'] })
 
             return json.encode(output)

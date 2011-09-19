@@ -30,7 +30,7 @@ def createIndexWriter(indexPath):
     if not os.path.exists(indexPath):
         os.mkdir(indexPath)
 
-    Schema = whoosh.fields.Schema(  track_id    =   whoosh.fields.ID(stored=True),
+    Schema = whoosh.fields.Schema(  song_id     =   whoosh.fields.ID(stored=True),
                                     title       =   whoosh.fields.TEXT(stored=True, field_boost=8.0),
                                     artist      =   whoosh.fields.TEXT(stored=True, field_boost=4.0),
                                     release     =   whoosh.fields.TEXT(stored=True, field_boost=2.0),
@@ -46,7 +46,7 @@ def createIndex(dbc_meta, dbc_terms, indexPath):
 
     cur = dbc_meta.cursor()
 
-    cur.execute('''SELECT   track_id,
+    cur.execute('''SELECT   song_id,
                             title,
                             artist_name,
                             artist_id,
@@ -55,11 +55,11 @@ def createIndex(dbc_meta, dbc_terms, indexPath):
 
     writer = createIndexWriter(indexPath)
 
-    for (tr_id, track_title, artist_name, artist_id, release_name) in cur:
+    for (s_id, track_title, artist_name, artist_id, release_name) in cur:
         term_array = getTerms(dbc_terms, artist_id)
 
 
-        writer.add_document(track_id    =   tr_id, 
+        writer.add_document(song_id     =   s_id, 
                             title       =   track_title, 
                             artist      =   artist_name,
                             release     =   release_name,
