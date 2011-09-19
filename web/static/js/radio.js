@@ -3,7 +3,7 @@ var player = null;
 var paused = true;
 
 var trackDuration = 0;
-var songQueue = [];
+var songQueue;
 
 function playPauseMusic() {
     if (player == null) {
@@ -50,7 +50,7 @@ radioListener.ready = function() {
     player = $("#player").get(0);
     console.log('Ready to play.');
     // Add to the queue?
-    loadSongs();
+//     loadSongs();
 }
 
 radioListener.playStateChanged = function(playState) {
@@ -143,10 +143,21 @@ radioListener.playingSomewhereElse = function() {
     console.log("CAN'T PLAY HERE");
 }
 
+function appendSong(song) {
+    songQueue.push(song);
+    $("#queue > ul").append('<li>' + song + '</li>');
+}
+
+function clearSongQueue() {
+    songQueue = [];
+    $("#queue > ul > li").remove();
+}
+
 function loadSong(song_id) {
 
     $.getJSON('/queue/', {query: song_id}, function(data) {
-        songQueue = data;
+        clearSongQueue();
+        appendSong(data);
         playFromQueue();
     });
 
@@ -154,10 +165,12 @@ function loadSong(song_id) {
 
 function loadSongs() {
 
+    clearSongQueue();
+
     $.getJSON('/playlist/', {}, function(data) {
 
         for (i = 0; i < data.length; i++) {
-         songQueue.push(data[i]);
+            appendSong(data[i]);
         }
         playFromQueue();
     });
@@ -175,6 +188,9 @@ function playFromQueue() {
 
 function initRdioPlayer() {
     var url = '/rdio/';
+    
+    clearSongQueue();
+
     $.getJSON(url, {}, function(data) {
         if (data) {
             params = {  'playbackToken':    data.playbackToken,
