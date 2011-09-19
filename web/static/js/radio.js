@@ -33,7 +33,6 @@ function previousTrack() {
 
 function nextTrack() {
     if (player != null) {
-        //player.rdio_next();
         playFromQueue();
     }
 }
@@ -83,9 +82,9 @@ radioListener.playingTrackChanged = function(playingTrack, sourcePosition) {
 
     trackDuration = playingTrack.duration;
 
-    document.getElementById("song-title").innerHTML     = playingTrack.name;
-    document.getElementById("artist-name").innerHTML    = playingTrack.artist;
-    document.getElementById("album-art").innerHTML      = "<img id='album-art-img' src='" + playingTrack.icon + "'/>";
+    $("#song-title").text(playingTrack.name);
+    $("#artist-name").text(playingTrack.artist);
+    $("#album-art").html("<img id='album-art-img' src='" + playingTrack.icon + "'/>");
 }
 
 radioListener.playingSourceChanged = function(playingSource) {
@@ -109,11 +108,11 @@ radioListener.positionChanged = function(position) {
     //  The position within the track changed to position seconds. 
     //  This happens both in response to a seek and during playback.
 //     console.log('Position: ' + position);
-    minutes = Math.round(position / 60);
-    seconds = (Math.round(position) % 60).toString();
-    if (seconds.length < 2) {
-        seconds = '0' + seconds;
-    }
+//     minutes = Math.round(position / 60);
+//     seconds = (Math.round(position) % 60).toString();
+//     if (seconds.length < 2) {
+//         seconds = '0' + seconds;
+//     }
 
     $("#trackprogress").slider({value: position * 100 / trackDuration});
 }
@@ -158,11 +157,8 @@ function loadSongs() {
     $.getJSON('/playlist/', {}, function(data) {
 
         for (i = 0; i < data.length; i++) {
-         //   player.rdio_queue(data[i]);
          songQueue.push(data[i]);
         }
-//         player.rdio_playQueuedTrack(0);
-//         playPauseMusic();
         playFromQueue();
     });
 }

@@ -8,7 +8,6 @@
         <script type="text/javascript" src="http://www.google.com/jsapi"></script> 
         <script type="text/javascript"> google.load("jquery", "1.6.2"); </script>
         <script type="text/javascript"> google.load("jqueryui", "1.8.16"); </script> 
-        <script type="text/javascript" src="js/radio.js"></script>
         
         <link   rel     ="stylesheet" 
                 href    ="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" 
@@ -35,52 +34,8 @@
             }
         </style>
 
-		<script type="text/javascript">
-            $(function() {
-                $( "#trackprogress" ).slider({slide: seekTrack, animate: true, disabled: true, range: "min", step: 1});
-
-                $( "#previous" )
-                    .button({ text: false, icons: { primary: "ui-icon-seek-start" } })
-                    .click(previousTrack);
-
-                $( "#playpause" )
-                    .button({ text: false, icons: { primary: "ui-icon-play" } })
-                    .click(playPauseMusic);
-
-                $( "#next" )
-                    .button({ text: false, icons: { primary: "ui-icon-seek-end" } })
-                    .click(nextTrack);
-
-                $( "#search" )
-                    .autocomplete({
-                        source: function( request, response ) {
-                            $.ajax({
-                                url:        "/search/",
-                                dataType:   "json",
-                                data:       { query: request.term },
-                                success:    response 
-                            });
-                        },
-                        minLength: 0,
-                        select: function( event, ui ) {
-                            if (ui.item) {
-                                loadSong(ui.item.song_id);
-                            }
-                            console.log( ui.item ?
-                                "Selected: [" + ui.item.song_id + "] " + ui.item.artist + ' - ' + ui.item.title:
-                                "Nothing selected, input was " + this.value );
-                            }
-                    })
-                    .data( "autocomplete" )._renderItem = function( ul, item ) {
-                        return $( "<li></li>" )
-                                .data( "item.autocomplete", item )
-                                .append( "<a><b>" + item.artist + "</b><br>" + item.title + "</a>" )
-                                .appendTo( ul );
-                        };
-                
-                initRdioPlayer();
-            });
-		</script>
+        <script type="text/javascript" src="js/radio.js"></script>
+        <script type="text/javascript" src="js/ui.js"></script>
 	</head>
 
     <body>
