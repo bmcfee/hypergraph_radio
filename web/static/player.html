@@ -9,12 +9,6 @@
         <script type="text/javascript"> google.load("jquery", "1.6.2"); </script>
         <script type="text/javascript"> google.load("jqueryui", "1.8.16"); </script> 
 
-        <link   rel     ="stylesheet" 
-                href    ="http://static.jquery.com/ui/css/demo-docs-theme/ui.theme.css" 
-                type    ="text/css" 
-                media   ="all" 
-        /> 
-
         <link   rel     ="stylesheet"
                 href    ="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css"
                 type    ="text/css"
@@ -23,21 +17,42 @@
 
         <style type="text/css">
             body, html { 
-                font-family:    helvetica,verdana,sans-serif; 
-                font-size:      90%;
-                height:         100%;
+                font-family:        helvetica, verdana, sans-serif; 
+                font-size:          10pt;
+                height:             100%;
+                overflow:           auto;
             }
             body {
-                background-color: #cc0000;
-                margin:  0px;
-                padding: 0px;
-                height: 100%;
+                background-color:   #cc0000;
+                margin:             0px;
+                padding:            0px;
             }
             .ui-autocomplete-loading { 
-                background: white url('i/loader.gif') right center no-repeat; 
+                background:         white url('i/loader.gif') right center no-repeat; 
             }
             #toolbar {
-                margin: 6px 12px;
+                width:              200px;
+                text-align:         center;
+                margin:             0;
+            }
+            #album-art {
+                height:             200px;
+                width:              200px;
+                margin:             0;
+                padding:            0;
+            }
+            #main {
+                width:              60%; 
+                margin:             0px 20%; 
+                padding:            8px; 
+                height:             100%; 
+                background-color:   white; 
+                overflow:           auto;
+            }
+            #metadata {
+                width: 200px;
+                margin: 0px;
+                padding: 4px;
             }
         </style>
 
@@ -46,27 +61,26 @@
 	</head>
 
     <body>
-        <div style="width: 60%; margin: 0px 20%; padding: 8px; height: 100%; background-color: white;">
+        <div id="main">
             <div class="ui-widget" style="float:right; width:auto;">
                 <label for="search">Search: </label>
                 <input id="search" style="width: 320px;"/>
             </div>
 
             <div>
-                <div id="album-art" style="height=200px; width=200px; margin:0; padding:0;">
+                <div id="album-art">
                     <img src="i/big-loader.gif" alt="" style="width:32px; height:32px; padding:84px"/>
                 </div>
 
-                <div id="toolbar" class="ui-widget-header ui-corner-all" style="width: 200px; margin:0; text-align:
-                center">
+                <div id="toolbar" class="ui-widget-header ui-corner-all">
                     <button id="previous">  Previous    </button>
                     <button id="playpause"> Play/pause  </button>
                     <button id="next">      Next        </button>
                 </div>
 
-                <div id="metadata" style="margin:0px; padding:4px;">
-                    <div id="artist-name" style="height=20px; width=200px; font-weight: bold;"></div>
-                    <div id="song-title" style="height=20px; width=200px;"></div>
+                <div id="metadata">
+                    <div id="artist-name" style="font-weight: bold;"></div>
+                    <div id="song-title"></div>
                 </div>
             
                 <div    class="ui-progressbar ui-widget ui-widget-content ui-corner-all" 
