@@ -63,6 +63,9 @@
                         },
                         minLength: 0,
                         select: function( event, ui ) {
+                            if (ui.item) {
+                                loadSong(ui.item.song_id);
+                            }
                             console.log( ui.item ?
                                 "Selected: [" + ui.item.song_id + "] " + ui.item.artist + ' - ' + ui.item.title:
                                 "Nothing selected, input was " + this.value );

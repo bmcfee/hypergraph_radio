@@ -22,7 +22,7 @@ class Root:
         self.staticdir  = os.path.join(self.basedir, self.config.get('server', 'static'))
 
 
-        self._playlist  = NodePlaylist.Root()
+        self._playlist  = NodePlaylist.Root( os.path.join(self.basedir, self.config.get('server', 'rdio_index')))
         self._rdio      = NodeRdio.Root(    self.config.get('rdio', 'api_key'), 
                                             self.config.get('rdio', 'secret'),
                                             self.config.get('rdio', 'domain'))
@@ -42,6 +42,10 @@ class Root:
         return self._playlist.index()
         pass
     
+    @cherrypy.expose
+    def queue(self, query=None):
+        return self._playlist.queue(query)
+
     @cherrypy.expose
     def search(self, query=None):
         return self._search.search(query + '*')

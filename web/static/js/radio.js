@@ -144,6 +144,15 @@ radioListener.playingSomewhereElse = function() {
     console.log("CAN'T PLAY HERE");
 }
 
+function loadSong(song_id) {
+
+    $.getJSON('/queue/', {query: song_id}, function(data) {
+        songQueue = data;
+        playFromQueue();
+    });
+
+}
+
 function loadSongs() {
 
     $.getJSON('/playlist/', {}, function(data) {
