@@ -37,7 +37,7 @@
 
 		<script type="text/javascript">
             $(function() {
-                $( "#trackprogress" ).progressbar();
+                $( "#trackprogress" ).slider({slide: seekTrack, animate: true, disabled: true, range: "min", step: 1});
 
                 $( "#previous" )
                     .button({ text: false, icons: { primary: "ui-icon-seek-start" } })
@@ -91,9 +91,9 @@
                 <div id="album-art" style="height=256px; width=256px; margin:0; padding:0;"></div>
 
                 <div id="toolbar" class="ui-widget-header ui-corner-all" style="width: 200px; margin:0;">
-                    <button id="previous">|&lt;</button>
-                    <button id="playpause">&gt;</button>
-                    <button id="next">&gt;|</button>
+                    <button id="previous">Previous</button>
+                    <button id="playpause">Play/pause</button>
+                    <button id="next">Next</button>
                 </div>
 
                 <div id="artist-name" style="height=20px; width=200px; font-weight: bold;"></div>
@@ -102,7 +102,7 @@
                 <div id="player"></div>
 
                 <div    class="ui-progressbar ui-widget ui-widget-content ui-corner-all" 
-                        style="width: 200px; height:6px;">
+                        style="width: 200px; height:10px;">
                     <div    id      ="trackprogress" 
                             class   ="ui-progressbar-value">
                     </div>

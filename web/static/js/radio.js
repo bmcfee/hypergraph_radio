@@ -38,6 +38,12 @@ function nextTrack() {
     }
 }
 
+function seekTrack() {
+    if (player != null) {
+        offset = Math.round($("#trackprogress").slider("option", "value") * trackDuration / 100);
+        player.rdio_seek(offset);
+    }
+}
 
 radioListener.ready = function() {
     radioListener.is_ready = true;
@@ -109,7 +115,8 @@ radioListener.positionChanged = function(position) {
         seconds = '0' + seconds;
     }
 
-    $("#trackprogress").progressbar({value: position * 100 / trackDuration});
+//     $("#trackprogress").progressbar({value: position * 100 / trackDuration});
+    $("#trackprogress").slider({value: position * 100 / trackDuration});
 }
 
 radioListener.queueChanged = function(newQueue) {
@@ -157,6 +164,7 @@ function playFromQueue() {
         return;
     }
 
+    $("#trackprogress").slider("option", "disabled", false);
     song = songQueue.shift();
     player.rdio_play(song);
 }
