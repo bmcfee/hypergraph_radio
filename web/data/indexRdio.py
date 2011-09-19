@@ -29,20 +29,25 @@ def loadMapping(filename):
 
 def lookupRdio(api_key, song_id):
 
-    f = urllib2.urlopen('http://developer.echonest.com/api/v4/song/profile?api_key=%s&format=json&id=%s&bucket=id:rdio-us-streaming' % (api_key, song_id))
+    while True:
+        try:
+            f = urllib2.urlopen('http://developer.echonest.com/api/v4/song/profile?api_key=%s&format=json&id=%s&bucket=id:rdio-us-streaming' % (api_key, song_id))
 
-    data = json.loads(f.read())['response']
+            data = json.loads(f.read())['response']
     
-    rdio_id = None
+            rdio_id = None
 
-    if      'songs' in data and len(data['songs']) > 0  and u'foreign_ids' in data['songs'][0]  and len(data['songs'][0]['foreign_ids']) > 0:
-        # Success.  Moving on...
-        foreign_id  = data['songs'][0]['foreign_ids'][0]['foreign_id']
-        rdio_id     = foreign_id[foreign_id.rfind(':')+1:]
+            if      'songs' in data and len(data['songs']) > 0  and u'foreign_ids' in data['songs'][0]  and len(data['songs'][0]['foreign_ids']) > 0:
+                # Success.  Moving on...
+                foreign_id  = data['songs'][0]['foreign_ids'][0]['foreign_id']
+                rdio_id     = foreign_id[foreign_id.rfind(':')+1:]
 
-    time.sleep(0.5)
+            time.sleep(0.5)
 
-    return rdio_id
+            return rdio_id
+        finally:
+            time.sleep(0.5)
+    pass
 
 def saveMapping(M, filename):
     with open(filename, 'w') as f:

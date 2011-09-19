@@ -145,7 +145,7 @@ radioListener.playingSomewhereElse = function() {
 
 function appendSong(song) {
     songQueue.push(song);
-    $("#queue > ul").append('<li>' + song + '</li>');
+    $("#queue > ul").append('<li>' + song.artist + ' - ' + song.title + '</li>');
 }
 
 function clearSongQueue() {
@@ -157,7 +157,9 @@ function loadSong(song_id) {
 
     $.getJSON('/queue/', {query: song_id}, function(data) {
         clearSongQueue();
-        appendSong(data);
+        for (i = 0; i < data.length; i++) {
+            appendSong(data[i]);
+        }
         playFromQueue();
     });
 
@@ -183,7 +185,7 @@ function playFromQueue() {
 
     $("#trackprogress").slider("option", "disabled", false);
     song = songQueue.shift();
-    player.rdio_play(song);
+    player.rdio_play(song.rdio_id);
 }
 
 function initRdioPlayer() {

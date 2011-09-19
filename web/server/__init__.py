@@ -22,7 +22,9 @@ class Root:
         self.staticdir  = os.path.join(self.basedir, self.config.get('server', 'static'))
 
 
-        self._playlist  = NodePlaylist.Root( os.path.join(self.basedir, self.config.get('server', 'rdio_index')))
+        self._playlist  = NodePlaylist.Root( 
+            os.path.join(self.basedir, self.config.get('server', 'song_meta')),
+            os.path.join(self.basedir, self.config.get('server', 'rdio_index')))
         self._rdio      = NodeRdio.Root(    self.config.get('rdio', 'api_key'), 
                                             self.config.get('rdio', 'secret'),
                                             self.config.get('rdio', 'domain'))
