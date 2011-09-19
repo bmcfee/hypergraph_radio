@@ -80,8 +80,6 @@ radioListener.playingTrackChanged = function(playingTrack, sourcePosition) {
     }
     console.log('Playing: ' + playingTrack.artist + ' - ' + playingTrack.name );
 
-    console.log(playingTrack);
-
     trackDuration = playingTrack.duration;
 
     $("#song-title").text(playingTrack.name);

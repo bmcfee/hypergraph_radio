@@ -6,6 +6,7 @@ $(document).keydown(function (e) {
 
 
     switch (e.which) {
+
         case $.ui.keyCode.LEFT:
             previousTrack();
             e.preventDefault();
@@ -30,7 +31,6 @@ $(document).keydown(function (e) {
             break
     }
 });
-
 
 // Initialize control widgets and start the player
 $(function() {
@@ -58,7 +58,7 @@ $(function() {
                     success:    response 
                 });
             },
-            minLength: 3,       // don't search if the length is less than 3 characters
+            minLength: 2,       // don't search if the length is less than 2 characters
             select: function( event, ui ) {
                 if (ui.item) {
                     loadSong(ui.item.song_id);
@@ -75,6 +75,7 @@ $(function() {
                     .append( "<a><b>" + item.artist + "</b><br>" + item.title + "</a>" )
                     .appendTo( ul );
         };
+
 
     initRdioPlayer();
 });
