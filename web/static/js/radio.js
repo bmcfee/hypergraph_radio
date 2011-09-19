@@ -80,11 +80,13 @@ radioListener.playingTrackChanged = function(playingTrack, sourcePosition) {
     }
     console.log('Playing: ' + playingTrack.artist + ' - ' + playingTrack.name );
 
+    console.log(playingTrack);
+
     trackDuration = playingTrack.duration;
 
     $("#song-title").text(playingTrack.name);
     $("#artist-name").text(playingTrack.artist);
-    $("#album-art").html("<img id='album-art-img' src='" + playingTrack.icon + "'/>");
+    $("#album-art").html("<img id='album-art-img' style='width: 200px; height: 200px;' src='" + playingTrack.icon + "'/>");
 }
 
 radioListener.playingSourceChanged = function(playingSource) {

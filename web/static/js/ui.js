@@ -4,6 +4,7 @@
 // Handle keyboard events
 $(document).keydown(function (e) {
 
+
     switch (e.which) {
         case $.ui.keyCode.LEFT:
             previousTrack();
@@ -22,8 +23,10 @@ $(document).keydown(function (e) {
             break;
 
         case $.ui.keyCode.SPACE:
-            playPauseMusic();
-            e.preventDefault();
+            if (! $("#search").is(":focus")) {
+                playPauseMusic();
+                e.preventDefault();
+            }
             break
     }
 });
@@ -55,10 +58,11 @@ $(function() {
                     success:    response 
                 });
             },
-            minLength: 0,
+            minLength: 3,       // don't search if the length is less than 3 characters
             select: function( event, ui ) {
                 if (ui.item) {
                     loadSong(ui.item.song_id);
+                    $("#search").blur();
                 }
                 console.log( ui.item ?
                     "Selected: [" + ui.item.song_id + "] " + ui.item.artist + ' - ' + ui.item.title:

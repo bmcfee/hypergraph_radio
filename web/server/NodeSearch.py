@@ -9,6 +9,9 @@ class Root(object):
         self.parser = whoosh.qparser.MultifieldParser(['title', 'artist', 'release', 'terms'], self.index.schema)
 
     def search(self, querystring):
+        if querystring == '*':
+            return json.encode([])
+
         with self.index.searcher() as search:
             results = search.search(self.parser.parse(unicode(querystring)), limit=10)
             output = []
