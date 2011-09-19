@@ -115,7 +115,6 @@ radioListener.positionChanged = function(position) {
         seconds = '0' + seconds;
     }
 
-//     $("#trackprogress").progressbar({value: position * 100 / trackDuration});
     $("#trackprogress").slider({value: position * 100 / trackDuration});
 }
 
