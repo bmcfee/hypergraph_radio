@@ -1,54 +1,97 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 	<head>
-		<title>SWFObject 2 static publishing example page</title>
+		<title>Reboot radio</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
 		<script type="text/javascript" src="js/swfobject.js"></script>
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js" djConfig="parseOnLoad: true"></script>
         <script type="text/javascript" src="http://www.google.com/jsapi"></script> 
-        <script type="text/javascript"> google.load("jquery", "1.4.2"); </script> 
-        <script type="text/javascript"> google.load("jqueryui", "1.8.6"); </script> 
-		<script type="text/javascript" src="js/radio.js"></script>
-		<script type="text/javascript">
-            initRdioPlayer();
-		</script>
-        <script type="text/javascript">
-            dojo.require("dijit.form.Button");
-            dojo.require("dijit.ProgressBar");
-        </script>
-        <link rel="stylesheet" href="http://www.w3.org/StyleSheets/Core/Midnight" type="text/css">
-        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dijit/themes/nihilo/nihilo.css" />
+        <script type="text/javascript"> google.load("jquery", "1.6.2"); </script>
+        <script type="text/javascript"> google.load("jqueryui", "1.8.16"); </script> 
+        <script type="text/javascript" src="js/radio.js"></script>
+        
+        <link   rel     ="stylesheet" 
+                href    ="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" 
+                type    ="text/css" 
+                media   ="all" 
+        /> 
+
+        <link   rel     ="stylesheet" 
+                href    ="http://static.jquery.com/ui/css/demo-docs-theme/ui.theme.css" 
+                type    ="text/css" 
+                media   ="all" 
+        /> 
+
         <style type="text/css">
-            body, html { font-family:helvetica,arial,sans-serif; font-size:90%; }
+            body, html { font-family:helvetica,verdana,sans-serif; font-size:90%; }
+            .ui-autocomplete-loading { background: white url('i/loader.gif') right center no-repeat; }
         </style>
+
+		<script type="text/javascript">
+            $(function() {
+                $( "#trackprogress" ).progressbar();
+
+                $( "#previous" )
+                    .button({ text: false, icons: { primary: "ui-icon-seek-start" } })
+                    .click(previousTrack);
+
+                $( "#playpause" )
+                    .button({ text: false, icons: { primary: "ui-icon-play" } })
+                    .click(playPauseMusic);
+
+                $( "#next" )
+                    .button({ text: false, icons: { primary: "ui-icon-seek-end" } })
+                    .click(nextTrack);
+
+                $( "#search" )
+                    .autocomplete({
+                        source: function( request, response ) {
+                            $.ajax({
+                                url:        "/search/",
+                                dataType:   "json",
+                                data:       { query: request.term },
+                                success:    function( data ) {
+                                    response( $.map( data, function( item ) {
+                                            return { label: item.artist + ' - ' + item.title, value: item.song_id }
+                                        }
+                                        )
+                                    );
+                                }
+                            });
+                        },
+                        minLength: 2,
+                        select: function( event, ui ) {
+                            console.log( ui.item ?
+                                "Selected: [" + ui.item.value + "] " + ui.item.label :
+                                "Nothing selected, input was " + this.value );
+                            }
+                    });
+                
+                initRdioPlayer();
+            });
+		</script>
 	</head>
-    <body class="nihilo">
 
-    <button dojoType="dijit.form.Button" id="previous">
-        &lt;&lt;
-        <script type="dojo/method" event="onClick" args="evt">
-            previousTrack();
-        </script>
-    </button>
+    <body>
+        <div class="ui-widget" style="float: right;width=50%">
+            <label for="search">Search: </label>
+            <input id="search" />
+        </div>
 
-    <button dojoType="dijit.form.Button" id="playpause">
-        &gt;
-        <script type="dojo/method" event="onClick" args="evt">
-            playPauseMusic();
-        </script>
-    </button>
+        <span id="toolbar" class="ui-widget-header ui-corner-all">
+            <button id="previous">|&lt;</button>
+            <button id="playpause">&gt;</button>
+            <button id="next">&gt;|</button>
+        </span>
 
-    <button dojoType="dijit.form.Button" id="next">
-        &gt;&gt;
-        <script type="dojo/method" event="onClick" args="evt">
-            nextTrack();
-        </script>
-    </button>
+        <div id="album-art" style="height=256px; width=256px;"></div>
 
-    <div id="album-art" style="height=256px; width=256px;"></div>
-    <span id="artist-name" style="height=20px; width=200px;"></span> - <span id="song-title" style="height=20px; width=200px;"></span>
-    <div id="player"></div>
+        <span id="artist-name" style="height=20px; width=200px;"></span> - <span id="song-title" style="height=20px; width=200px;"></span>
+        
+        <div id="player"></div>
 
-    <div dojoType="dijit.ProgressBar" style="width:200px" jsId="jsProgress" id="trackProgress" maximum="1"></div>
-  </body>
+        <div class="ui-progressbar ui-widget ui-widget-content ui-corner-all" style="width: 200px; height:6px;">
+            <div id="trackprogress" class="ui-progressbar-value"></div>
+</div>
+    </body>
 </html>

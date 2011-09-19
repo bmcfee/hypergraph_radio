@@ -44,7 +44,7 @@ class Root:
     
     @cherrypy.expose
     def search(self, query=None):
-        return self._search.search(query)
+        return self._search.search(query + '*')
 
     @cherrypy.expose
     def index(self):

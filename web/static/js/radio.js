@@ -59,9 +59,9 @@ radioListener.playStateChanged = function(playState) {
         paused = false;
     }
     if (playState == 1) {
-        dijit.byId("playpause").setLabel('||');
+        $( "#playpause" ).button("option", "icons", {primary: 'ui-icon-pause'});
     } else {
-        dijit.byId("playpause").setLabel('&gt;');
+        $( "#playpause" ).button("option", "icons", {primary: 'ui-icon-play'});
     }
 }
 
@@ -108,7 +108,8 @@ radioListener.positionChanged = function(position) {
     if (seconds.length < 2) {
         seconds = '0' + seconds;
     }
-    jsProgress.update({maximum: trackDuration, progress: position, label: minutes + ':' + seconds});
+
+    $("#trackprogress").progressbar({value: position * 100 / trackDuration});
 }
 
 radioListener.queueChanged = function(newQueue) {
