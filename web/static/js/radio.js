@@ -38,6 +38,12 @@ function nextTrack() {
     }
 }
 
+function seekTrack() {
+    if (player != null) {
+        offset = Math.round($("#trackprogress").slider("option", "value") * trackDuration / 100);
+        player.rdio_seek(offset);
+    }
+}
 
 radioListener.ready = function() {
     radioListener.is_ready = true;
@@ -59,9 +65,9 @@ radioListener.playStateChanged = function(playState) {
         paused = false;
     }
     if (playState == 1) {
-        dijit.byId("playpause").setLabel('||');
+        $( "#playpause" ).button("option", "icons", {primary: 'ui-icon-pause'});
     } else {
-        dijit.byId("playpause").setLabel('&gt;');
+        $( "#playpause" ).button("option", "icons", {primary: 'ui-icon-play'});
     }
 }
 
@@ -108,7 +114,8 @@ radioListener.positionChanged = function(position) {
     if (seconds.length < 2) {
         seconds = '0' + seconds;
     }
-    jsProgress.update({maximum: trackDuration, progress: position, label: minutes + ':' + seconds});
+
+    $("#trackprogress").slider({value: position * 100 / trackDuration});
 }
 
 radioListener.queueChanged = function(newQueue) {
@@ -137,6 +144,15 @@ radioListener.playingSomewhereElse = function() {
     console.log("CAN'T PLAY HERE");
 }
 
+function loadSong(song_id) {
+
+    $.getJSON('/queue/', {query: song_id}, function(data) {
+        songQueue = data;
+        playFromQueue();
+    });
+
+}
+
 function loadSongs() {
 
     $.getJSON('/playlist/', {}, function(data) {
@@ -156,6 +172,7 @@ function playFromQueue() {
         return;
     }
 
+    $("#trackprogress").slider("option", "disabled", false);
     song = songQueue.shift();
     player.rdio_play(song);
 }
