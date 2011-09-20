@@ -153,6 +153,8 @@ function resetPlayer() {
     $("#trackprogress")
         .slider("option", "disabled", true)
         .slider("option", "value", 0);
+    $("#expand")
+        .button("option", "disabled", true);
 
     $("#song-title")
         .text('');
@@ -203,15 +205,49 @@ function deleteSong(node) {
     }
 }
 
-function appendSong(song) {
+function askForSongs(node) {
 
-    var delButton = $('<button style="float: right; font-size: 8pt;"/>')
-        .button({text: false, icons: {primary: 'ui-icon-minus'}})
+    var before_id   = node.find('.song_id').val();
+    var after_id    = node.next().find('.song_id').val();
+    
+    var bad_ids     = [];
+
+    $('.song_id').each(function() { bad_ids.push($(this).val()); });
+
+    $.post(  '/playlist/', 
+                {
+                    before:     before_id, 
+                    after:      after_id,
+                    not_list:   JSON.stringify(bad_ids)     // XXX: this seems hacky
+                }, 
+                function(data, textStatus, jqXHR) { 
+                    for (var i = data.length - 1; i >= 0; i--) {
+                        node.after(createSongNode(data[i]));
+                    }
+                    updatePlayerFromList(false);
+                }, 'json');
+}
+
+function expandPlaylist() {
+    if ($("#playlistWidget li").length > 0) {
+        askForSongs($("#playlistWidget li:last"));
+    }
+}
+
+function createSongNode(song) {
+
+    var delButton = $('<button style="float: right; font-size: 8pt; z-index: 1;"/>')
+        .button({text: false, icons: {primary: 'ui-icon-cancel'}})
         .click(function() { deleteSong( $(this).parent() ); });
+
+    var addButton = $('<button style="float: right; font-size: 8pt; z-index: 1;"/>')
+        .button({text: false, icons: {primary: 'ui-icon-plusthick'}})
+        .click(function() { askForSongs( $(this).parent() ); });
 
     var li = $('<li />')
         .addClass('playlist')
         .append(delButton)
+        .append(addButton)
         .append('<div class="artistName">' + song.artist + '</div>')
         .append('<div class="songTitle">' + song.title + '</div>')
         .append('<input type="hidden" name="rdio_id" class="rdio_id" value="' + song.rdio_id + '"/>')
@@ -228,10 +264,17 @@ function appendSong(song) {
         $(this).find('button').addClass('hidden');
     });
 
+    return li;
+}
+
+function appendSong(song) {
     $("#playlist")
-        .append(li);
+        .append(createSongNode(song));
 
     $("#clear")
+        .button("option", "disabled", false);
+
+    $("#expand")
         .button("option", "disabled", false);
 
     $("#playpause")

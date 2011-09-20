@@ -52,6 +52,10 @@ $(function() {
         .button({ text: false, icons: { primary: "ui-icon-trash"}, disabled: true })
         .click(clearSongQueue);
 
+    $( "#expand" )
+        .button({ text: false, icons: { primary: "ui-icon-triangle-1-s"}, disabled: true })
+        .click(expandPlaylist);
+
     $( "#playlist" )
         .sortable({
                 update: function(e, ui) { 

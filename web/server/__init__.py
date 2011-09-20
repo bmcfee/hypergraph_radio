@@ -40,8 +40,8 @@ class Root:
         pass
 
     @cherrypy.expose
-    def playlist(self):
-        return self._playlist.index()
+    def playlist(self, before=None, after=None, not_list=None):
+        return self._playlist.sample(before, after, not_list)
         pass
     
     @cherrypy.expose

@@ -12,8 +12,16 @@ class Root(object):
             self.songMeta = pickle.load(f)
         pass
 
-    def index(self):
-        return json.encode([self.package(X) for X in ['SOWWHEW12A81C21D9D']])
+    def sample(self, before, after, not_list):
+        not_list = json.decode(not_list)
+
+        if before is None and after is None:
+            return json.encode([])
+
+        # TODO:   2011-09-20 12:59:44 by Brian McFee <bmcfee@cs.ucsd.edu>
+        # this is where markov smarts goes             
+
+        return json.encode([self.package('SOITXNB12A8C144ECD')])
 
     def package(self, song_id):
         S = {   'song_id': song_id, 
