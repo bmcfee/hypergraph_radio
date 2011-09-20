@@ -37,15 +37,15 @@ $(function() {
     $( "#trackprogress" ).slider({slide: seekTrack, animate: true, disabled: true, range: "min", step: 1});
 
     $( "#previous" )
-        .button({ text: false, icons: { primary: "ui-icon-seek-start" } })
+        .button({ text: false, icons: { primary: "ui-icon-seek-start" }, disabled: true })
         .click(previousTrack);
 
     $( "#playpause" )
-        .button({ text: false, icons: { primary: "ui-icon-play" } })
+        .button({ text: false, icons: { primary: "ui-icon-play" }, disabled: true })
         .click(playPauseMusic);
 
     $( "#next" )
-        .button({ text: false, icons: { primary: "ui-icon-seek-end" } })
+        .button({ text: false, icons: { primary: "ui-icon-seek-end" }, disabled: true })
         .click(nextTrack);
 
     $( "#clear" )
