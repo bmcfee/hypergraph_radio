@@ -1,8 +1,9 @@
 import cjson as json
 import cPickle as pickle
+import random
 
 class Root(object):
-    def __init__(self, songMeta, rdioMap):
+    def __init__(self, songMeta, rdioMap, knn):
         self.songToRdio = {}
         with open(rdioMap, 'r') as f:
             self.songToRdio = pickle.load(f)
@@ -10,6 +11,10 @@ class Root(object):
         self.songMeta = {}
         with open(songMeta, 'r') as f:
             self.songMeta = pickle.load(f)
+
+        self.knn = {}
+        with open(knn, 'r') as f:
+            self.knn = pickle.load(f)
         pass
 
     def sample(self, before, after, not_list):
@@ -19,7 +24,14 @@ class Root(object):
             return json.encode([])
 
         # TODO:   2011-09-20 12:59:44 by Brian McFee <bmcfee@cs.ucsd.edu>
-        # this is where markov smarts goes             
+        # this is where markov smarts goes  
+
+        if before in self.knn:
+            S = self.knn[before]
+            for x in not_list:
+                if x in S:
+                    S.remove(x)
+            return json.encode([self.package(random.choice(S))])
 
         return json.encode([self.package('SOITXNB12A8C144ECD')])
 

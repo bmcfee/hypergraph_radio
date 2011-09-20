@@ -6,7 +6,8 @@ body, html {
 }
 
 body {
-    background-color:   #cc0000;
+/*     background-color:   #cc0000; */
+    background-color:   #4488cc;
     margin:             0px;
     padding:            0px;
 }
@@ -80,7 +81,8 @@ li.played {
 }
 
 li.playing {
-    background-color:   #cc0000;
+/*     background-color:   #cc0000; */
+    background-color:   #4488cc;
     color:              white;
 }
 

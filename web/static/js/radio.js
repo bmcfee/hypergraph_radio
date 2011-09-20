@@ -70,10 +70,12 @@ radioListener.playStateChanged = function(playState) {
         $("#trackprogress").slider("option", "disabled", false);
     }
 
-    if (playState == 2) {
+// FIXME:  2011-09-20 14:48:48 by Brian McFee <bmcfee@cs.ucsd.edu>
+//  
+//     if (playState == 2) {
         // Stopped only happens when the current track ends
-        moveForward();
-    }
+//         moveForward();
+//     }
 }
 
 
