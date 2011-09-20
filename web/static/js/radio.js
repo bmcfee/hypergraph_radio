@@ -178,7 +178,10 @@ function importSongs(data, shouldPlay) {
 }
 
 function loadSong(song_id) {
-    $.getJSON('/queue/', {query: song_id}, function(data) { importSongs(data, $("li.playing").length == 0); });
+    $.getJSON('/queue/', {query: song_id}, function(data) { 
+                                                importSongs(data, $("li.playing").length == 0); 
+                                                updatePlayerFromList(false);
+                                            });
 }
 
 function appendSong(song) {

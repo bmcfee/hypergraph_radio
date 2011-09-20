@@ -53,7 +53,13 @@ $(function() {
         .click(clearSongQueue);
 
     $( "#playlist" )
-        .sortable({update: function(e, ui) { updatePlayerFromList(false); }})
+        .sortable({
+                update: function(e, ui) { 
+                            updatePlayerFromList(false); 
+                        },
+                scroll: true,
+                revert: 'invalid'
+        })
         .disableSelection();
 
     $( "#search" )
