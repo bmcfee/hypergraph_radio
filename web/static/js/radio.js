@@ -185,12 +185,36 @@ function loadSong(song_id) {
 }
 
 function appendSong(song) {
+
+    var li = $('<li />').addClass('playlist')
+        .append('<div class="artistName">' + song.artist + '</div>')
+        .append('<div class="songTitle">' + song.title + '</div>')
+        .append('<input type="hidden" name="rdio_id" class="rdio_id" value="' + song.rdio_id + '"/>')
+        .append('<input type="hidden" name="song_id" class="song_id" value="' + song.song_id + '"/>');
+
+    li.bind('dblclick', function() { seekTo(li); });
+
     $("#playlist")
-        .append('<li class="playlist"><span style="font-weight: bold;">' + song.artist + '</span><br>' + song.title + '<input type="hidden" name="rdio_id" class="rdio_id" value="' + song.rdio_id + '"/></li>');
+        .append(li);
+
     $("#clear")
         .button("option", "disabled", false);
+
     $("#playpause")
         .button("option", "disabled", false);
+}
+
+
+function seekTo(node) {
+    $("li.playing")
+        .removeClass('playing')
+        .addClass('playlist');
+
+    node
+        .removeClass('playlist')
+        .addClass('playing');
+
+    updatePlayerFromList(true);
 }
 
 function moveForward() {

@@ -83,3 +83,10 @@ li.playing {
     background-color:   #cc0000;
     color:              white;
 }
+
+.artistName {
+    font-weight: bold;
+}
+.songTitle {
+    font-weight: normal;
+}
