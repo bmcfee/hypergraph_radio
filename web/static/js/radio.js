@@ -145,7 +145,7 @@ radioListener.playingSomewhereElse = function() {
 
 function appendSong(song) {
     songQueue.push(song);
-    $("#queue > ul").append('<li>' + song.artist + ' - ' + song.title + '</li>');
+    $("#queue > ul").append('<li class="playlist"><span style="font-weight: bold;">' + song.artist + '</span><br>' + song.title + '</li>');
 }
 
 function clearSongQueue() {
@@ -156,11 +156,11 @@ function clearSongQueue() {
 function loadSong(song_id) {
 
     $.getJSON('/queue/', {query: song_id}, function(data) {
-        clearSongQueue();
+        shouldPlay = songQueue.length == 0;
         for (i = 0; i < data.length; i++) {
             appendSong(data[i]);
         }
-        playFromQueue();
+        shouldPlay && playFromQueue();
     });
 
 }

@@ -1,0 +1,70 @@
+body, html { 
+    font-family:        helvetica, verdana, sans-serif; 
+    font-size:          10pt;
+    height:             100%;
+    overflow:           auto;
+}
+
+body {
+    background-color:   #cc0000;
+    margin:             0px;
+    padding:            0px;
+}
+
+.ui-autocomplete-loading { 
+    background:         white url('i/loader.gif') right center no-repeat; 
+}
+
+#toolbar {
+    width:              200px;
+    text-align:         center;
+    margin:             0;
+}
+
+#album-art {
+    height:             200px;
+    width:              200px;
+    margin:             0;
+    padding:            0;
+}
+
+#main {
+    width:              60%; 
+    margin:             0px 20%; 
+    padding:            8px; 
+    height:             100%; 
+    background-color:   white; 
+    overflow:           auto;
+}
+
+#metadata {
+    width: 200px;
+    margin: 0px;
+    padding: 4px;
+}
+
+ul {
+    list-style-type:    none;
+    padding:            0;
+    margin:             0;
+}
+
+li.playlist {
+    background-color:   #fafafa;
+    margin:             0;
+    padding:            4px;
+    border-bottom:      1px solid black;
+}
+
+li.playlist:nth-child(even) {
+    background-color:   #f4f4f4;
+}
+
+li.played {
+    text-color: #080808;
+}
+
+li.playing {
+    background-color:   #cc0000;
+    text-color:         white;
+}
