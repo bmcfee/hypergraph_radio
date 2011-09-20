@@ -44,7 +44,7 @@ body {
 
 #playlistWidget {
     width:              320px;
-    height:             25%;
+    height:             75%;
     overflow-x:         hidden;
     overflow-y:         auto;
     margin:             0px;

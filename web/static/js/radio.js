@@ -170,7 +170,7 @@ function clearSongQueue() {
 
     songQueuePosition   = -1;
     songQueue           = [];
-    $("#playlist > ul > li")
+    $("#playlistWidget > ul > li")
         .remove();
 }
 
