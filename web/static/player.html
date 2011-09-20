@@ -23,6 +23,7 @@
 
         <script type="text/javascript" src="js/radio.js"></script>
         <script type="text/javascript" src="js/ui.js"></script>
+        <script type="text/javascript" src="js/jquery.scrollTo-1.4.2-min.js"></script>
 	</head>
 
     <body>
@@ -32,13 +33,13 @@
                 <input id="search" style="width: 320px;"/>
             </div>
             
-            <div style="float:right; clear: both; width:auto; margin-top: 10pt;">
+            <div style="float:right; clear: both; width:auto; margin-top: 10pt; height: 100%;">
                 <div style="float: none; clear: both; width: 320px;">
                     <span style="font-weight: bold;">Playlist</span>
                 </div>
 
-                <div id="queue">
-                    <ul style="margin: 0px;" id="playlistWidget"></ul>
+                <div id="playlistWidget">
+                    <ul class="playlist"></ul>
                 </div>
                 <button id="clear" style="float: right; font-size: 8pt;">Clear</button>
             </div>

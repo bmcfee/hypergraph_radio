@@ -170,7 +170,7 @@ function clearSongQueue() {
 
     songQueuePosition   = -1;
     songQueue           = [];
-    $("#queue > ul > li")
+    $("#playlist > ul > li")
         .remove();
 }
 
@@ -188,7 +188,7 @@ function loadSong(song_id) {
 function appendSong(song) {
     songQueue.push(song);
 
-    $("#queue > ul")
+    $("#playlistWidget > ul")
         .append('<li class="playlist"><span style="font-weight: bold;">' + song.artist + '</span><br>' + song.title + '</li>');
     $("#clear")
         .button("option", "disabled", false);
@@ -224,17 +224,17 @@ function revertQueue() {
 }
 
 function updatePlaylistStyle() {
-    $("#playlistWidget li:lt(" + songQueuePosition + ")")
+    $("ul.playlist li:lt(" + songQueuePosition + ")")
         .removeClass("playing")
         .removeClass("playlist")
         .addClass("played");
 
-    $("#playlistWidget li:eq(" + songQueuePosition + ")")
+    $("ul.playlist li:eq(" + songQueuePosition + ")")
         .removeClass("playlist")
         .removeClass("played")
         .addClass("playing");
 
-    $("#playlistWidget li:gt(" + songQueuePosition + ")")
+    $("ul.playlist li:gt(" + songQueuePosition + ")")
         .removeClass("played")
         .removeClass("playing")
         .addClass("playlist")
@@ -243,6 +243,8 @@ function updatePlaylistStyle() {
         .button("option", "disabled", songQueuePosition == 0);
     $("#next")
         .button("option", "disabled", songQueuePosition == songQueue.length - 1);
+
+    $("#playlistWidget").scrollTo($("ul.playlist li:eq(" + songQueuePosition + ")"));
 }
 
 function initRdioPlayer() {
