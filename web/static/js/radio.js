@@ -49,8 +49,6 @@ radioListener.ready = function() {
 
     player = $("#player").get(0);
     console.log('Ready to play.');
-    // Add to the queue?
-//     loadSongs();
 }
 
 radioListener.playStateChanged = function(playState) {
@@ -146,36 +144,41 @@ radioListener.playingSomewhereElse = function() {
 function appendSong(song) {
     songQueue.push(song);
     $("#queue > ul").append('<li class="playlist"><span style="font-weight: bold;">' + song.artist + '</span><br>' + song.title + '</li>');
+    $("#clear").button("option", "disabled", false);
+}
+
+function resetPlayer() {
+    stopMusic();
+
+    $("#clear")
+        .button("option", "disabled", true);
+    
+    $("#trackprogress")
+        .slider("option", "disabled", true)
+        .slider("option", "value", 0);
+
+    $("#song-title").text('');
+    $("#artist-name").text('');
+    $("#album-art").html("<img src='/i/big-loader.gif' alt='' style='width:32px; height:32px; padding:84px' />");
+
 }
 
 function clearSongQueue() {
     songQueue = [];
     $("#queue > ul > li").remove();
+
+    resetPlayer();
+}
+
+function importSongs(data, shouldPlay) {
+    for (i = 0; i < data.length; i++) {
+        appendSong(data[i]);
+    }
+    shouldPlay && playFromQueue();
 }
 
 function loadSong(song_id) {
-
-    $.getJSON('/queue/', {query: song_id}, function(data) {
-        shouldPlay = songQueue.length == 0;
-        for (i = 0; i < data.length; i++) {
-            appendSong(data[i]);
-        }
-        shouldPlay && playFromQueue();
-    });
-
-}
-
-function loadSongs() {
-
-    clearSongQueue();
-
-    $.getJSON('/playlist/', {}, function(data) {
-
-        for (i = 0; i < data.length; i++) {
-            appendSong(data[i]);
-        }
-        playFromQueue();
-    });
+    $.getJSON('/queue/', {query: song_id}, function(data) { importSongs(data, songQueue.length < 1); });
 }
 
 function playFromQueue() {

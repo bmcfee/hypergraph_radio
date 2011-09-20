@@ -48,6 +48,10 @@ $(function() {
         .button({ text: false, icons: { primary: "ui-icon-seek-end" } })
         .click(nextTrack);
 
+    $( "#clear" )
+        .button({ text: false, icons: { primary: "ui-icon-trash"}, disabled: true })
+        .click(clearSongQueue);
+
     $( "#search" )
         .autocomplete({
             source: function( request, response ) {

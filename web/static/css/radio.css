@@ -12,7 +12,7 @@ body {
 }
 
 .ui-autocomplete-loading { 
-    background:         white url('i/loader.gif') right center no-repeat; 
+    background:         white url('/i/loader.gif') right center no-repeat; 
 }
 
 #toolbar {
