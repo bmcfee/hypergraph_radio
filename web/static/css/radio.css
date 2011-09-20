@@ -90,3 +90,7 @@ li.playing {
 .songTitle {
     font-weight: normal;
 }
+
+.hidden {
+    display: none;
+}

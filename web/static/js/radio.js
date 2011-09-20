@@ -184,15 +184,49 @@ function loadSong(song_id) {
                                             });
 }
 
+function deleteSong(node) {
+    console.log('Deleting song: ' + node.find('input.song_id').val());
+
+    if (node.hasClass('playing')) {
+        if (node.next().length > 0) {
+            moveForward();
+            node.remove();
+        } else if (node.prev().length > 0) {
+            moveBack();
+            node.remove();
+        } else {
+            clearSongQueue();
+        }
+    } else {
+        node.remove();
+        updatePlayerFromList(false);
+    }
+}
+
 function appendSong(song) {
 
-    var li = $('<li />').addClass('playlist')
+    var delButton = $('<button style="float: right; font-size: 8pt;"/>')
+        .button({text: false, icons: {primary: 'ui-icon-minus'}})
+        .click(function() { deleteSong( $(this).parent() ); });
+
+    var li = $('<li />')
+        .addClass('playlist')
+        .append(delButton)
         .append('<div class="artistName">' + song.artist + '</div>')
         .append('<div class="songTitle">' + song.title + '</div>')
         .append('<input type="hidden" name="rdio_id" class="rdio_id" value="' + song.rdio_id + '"/>')
         .append('<input type="hidden" name="song_id" class="song_id" value="' + song.song_id + '"/>');
 
-    li.bind('dblclick', function() { seekTo(li); });
+    li.find('button')
+        .addClass('hidden');
+
+    li.bind('dblclick', function() { seekTo( $(this) ); });
+
+    li.hover(function(e) {
+        $(this).find('button').removeClass('hidden');
+    }, function(e) {
+        $(this).find('button').addClass('hidden');
+    });
 
     $("#playlist")
         .append(li);
