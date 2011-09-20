@@ -3,7 +3,7 @@ import cPickle as pickle
 import random
 
 class Root(object):
-    def __init__(self, songMeta, rdioMap, knn):
+    def __init__(self, songMeta, rdioMap, model):
         self.songToRdio = {}
         with open(rdioMap, 'r') as f:
             self.songToRdio = pickle.load(f)
@@ -12,9 +12,9 @@ class Root(object):
         with open(songMeta, 'r') as f:
             self.songMeta = pickle.load(f)
 
-        self.knn = {}
-        with open(knn, 'r') as f:
-            self.knn = pickle.load(f)
+        self.model = {}
+        with open(model, 'r') as f:
+            self.model = pickle.load(f)
         pass
 
     def sample(self, before, after, not_list):
@@ -26,8 +26,8 @@ class Root(object):
         # TODO:   2011-09-20 12:59:44 by Brian McFee <bmcfee@cs.ucsd.edu>
         # this is where markov smarts goes  
 
-        if before in self.knn:
-            S = self.knn[before]
+        if before in self.model:
+            S = self.model[before]
             for x in not_list:
                 if x in S:
                     S.remove(x)
