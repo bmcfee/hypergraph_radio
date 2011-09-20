@@ -195,7 +195,7 @@ function appendSong(song) {
     $("#playpause")
         .button("option", "disabled", false);
     $("#next")
-        .button("option", "disabled", songQueue.length - 1 > songQueuePosition);
+        .button("option", "disabled", songQueue.length - 1 <= songQueuePosition);
 }
 
 function advanceQueue() {
