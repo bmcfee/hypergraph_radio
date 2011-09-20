@@ -52,6 +52,10 @@ $(function() {
         .button({ text: false, icons: { primary: "ui-icon-trash"}, disabled: true })
         .click(clearSongQueue);
 
+    $( "#playlist" )
+        .sortable({update: function(e, ui) { updatePlayerFromList(false); }})
+        .disableSelection();
+
     $( "#search" )
         .autocomplete({
             source: function( request, response ) {

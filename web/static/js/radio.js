@@ -3,8 +3,6 @@ var player = null;
 var paused = true;
 
 var trackDuration       = 0;
-var songQueue           = [];
-var songQueuePosition   = -1;
 
 function playPauseMusic() {
     if (player == null) {
@@ -28,13 +26,13 @@ function stopMusic() {
 
 function previousTrack() {
     if (player != null) {
-        revertQueue();
+        moveBack();
     }
 }
 
 function nextTrack() {
     if (player != null) {
-        advanceQueue();
+        moveForward();
     }
 }
 
@@ -168,9 +166,7 @@ function resetPlayer() {
 function clearSongQueue() {
     resetPlayer();
 
-    songQueuePosition   = -1;
-    songQueue           = [];
-    $("#playlistWidget > ul > li")
+    $("#playlist  > li")
         .remove();
 }
 
@@ -178,73 +174,83 @@ function importSongs(data, shouldPlay) {
     for (i = 0; i < data.length; i++) {
         appendSong(data[i]);
     }
-    shouldPlay && advanceQueue();
+    shouldPlay && moveForward();
 }
 
 function loadSong(song_id) {
-    $.getJSON('/queue/', {query: song_id}, function(data) { importSongs(data, songQueue.length < 1); });
+    $.getJSON('/queue/', {query: song_id}, function(data) { importSongs(data, $("li.playing").length == 0); });
 }
 
 function appendSong(song) {
-    songQueue.push(song);
-
-    $("#playlistWidget > ul")
-        .append('<li class="playlist"><span style="font-weight: bold;">' + song.artist + '</span><br>' + song.title + '</li>');
+    $("#playlist")
+        .append('<li class="playlist"><span style="font-weight: bold;">' + song.artist + '</span><br>' + song.title + '<input type="hidden" name="rdio_id" class="rdio_id" value="' + song.rdio_id + '"/></li>');
     $("#clear")
         .button("option", "disabled", false);
     $("#playpause")
         .button("option", "disabled", false);
-    $("#next")
-        .button("option", "disabled", songQueue.length - 1 <= songQueuePosition);
 }
 
-function advanceQueue() {
-    if (songQueue.length < 1 || songQueuePosition == songQueue.length - 1) {
-        return;
+function moveForward() {
+    var currentlyPlaying = $("li.playing");
+
+    if (currentlyPlaying.length > 0) {
+    
+        var next = currentlyPlaying.next();
+
+        if (next.length > 0) {
+            currentlyPlaying
+                .removeClass('playing')
+                .addClass('playlist');
+
+            next
+                .removeClass('playlist')
+                .addClass('playing');
+
+            updatePlayerFromList(true);
+        }
+    } else {
+        $("li.playlist:first")
+            .removeClass('playlist')
+            .addClass('playing');
+        updatePlayerFromList(true);
+    }
+}
+
+function moveBack() {
+    var currentlyPlaying = $("li.playing");
+
+    if (currentlyPlaying.length > 0) {
+        
+        var prev = currentlyPlaying.prev();
+
+        if (prev.length > 0) {
+            currentlyPlaying
+                .removeClass('playing')
+                .addClass('playlist');
+            prev
+                .removeClass('playlist')
+                .addClass('playing');
+
+            updatePlayerFromList(true);
+        }
+    }
+}
+
+function updatePlayerFromList(changePlayer) {
+    var playing_node    = $("li.playing");
+    var rdio_id         = $("li.playing > input.rdio_id").val();
+
+    if (changePlayer && rdio_id != undefined) { 
+        player.rdio_play( rdio_id ); 
+        $("#playlistWidget").scrollTo($("li.playing"));
     }
 
-    songQueuePosition++;
-    song = songQueue[songQueuePosition];
-    player.rdio_play(song.rdio_id);
-
-    updatePlaylistStyle();
-}
-
-function revertQueue() {
-
-    if (songQueue.length < 1 || songQueuePosition == 0) {
-        return;
-    }
-
-    songQueuePosition--;
-    song = songQueue[songQueuePosition];
-    player.rdio_play(song.rdio_id);
-
-    updatePlaylistStyle();
-}
-
-function updatePlaylistStyle() {
-    $("ul.playlist li:lt(" + songQueuePosition + ")")
-        .removeClass("playing")
-        .removeClass("playlist")
-        .addClass("played");
-
-    $("ul.playlist li:eq(" + songQueuePosition + ")")
-        .removeClass("playlist")
-        .removeClass("played")
-        .addClass("playing");
-
-    $("ul.playlist li:gt(" + songQueuePosition + ")")
-        .removeClass("played")
-        .removeClass("playing")
-        .addClass("playlist")
-
+    
     $("#previous")
-        .button("option", "disabled", songQueuePosition == 0);
+        .button("option", "disabled", playing_node.prev().length == 0);
     $("#next")
-        .button("option", "disabled", songQueuePosition == songQueue.length - 1);
-
-    $("#playlistWidget").scrollTo($("ul.playlist li:eq(" + songQueuePosition + ")"));
+        .button("option", "disabled", playing_node.next().length == 0);
+    
 }
 
 function initRdioPlayer() {
