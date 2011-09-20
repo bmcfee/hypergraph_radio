@@ -1,0 +1,85 @@
+body, html { 
+    font-family:        helvetica, verdana, sans-serif; 
+    font-size:          10pt;
+    height:             100%;
+    overflow:           hidden;
+}
+
+body {
+    background-color:   #cc0000;
+    margin:             0px;
+    padding:            0px;
+}
+
+.ui-autocomplete-loading { 
+    background:         white url('/i/loader.gif') right center no-repeat; 
+}
+
+#toolbar {
+    width:              200px;
+    text-align:         center;
+    margin:             0;
+}
+
+#album-art {
+    height:             200px;
+    width:              200px;
+    margin:             0;
+    padding:            0;
+}
+
+#main {
+    width:              60%; 
+    margin:             0px 20%; 
+    padding:            8px; 
+    height:             100%; 
+    background-color:   white; 
+}
+
+#metadata {
+    width: 200px;
+    margin: 0px;
+    padding: 4px;
+}
+
+#playlistWidget {
+    width:              320px;
+    height:             75%;
+    overflow-x:         hidden;
+    overflow-y:         auto;
+    margin:             0px;
+    text-align:         left;
+    border:             1px solid black;
+}
+
+ul.playlist {
+    list-style-type:    none;
+    padding:            0;
+    margin:             0;
+}
+
+li.playlist, li.played, li.playing {
+    margin:             0;
+    padding:            4px;
+    border-top:         1px solid black;
+}
+li.playlist {
+    background-color:   #fafafa;
+}
+
+li.playlist:nth-child(1), li.played:nth-child(1) {
+    border-top:     0px;
+}
+
+li.playlist:nth-child(even), li.played:nth-child(even) {
+    background-color:   #f4f4f4;
+}
+
+li.played {
+    color:              #707070;
+}
+
+li.playing {
+    background-color:   #cc0000;
+    color:              white;
+}

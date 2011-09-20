@@ -1,9 +1,13 @@
 [server]
-root=/PATH/TO/radio/web
+root=/PATH/TO/radio/web/
 static=static
-text_index=data/index
+text_index=data/index_filtered
+rdio_index=data/songToRdio.pickle
 
 [rdio]
-api_key=YOUR_API_KEY
-secret=YOUR_SECRET_KEY
-domain=YOUR_DOMAIN
+api_key=YOUR_RDIO_API
+secret=YOUR_RDIO_SECRET
+domain=YOUR_HOST
+
+[echonest]
+api_key=YOUR_ECHONEST_API

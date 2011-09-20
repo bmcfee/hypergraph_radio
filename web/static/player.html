@@ -4,112 +4,68 @@
 		<title>Reboot radio</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 
-		<script type="text/javascript" src="js/swfobject.js"></script>
         <script type="text/javascript" src="http://www.google.com/jsapi"></script> 
-        <script type="text/javascript"> google.load("jquery", "1.6.2"); </script>
-        <script type="text/javascript"> google.load("jqueryui", "1.8.16"); </script> 
+        <script type="text/javascript"> google.load("swfobject", "2.2");    </script>
+        <script type="text/javascript"> google.load("jquery", "1.6.2");     </script>
+        <script type="text/javascript"> google.load("jqueryui", "1.8.16");  </script> 
+
+        <link   rel     ="stylesheet"
+                href    ="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css"
+                type    ="text/css"
+                media   ="all"
+        />
+
+        <link   rel     ="stylesheet"
+                href    ="css/radio.css"
+                type    ="text/css"
+                media   ="all"
+        />
+
         <script type="text/javascript" src="js/radio.js"></script>
-        
-        <link   rel     ="stylesheet" 
-                href    ="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" 
-                type    ="text/css" 
-                media   ="all" 
-        /> 
-
-        <link   rel     ="stylesheet" 
-                href    ="http://static.jquery.com/ui/css/demo-docs-theme/ui.theme.css" 
-                type    ="text/css" 
-                media   ="all" 
-        /> 
-
-        <style type="text/css">
-            body, html { 
-                font-family:    helvetica,verdana,sans-serif; 
-                font-size:      90%;
-            }
-            .ui-autocomplete-loading { 
-                background: white url('i/loader.gif') right center no-repeat; 
-            }
-            #toolbar {
-                margin: 6px 12px;
-            }
-        </style>
-
-		<script type="text/javascript">
-            $(function() {
-                $( "#trackprogress" ).slider({slide: seekTrack, animate: true, disabled: true, range: "min", step: 1});
-
-                $( "#previous" )
-                    .button({ text: false, icons: { primary: "ui-icon-seek-start" } })
-                    .click(previousTrack);
-
-                $( "#playpause" )
-                    .button({ text: false, icons: { primary: "ui-icon-play" } })
-                    .click(playPauseMusic);
-
-                $( "#next" )
-                    .button({ text: false, icons: { primary: "ui-icon-seek-end" } })
-                    .click(nextTrack);
-
-                $( "#search" )
-                    .autocomplete({
-                        source: function( request, response ) {
-                            $.ajax({
-                                url:        "/search/",
-                                dataType:   "json",
-                                data:       { query: request.term },
-                                success:    response 
-                            });
-                        },
-                        minLength: 0,
-                        select: function( event, ui ) {
-                            if (ui.item) {
-                                loadSong(ui.item.song_id);
-                            }
-                            console.log( ui.item ?
-                                "Selected: [" + ui.item.song_id + "] " + ui.item.artist + ' - ' + ui.item.title:
-                                "Nothing selected, input was " + this.value );
-                            }
-                    })
-                    .data( "autocomplete" )._renderItem = function( ul, item ) {
-                        return $( "<li></li>" )
-                                .data( "item.autocomplete", item )
-                                .append( "<a><b>" + item.artist + "</b><br>" + item.title + "</a>" )
-                                .appendTo( ul );
-                        };
-                
-                initRdioPlayer();
-            });
-		</script>
+        <script type="text/javascript" src="js/ui.js"></script>
+        <script type="text/javascript" src="js/jquery.scrollTo-1.4.2-min.js"></script>
 	</head>
 
     <body>
-        <div style="width: 60%; margin: 16px 20%;">
-            <div class="ui-widget" style="float:right;">
+        <div id="main">
+            <div class="ui-widget" style="float:right; width:auto;">
                 <label for="search">Search: </label>
-                <input id="search" />
+                <input id="search" style="width: 320px;"/>
+            </div>
+            
+            <div style="float:right; clear: both; width:auto; margin-top: 10pt; height: 100%;">
+                <div style="float: none; clear: both; width: 320px;">
+                    <span style="font-weight: bold;">Playlist</span>
+                </div>
+
+                <div id="playlistWidget">
+                    <ul class="playlist"></ul>
+                </div>
+                <button id="clear" style="float: right; font-size: 8pt;">Clear</button>
             </div>
 
             <div>
-                <div id="album-art" style="height=256px; width=256px; margin:0; padding:0;"></div>
-
-                <div id="toolbar" class="ui-widget-header ui-corner-all" style="width: 200px; margin:0;">
-                    <button id="previous">Previous</button>
-                    <button id="playpause">Play/pause</button>
-                    <button id="next">Next</button>
+                <div id="album-art">
+                    <img src="i/big-loader.gif" alt="" style="width:32px; height:32px; padding:84px"/>
                 </div>
 
-                <div id="artist-name" style="height=20px; width=200px; font-weight: bold;"></div>
-                <div id="song-title" style="height=20px; width=200px;"></div>
-            
-                <div id="player"></div>
+                <div id="toolbar" class="ui-widget-header ui-corner-all">
+                    <button id="previous">  Previous    </button>
+                    <button id="playpause"> Play/pause  </button>
+                    <button id="next">      Next        </button>
+                </div>
 
+                <div id="metadata">
+                    <div id="artist-name" style="font-weight: bold;"></div>
+                    <div id="song-title"></div>
+                </div>
+            
                 <div    class="ui-progressbar ui-widget ui-widget-content ui-corner-all" 
                         style="width: 200px; height:10px;">
-                    <div    id      ="trackprogress" 
-                            class   ="ui-progressbar-value">
-                    </div>
+                    <div    id      ="trackprogress" class   ="ui-progressbar-value"></div>
                 </div>
+
+                <div id="player"></div>
             </div>
         </div>
     </body>
