@@ -3,11 +3,13 @@ root=/PATH/TO/radio/web/
 static=static
 text_index=data/index_filtered
 rdio_index=data/songToRdio.pickle
+song_meta=data/songToMeta.pickle
+playlist_model=data/subset_rdio_50nn.pickle
 
 [rdio]
-api_key=YOUR_RDIO_API
+api_key=YOUR_RDIO_KEY
 secret=YOUR_RDIO_SECRET
-domain=YOUR_HOST
+domain=YOUR_RDIO_HOST
 
 [echonest]
-api_key=YOUR_ECHONEST_API
+api_key=YOUR_ECHONEST_KEY
