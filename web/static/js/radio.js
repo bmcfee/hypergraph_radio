@@ -69,6 +69,11 @@ radioListener.playStateChanged = function(playState) {
     if (playState != 2) {
         $("#trackprogress").slider("option", "disabled", false);
     }
+
+    if (playState == 2) {
+        // Stopped only happens when the current track ends
+        moveForward();
+    }
 }
 
 
@@ -83,9 +88,14 @@ radioListener.playingTrackChanged = function(playingTrack, sourcePosition) {
 
     trackDuration = playingTrack.duration;
 
-    $("#song-title").text(playingTrack.name);
-    $("#artist-name").text(playingTrack.artist);
-    $("#album-art").html("<img id='album-art-img' style='width: 200px; height: 200px;' src='" + playingTrack.icon + "'/>");
+    $("#song-title")
+        .text(playingTrack.name);
+
+    $("#artist-name")
+        .text(playingTrack.artist);
+
+    $("#album-art")
+        .html("<img id='album-art-img' style='width: 200px; height: 200px;' src='" + playingTrack.icon + "'/>");
 }
 
 radioListener.playingSourceChanged = function(playingSource) {
