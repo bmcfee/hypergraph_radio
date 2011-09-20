@@ -205,7 +205,7 @@ function deleteSong(node) {
     }
 }
 
-function askForSongs(node) {
+function askForSongs(node, deleteAfter) {
 
     var before_id   = node.find('.song_id').val();
     var after_id    = node.next().find('.song_id').val();
@@ -224,6 +224,9 @@ function askForSongs(node) {
                     for (var i = data.length - 1; i >= 0; i--) {
                         node.after(createSongNode(data[i]));
                     }
+                    if (deleteAfter) {
+                        deleteSong(node);
+                    }
                     updatePlayerFromList(false);
                 }, 'json');
 }
@@ -237,16 +240,24 @@ function expandPlaylist() {
 function createSongNode(song) {
 
     var delButton = $('<button style="float: right; font-size: 8pt; z-index: 1;"/>')
+        .text('Delete this song')
         .button({text: false, icons: {primary: 'ui-icon-cancel'}})
         .click(function() { deleteSong( $(this).parent() ); });
 
     var addButton = $('<button style="float: right; font-size: 8pt; z-index: 1;"/>')
+        .text('Add a song')
         .button({text: false, icons: {primary: 'ui-icon-plusthick'}})
-        .click(function() { askForSongs( $(this).parent() ); });
+        .click(function() { askForSongs( $(this).parent(), false ); });
+
+    var replaceButton = $('<button style="float: right; font-size: 8pt; z-index: 1;"/>')
+        .text('Replace this song')
+        .button({text: false, icons: {primary: 'ui-icon-arrowreturnthick-1-w'}})
+        .click(function() { askForSongs( $(this).parent(), true ); });
 
     var li = $('<li />')
         .addClass('playlist')
         .append(delButton)
+        .append(replaceButton)
         .append(addButton)
         .append('<div class="artistName">' + song.artist + '</div>')
         .append('<div class="songTitle">' + song.title + '</div>')
