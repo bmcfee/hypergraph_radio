@@ -9,6 +9,8 @@ function playPauseMusic() {
         return;
     }
 
+    startMusic();
+
     if (paused) {
         paused = false;
         player.rdio_play();
@@ -18,10 +20,30 @@ function playPauseMusic() {
     }
 }
 
+function startMusic() {
+
+    if ($("li.playing").length == 0) {
+        moveForward();
+    }
+}
+
 function stopMusic() {
     if (player != null) {
         player.rdio_stop();
     }
+    $("li.playing")
+        .removeClass("playing")
+        .addClass("playlist");
+    resetPlayerDisplay();
+}
+
+function resetPlayerDisplay() {
+    $("#song-title")
+        .text('');
+    $("#artist-name")
+        .text('');
+    $("#album-art")
+        .html("<img src='/i/big-loader.gif' alt='' style='width:32px; height:32px; padding:84px' />");
 }
 
 function previousTrack() {
@@ -70,12 +92,6 @@ radioListener.playStateChanged = function(playState) {
         $("#trackprogress").slider("option", "disabled", false);
     }
 
-// FIXME:  2011-09-20 14:48:48 by Brian McFee <bmcfee@cs.ucsd.edu>
-//  
-//     if (playState == 2) {
-        // Stopped only happens when the current track ends
-//         moveForward();
-//     }
 }
 
 
@@ -84,6 +100,9 @@ radioListener.playingTrackChanged = function(playingTrack, sourcePosition) {
     //  Track metadata is provided as playingTrack and the position within the playing source as sourcePosition.
 
     if (playingTrack == null) {
+        // we're all out of tracks
+        resetPlayerDisplay();
+        
         return;
     }
     console.log('Playing: ' + playingTrack.artist + ' - ' + playingTrack.name );
@@ -104,6 +123,13 @@ radioListener.playingSourceChanged = function(playingSource) {
     //  The currently playing source changed. 
     //  The source metadata, including a track listing is inside playingSource.
 //     console.log('New source: ' + JSON.stringify(playingSource));
+    if (playingSource == null) {
+        if ($("li.playing").next().length > 0) {
+            moveForward();
+        } else {
+            stopMusic();
+        }
+    }
 }
 
 radioListener.volumeChanged = function(volume) {
@@ -167,13 +193,6 @@ function resetPlayer() {
         .slider("option", "value", 0);
     $("#expand")
         .button("option", "disabled", true);
-
-    $("#song-title")
-        .text('');
-    $("#artist-name")
-        .text('');
-    $("#album-art")
-        .html("<img src='/i/big-loader.gif' alt='' style='width:32px; height:32px; padding:84px' />");
 
 }
 
