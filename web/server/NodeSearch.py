@@ -23,3 +23,12 @@ class Root(object):
 
             return json.encode(output)
         pass
+
+    def tags(self, query):
+
+        with self.index.searcher() as search:
+            results = search.document(song_id=query)
+            if results is None:
+                return json.encode([])
+            else:
+                return json.encode(results['terms'].split(','))

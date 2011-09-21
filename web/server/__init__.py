@@ -55,6 +55,10 @@ class Root:
         return self._search.search(query + '*')
 
     @cherrypy.expose
+    def tags(self, query=None):
+        return self._search.tags(query)
+
+    @cherrypy.expose
     def index(self):
         return serve_file(os.path.join(self.staticdir, 'player.html'), content_type='text/html')
         pass

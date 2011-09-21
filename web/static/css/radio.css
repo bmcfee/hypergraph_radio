@@ -99,3 +99,11 @@ li.playing {
 .hidden {
     display: none;
 }
+
+#tags {
+    width:      200px;
+    text-align: justify;
+    font-weight: bold;
+    color:      #4488cc;
+    margin-top: 4px;
+}

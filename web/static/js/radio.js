@@ -44,6 +44,8 @@ function resetPlayerDisplay() {
         .text('');
     $("#album-title")
         .text('');
+    $("#tags")
+        .text('');
     $("#album-art")
         .html("<img src='/i/big-loader.gif' alt='' style='width:32px; height:32px; padding:84px' />");
 }
@@ -401,9 +403,18 @@ function moveBack() {
     }
 }
 
+function getTags(song_id) {
+    $.getJSON('/tags/', {query: song_id}, function(data) { 
+        $("#tags")
+            .text(data.join(' '));
+    });
+
+}
+
 function updatePlayerFromList(changePlayer) {
     var playing_node    = $("li.playing");
     var rdio_id         = $("li.playing > input.rdio_id").val();
+    var song_id         = $("li.playing > input.song_id").val();
 
     if (changePlayer && rdio_id != undefined) { 
         player.rdio_play( rdio_id ); 
@@ -416,6 +427,7 @@ function updatePlayerFromList(changePlayer) {
     $("#next")
         .button("option", "disabled", playing_node.next().length == 0);
     
+    getTags(song_id);
 }
 
 function initRdioPlayer() {
