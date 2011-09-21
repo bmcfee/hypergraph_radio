@@ -1,6 +1,8 @@
 // CREATED:2011-09-19 09:00:10 by Brian McFee <bmcfee@cs.ucsd.edu>
 // UI control code for the radio 
 
+var infiniteRadio = true;
+
 // Handle keyboard events
 $(document).keydown(function (e) {
 
@@ -32,6 +34,22 @@ $(document).keydown(function (e) {
     }
 });
 
+function toggleRadio(buttonNode) {
+
+    infiniteRadio = ! infiniteRadio;
+
+    console.log("Infinite radio is now: " + infiniteRadio);
+    buttonNode
+        .button("option", "icons", { primary: infiniteRadio ? "ui-icon-signal-diag" : "ui-icon-link" })
+        .button("option", "label", "Radio " + (infiniteRadio ? "ON" : "OFF"));
+
+    if (infiniteRadio && $("li.playing").length > 0 && $("li.playing").next().length == 0) {
+        // radio mode was enabled while we were on the last song.  add a track.
+        expandPlaylist();
+    }
+
+}
+
 // Initialize control widgets and start the player
 $(function() {
     $( "#trackprogress" ).slider({slide: seekTrack, animate: true, disabled: true, range: "min", step: 1});
@@ -51,6 +69,13 @@ $(function() {
     $( "#clear" )
         .button({ text: false, icons: { primary: "ui-icon-trash"}, disabled: true })
         .click(clearSongQueue);
+
+    $( "#toolbar" )
+        .buttonset();
+
+    $( "#infinite" )
+        .button({ label: "Radio " + (infiniteRadio ? "ON" : "OFF"), icons: { primary: "ui-icon-signal-diag"}, disabled: false})
+        .click(function() {toggleRadio($(this));});
 
     $( "#expand" )
         .button({ text: false, icons: { primary: "ui-icon-triangle-1-s"}, disabled: true })

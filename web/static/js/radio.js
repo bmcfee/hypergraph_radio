@@ -104,6 +104,9 @@ radioListener.playingTrackChanged = function(playingTrack, sourcePosition) {
         resetPlayerDisplay();
         
         return;
+    } else if ( infiniteRadio && $("li.playing").next().length == 0 ) {
+        // we're on the last track, but in radio mode.. add another
+        expandPlaylist();
     }
     console.log('Playing: ' + playingTrack.artist + ' - ' + playingTrack.name );
 
@@ -270,26 +273,30 @@ function expandPlaylist() {
 
 function createSongNode(song) {
 
-    var delButton = $('<button style="float: right; font-size: 8pt; z-index: 1;"/>')
+    var delButton = $('<button />')
         .text('Delete this song')
         .button({text: false, icons: {primary: 'ui-icon-cancel'}})
-        .click(function() { deleteSong( $(this).parent() ); });
+        .click(function() { deleteSong( $(this).parents('li') ); });
 
-    var addButton = $('<button style="float: right; font-size: 8pt; z-index: 1;"/>')
+    var addButton = $('<button />')
         .text('Add a song')
         .button({text: false, icons: {primary: 'ui-icon-plusthick'}})
-        .click(function() { askForSongs( $(this).parent(), false ); });
+        .click(function() { askForSongs( $(this).parents('li'), false ); });
 
-    var replaceButton = $('<button style="float: right; font-size: 8pt; z-index: 1;"/>')
+    var replaceButton = $('<button />')
         .text('Replace this song')
         .button({text: false, icons: {primary: 'ui-icon-arrowreturnthick-1-w'}})
-        .click(function() { askForSongs( $(this).parent(), true ); });
+        .click(function() { askForSongs( $(this).parents('li'), true ); });
+
+    var bs = $('<div style="float: right; text-align: left;"></div>')
+                    .append(addButton)
+                    .append(replaceButton)
+                    .append(delButton)
+                    .buttonset();
 
     var li = $('<li />')
         .addClass('playlist')
-        .append(delButton)
-        .append(replaceButton)
-        .append(addButton)
+        .append(bs)
         .append('<div class="artistName">' + song.artist + '</div>')
         .append('<div class="songTitle">' + song.title + '</div>')
         .append('<input type="hidden" name="rdio_id" class="rdio_id" value="' + song.rdio_id + '"/>')
