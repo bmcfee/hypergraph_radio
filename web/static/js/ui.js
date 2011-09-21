@@ -1,12 +1,11 @@
 // CREATED:2011-09-19 09:00:10 by Brian McFee <bmcfee@cs.ucsd.edu>
 // UI control code for the radio 
 
-var infiniteRadio = true;
+var infiniteRadio   = true;
+var volumeOn        = true;
 
 // Handle keyboard events
 $(document).keydown(function (e) {
-
-
     switch (e.which) {
 
         case $.ui.keyCode.LEFT:
@@ -36,7 +35,7 @@ $(document).keydown(function (e) {
 
 function toggleRadio(buttonNode) {
 
-    infiniteRadio = ! infiniteRadio;
+    infiniteRadio ^= 1;
 
     console.log("Infinite radio is now: " + infiniteRadio);
     buttonNode
@@ -48,6 +47,16 @@ function toggleRadio(buttonNode) {
         expandPlaylist();
     }
 
+}
+
+function toggleVolume(buttonNode) {
+
+    volumeOn ^= 1;
+
+    buttonNode
+        .button("option", "icons", { primary: volumeOn ? "ui-icon-volume-on" : "ui-icon-volume-off" });
+
+    setMute(volumeOn);
 }
 
 // Initialize control widgets and start the player
@@ -69,6 +78,10 @@ $(function() {
     $( "#clear" )
         .button({ text: false, icons: { primary: "ui-icon-trash"}, disabled: true })
         .click(clearSongQueue);
+
+    $( "#volume" )
+        .button({ text: false, icons: { primary: "ui-icon-volume-on"}, disabled: true })
+        .click(function() {toggleVolume($(this));});
 
     $( "#toolbar" )
         .buttonset();

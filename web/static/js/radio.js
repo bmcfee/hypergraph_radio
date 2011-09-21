@@ -42,6 +42,8 @@ function resetPlayerDisplay() {
         .text('');
     $("#artist-name")
         .text('');
+    $("#album-title")
+        .text('');
     $("#album-art")
         .html("<img src='/i/big-loader.gif' alt='' style='width:32px; height:32px; padding:84px' />");
 }
@@ -65,8 +67,16 @@ function seekTrack() {
     }
 }
 
+function setMute(volume) {
+    if (player != null) {
+        player.rdio_setMute(! volume);
+    }
+}
+
 radioListener.ready = function() {
     radioListener.is_ready = true;
+    $("#volume")
+        .button("option", "disabled", false);
 
     player = $("#player").get(0);
     console.log('Ready to play.');
@@ -118,6 +128,9 @@ radioListener.playingTrackChanged = function(playingTrack, sourcePosition) {
     $("#artist-name")
         .text(playingTrack.artist);
 
+    $("#album-title")
+        .text(playingTrack.album);
+
     $("#album-art")
         .html("<img id='album-art-img' style='width: 200px; height: 200px;' src='" + playingTrack.icon + "'/>");
 }
@@ -125,7 +138,6 @@ radioListener.playingTrackChanged = function(playingTrack, sourcePosition) {
 radioListener.playingSourceChanged = function(playingSource) {
     //  The currently playing source changed. 
     //  The source metadata, including a track listing is inside playingSource.
-//     console.log('New source: ' + JSON.stringify(playingSource));
     if (playingSource == null) {
         if ($("li.playing").next().length > 0) {
             moveForward();
