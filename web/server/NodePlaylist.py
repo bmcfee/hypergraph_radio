@@ -28,9 +28,14 @@ class Root(object):
 
         if before in self.model:
             S = self.model[before]
-            for x in not_list:
-                if x in S:
-                    S.remove(x)
+            while True:
+                if len(S) == 0:
+                    break
+                x = random.choice(S)
+                if x not in not_list:
+                    return json.encode([self.package(x)])
+                S.remove(x)
+
             return json.encode([self.package(random.choice(S))])
 
         return json.encode([self.package('SOITXNB12A8C144ECD')])
