@@ -273,25 +273,25 @@ function expandPlaylist() {
 
 function createSongNode(song) {
 
-    var delButton = $('<button />')
+    var delButton = $('<button style="float: right;"/>')
         .text('Delete this song')
         .button({text: false, icons: {primary: 'ui-icon-cancel'}})
         .click(function() { deleteSong( $(this).parents('li') ); });
 
-    var addButton = $('<button />')
+    var addButton = $('<button style="float: right;"/>')
         .text('Add a song')
         .button({text: false, icons: {primary: 'ui-icon-plusthick'}})
         .click(function() { askForSongs( $(this).parents('li'), false ); });
 
-    var replaceButton = $('<button />')
+    var replaceButton = $('<button style="float: right;"/>')
         .text('Replace this song')
         .button({text: false, icons: {primary: 'ui-icon-arrowreturnthick-1-w'}})
         .click(function() { askForSongs( $(this).parents('li'), true ); });
 
-    var bs = $('<div style="float: right; text-align: left;"></div>')
-                    .append(addButton)
-                    .append(replaceButton)
+    var bs = $('<div style="float: right; font-size: 8pt;"></div>')
                     .append(delButton)
+                    .append(replaceButton)
+                    .append(addButton)
                     .buttonset();
 
     var li = $('<li />')
