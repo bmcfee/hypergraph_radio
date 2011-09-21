@@ -24,6 +24,10 @@ $(document).keydown(function (e) {
         case $.ui.keyCode.UP:
             break;
 
+        case 77:
+            toggleVolume($("#volume"));
+            break;
+
         case $.ui.keyCode.SPACE:
             if (! $("#search").is(":focus")) {
                 playPauseMusic();
