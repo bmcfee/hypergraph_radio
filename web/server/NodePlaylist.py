@@ -41,10 +41,10 @@ class Root(object):
         return json.encode([self.package('SOITXNB12A8C144ECD')])
 
     def package(self, song_id):
-        S = {   'song_id': song_id, 
-                'rdio_id': self.songToRdio[song_id],
-                'artist':   self.songMeta[song_id]['artist'],
-                'title':    self.songMeta[song_id]['title'] }
+        S = {   'song_id':  song_id, 
+                'rdio_id':  self.songToRdio[song_id],
+                'artist':   unicode(self.songMeta[song_id]['artist'], 'utf-8', errors='replace'),
+                'title':    unicode(self.songMeta[song_id]['title'], 'utf-8', errors='replace') }
         return S
 
     def queue(self, qid):
