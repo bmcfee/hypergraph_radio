@@ -10,8 +10,10 @@ Usage:
 
 import sys, pprint, os
 import sqlite3
-import whoosh, whoosh.fields, whoosh.index
 import cPickle as pickle
+
+import whoosh, whoosh.fields, whoosh.index, whoosh.analysis
+from whoosh.support.charset import accent_map
 
 
 def getTerms(dbc, artist_id):
@@ -30,10 +32,12 @@ def createIndexWriter(indexPath):
     if not os.path.exists(indexPath):
         os.mkdir(indexPath)
 
+    A = whoosh.analysis.StemmingAnalyzer() | whoosh.analysis.CharsetFilter(accent_map)
+
     Schema = whoosh.fields.Schema(  song_id     =   whoosh.fields.ID(stored=True),
-                                    title       =   whoosh.fields.TEXT(stored=True, field_boost=8.0),
-                                    artist      =   whoosh.fields.TEXT(stored=True, field_boost=4.0),
-                                    release     =   whoosh.fields.TEXT(stored=True, field_boost=2.0),
+                                    title       =   whoosh.fields.TEXT(stored=True, field_boost=8.0, analyzer=A),
+                                    artist      =   whoosh.fields.TEXT(stored=True, field_boost=4.0, analyzer=A),
+                                    release     =   whoosh.fields.TEXT(stored=True, field_boost=2.0, analyzer=A),
                                     terms       =   whoosh.fields.KEYWORD(stored=True, scorable=True, commas=True))
 
     index = whoosh.index.create_in(indexPath, Schema)
