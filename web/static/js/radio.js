@@ -47,7 +47,8 @@ function resetPlayerDisplay() {
     $("#tags")
         .text('');
     $("#album-art")
-        .html("<img src='/i/big-loader.gif' alt='' style='width:32px; height:32px; padding:84px' />");
+        .html("<img src='/i/markovoni.png' alt='' style='width:200px; height:200px;' />");
+//         .html("<img src='/i/big-loader.gif' alt='' style='width:32px; height:32px; padding:84px' />");
     $("#artist-info").fadeOut('fast', function() {
         $("#artist-image")
             .attr('src', '');
