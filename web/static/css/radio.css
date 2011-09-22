@@ -125,3 +125,11 @@ li.playing {
 #artist-info {
     padding: 8pt;
 }
+
+#howto {
+    vertical-align: center;
+    text-align:     center;
+    height: 100%;
+    padding-top: 20%;
+    font-size:  14pt;
+}

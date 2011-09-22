@@ -54,6 +54,7 @@ function resetPlayerDisplay() {
         $("#artist-bio")
             .text('');
     });
+
 }
 
 function previousTrack() {
@@ -225,6 +226,9 @@ function clearSongQueue() {
 
     $("#playlist  > li")
         .remove();
+
+    $("#howto")
+        .removeClass("hidden");
 }
 
 function importSongs(data, shouldPlay) {
@@ -349,6 +353,9 @@ function appendSong(song) {
 
     $("#playpause")
         .button("option", "disabled", false);
+
+    $("#howto")
+        .addClass("hidden");
 }
 
 
