@@ -3,15 +3,18 @@ from cherrypy.lib.static import serve_file
 
 from ConfigParser import SafeConfigParser
 import os
+import cjson as json
 
 import NodeRdio
 import NodePlaylist
 import NodeSearch
 
+import MyEchoNest
+
+
 
 
 class Root:
-
 
     def __init__(self, serverIni):
 
@@ -30,7 +33,10 @@ class Root:
         self._rdio      = NodeRdio.Root(    self.config.get('rdio', 'api_key'), 
                                             self.config.get('rdio', 'secret'),
                                             self.config.get('rdio', 'domain'))
+
         self._search    = NodeSearch.Root(  os.path.join(self.basedir, self.config.get('server', 'text_index')))
+
+        self._EN        = MyEchoNest.EN(self.config.get('echonest', 'api_key'))
 
         self._cp_config = { 'tools.staticdir.on': True,
                             'tools.staticdir.dir' : self.staticdir }
@@ -38,25 +44,29 @@ class Root:
 
     @cherrypy.expose
     def rdio(self):
-        return self._rdio.index()
+        return json.encode(self._rdio.index())
         pass
 
     @cherrypy.expose
     def playlist(self, before=None, after=None, not_list=None):
-        return self._playlist.sample(before, after, not_list)
+        return json.encode(self._playlist.sample(before, after, json.decode(not_list)))
         pass
     
     @cherrypy.expose
     def queue(self, query=None):
-        return self._playlist.queue(query)
+        return json.encode(self._playlist.queue(query))
 
     @cherrypy.expose
     def search(self, query=None):
-        return self._search.search(query + '*')
+        return json.encode(self._search.search(query + '*'))
 
     @cherrypy.expose
     def tags(self, query=None):
-        return self._search.tags(query)
+        return json.encode(self._search.tags(query))
+
+    @cherrypy.expose
+    def artist(self, query=None):
+        return json.encode(self._search.artist(self._EN, query))
 
     @cherrypy.expose
     def index(self):

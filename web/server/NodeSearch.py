@@ -1,16 +1,16 @@
 import whoosh, whoosh.index, whoosh.qparser
-import cjson as json
-import pprint
 
 class Root(object):
 
     def __init__(self, indexPath):
         self.index  = whoosh.index.open_dir(indexPath)
         self.parser = whoosh.qparser.MultifieldParser(['title', 'artist', 'release', 'terms'], self.index.schema)
+        pass
+
 
     def search(self, querystring):
         if querystring == '*':
-            return json.encode([])
+            return 
 
         with self.index.searcher() as search:
             results = search.search(self.parser.parse(unicode(querystring)), limit=10)
@@ -21,14 +21,32 @@ class Root(object):
                                     'song_id':  r['song_id'],
                                     'release':  r['release'] })
 
-            return json.encode(output)
+            return output
         pass
+
 
     def tags(self, query):
 
         with self.index.searcher() as search:
             results = search.document(song_id=query)
             if results is None:
-                return json.encode([])
+                return
             else:
-                return json.encode(results['terms'].split(','))
+                return results['terms'].split(',')
+        pass
+
+
+    def artist(self, EN, query):
+
+        with self.index.searcher() as search:
+            results = search.document(song_id=query)
+            if results is None:
+                return
+
+            artist_id   = results['artist_id']
+            images      = EN.images(artist_id)
+            biography   = EN.bio(artist_id)
+
+            return {'image': images, 'bio': biography}
+        pass
+

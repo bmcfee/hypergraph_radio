@@ -1,5 +1,4 @@
 import rdioapi
-import cjson as json
 
 class Root(object):
 
@@ -14,6 +13,6 @@ class Root(object):
         pass
 
     def index(self):
-        return json.encode({'playbackToken': self.token})
+        return {'playbackToken': self.token}
         pass
 

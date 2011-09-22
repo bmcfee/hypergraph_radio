@@ -28,12 +28,12 @@
 
     <body>
         <div id="main">
-            <div class="ui-widget" style="float:right; width:auto;">
+            <div class="ui-widget" style="float:right; clear: both; width:auto;">
                 <label for="search">Add songs: </label>
                 <input id="search" style="width: 320px;"/>
             </div>
             
-            <div style="float:right; clear: both; width:auto; margin-top: 10pt; height: 100%;">
+            <div style="float:right; clear: both;  width:auto; margin: 10pt; height: 100%;">
                 <div style="float: none; clear: both; width: 320px;">
                     <span style="font-weight: bold;">Playlist</span>
                     <button id="clear" style="float: right; font-size: 8pt;">Clear</button>
@@ -44,13 +44,13 @@
                 </div>
             </div>
 
-            <div>
+            <div style="width: 200px; float: left; margin-right: 10px;">
                 <div id="album-art">
                     <img src="i/big-loader.gif" alt="" style="width:32px; height:32px; padding:84px"/>
                 </div>
 
                 <div id="toolbar" class="ui-widget-header ui-corner-all">
-                    <button id="volume">    Sound       </button>
+                    <button id="volume">    Mute        </button>
                     <button id="previous">  Previous    </button>
                     <button id="playpause"> Play/pause  </button>
                     <button id="next">      Next        </button>
@@ -70,6 +70,12 @@
 
                 <div id="player"></div>
             </div>
+
+            <div style="padding: 10px; padding-top: 32px; margin: 10px;">
+                <img id="artist-image" style="float: left; margin: 4px;" class="hidden" style="width: 120px;" />
+                <div id="artist-bio" style="text-align: left; padding: 4px;"></div>
+            </div>
+
         </div>
     </body>
 </html>

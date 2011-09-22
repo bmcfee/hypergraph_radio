@@ -48,6 +48,10 @@ function resetPlayerDisplay() {
         .text('');
     $("#album-art")
         .html("<img src='/i/big-loader.gif' alt='' style='width:32px; height:32px; padding:84px' />");
+    $("#artist-image")
+        .addClass("hidden");
+    $("#artist-bio")
+        .text('');
 }
 
 function previousTrack() {
@@ -403,12 +407,25 @@ function moveBack() {
     }
 }
 
+function getArtistInfo(song_id) {
+
+    $.getJSON('/artist/', {query: song_id}, function(data) {
+
+        $("#artist-image")
+            .attr("src", data['image'])
+            .removeClass('hidden');
+
+        $("#artist-bio")
+            .text(data['bio']);
+
+    });
+}
+
 function getTags(song_id) {
     $.getJSON('/tags/', {query: song_id}, function(data) { 
         $("#tags")
             .text(data.join(' '));
     });
-
 }
 
 function updatePlayerFromList(changePlayer) {
@@ -428,6 +445,7 @@ function updatePlayerFromList(changePlayer) {
         .button("option", "disabled", playing_node.next().length == 0);
     
     getTags(song_id);
+    getArtistInfo(song_id);
 }
 
 function initRdioPlayer() {
