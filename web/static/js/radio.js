@@ -456,7 +456,7 @@ function initRdioPlayer() {
     $.getJSON(url, {}, function(data) {
         if (data) {
             params = {  'playbackToken':    data.playbackToken,
-                        'domain':           encodeURIComponent('localhost'),
+                        'domain':           encodeURIComponent(data.domain),
                         'listener':         'radioListener' };
 
             swfobject.embedSWF(     'http://www.rdio.com/api/swf',  // embed url

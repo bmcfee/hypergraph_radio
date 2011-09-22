@@ -24,6 +24,6 @@ class Root(object):
             self.__init__(self.api_key, self.secret, self.domain, self.ttl)
 
     def index(self):
-        return {'playbackToken': self.token}
+        return {'playbackToken': self.token, 'domain': self.domain}
         pass
 
