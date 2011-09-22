@@ -46,11 +46,9 @@ function toggleRadio(buttonNode) {
 
     console.log("Infinite radio is now: " + infiniteRadio);
     buttonNode
-//         .button("option", "icons", { primary: infiniteRadio ? "ui-icon-signal-diag" : "ui-icon-link" })
         .button("option", "label", "Radio " + (infiniteRadio ? "ON" : "OFF"));
 
     if (infiniteRadio && $("li.playing").length > 0 && $("li.playing").next().length == 0) {
-        // radio mode was enabled while we were on the last song.  add a track.
         expandPlaylist();
     }
 

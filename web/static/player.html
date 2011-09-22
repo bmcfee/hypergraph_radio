@@ -27,24 +27,24 @@
 	</head>
 
     <body>
-        <div id="main">
-            <div class="ui-widget" style="float:right; clear: both; width:auto;">
-                <label for="search">Add songs: </label>
-                <input id="search" style="width: 320px;"/>
-            </div>
+        <div id="searchbox">
+            <label for="search">Search</label>
+            <input id="search" style="width: 320px; margin-right: 8pt;"/>
+        </div>
             
-            <div style="float:right; clear: both;  width:auto; margin: 10pt; height: 100%;">
-                <div style="float: none; clear: both; width: 320px;">
-                    <span style="font-weight: bold;">Playlist</span>
-                    <button id="clear" style="float: right; font-size: 8pt;">Clear</button>
-                    <button style="float: right; font-size: 8pt;" id="infinite">Infinite radio</button>
-                </div><div id="playlistWidget">
+        <div id="main">
+            <div style="float:right; clear: both;  width:320px; height: 100%; margin: 8pt;">
+                <div style="font-size: 8pt; float:right;">
+                    <button id="infinite">Infinite radio</button>
+                    <button id="clear" >Clear</button>
+                </div>
+                <div id="playlistWidget">
                     <ul id="playlist" class="playlist"></ul>
                     <button style="width: 100%;" id="expand">Expand playlist</button>
                 </div>
             </div>
 
-            <div style="width: 200px; float: left; margin-right: 10px;">
+            <div style="width: 200px; padding: 10pt; float: left;">
                 <div id="album-art">
                     <img src="i/big-loader.gif" alt="" style="width:32px; height:32px; padding:84px"/>
                 </div>
@@ -58,20 +58,21 @@
 
                 <div id="metadata">
                     <div id="artist-name" class="artistName"></div>
-                    <div id="song-title" class="songTitle"></div>
+                    <div id="song-title"  class="songTitle"></div>
                     <div id="album-title" class="albumTitle"></div>
                 </div>
             
                 <div    class="ui-progressbar ui-widget ui-widget-content ui-corner-all" 
-                        style="width: 200px; height:10px;">
+                        style="width: 100%; height:10px;">
                     <div    id      ="trackprogress" class   ="ui-progressbar-value"></div>
                 </div>
+
                 <div id="tags"></div>
 
                 <div id="player"></div>
             </div>
 
-            <div id="artist-info" style="padding: 10px; margin: 10px; margin-top: 20px;">
+            <div id="artist-info">
                 <img id="artist-image" />
                 <div id="artist-bio" style="text-align: left; padding: 4px;"></div>
             </div>
