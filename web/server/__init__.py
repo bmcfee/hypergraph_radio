@@ -32,7 +32,8 @@ class Root:
 
         self._rdio      = NodeRdio.Root(    self.config.get('rdio', 'api_key'), 
                                             self.config.get('rdio', 'secret'),
-                                            self.config.get('rdio', 'domain'))
+                                            self.config.get('rdio', 'domain'),
+                                            self.config.get('rdio', 'playback_ttl'))
 
         self._search    = NodeSearch.Root(  os.path.join(self.basedir, self.config.get('server', 'text_index')))
 
@@ -44,32 +45,38 @@ class Root:
 
     @cherrypy.expose
     def rdio(self):
+        self._rdio.refresh()
         return json.encode(self._rdio.index())
         pass
 
     @cherrypy.expose
     def playlist(self, before=None, after=None, not_list=None):
+        self._rdio.refresh()
         return json.encode(self._playlist.sample(before, after, json.decode(not_list)))
         pass
     
     @cherrypy.expose
     def queue(self, query=None):
+        self._rdio.refresh()
         return json.encode(self._playlist.queue(query))
 
     @cherrypy.expose
     def search(self, query=None):
+        self._rdio.refresh()
         return json.encode(self._search.search(query + '*'))
 
     @cherrypy.expose
     def tags(self, query=None):
+        self._rdio.refresh()
         return json.encode(self._search.tags(query))
 
     @cherrypy.expose
     def artist(self, query=None):
+        self._rdio.refresh()
         return json.encode(self._search.artist(self._EN, query))
 
     @cherrypy.expose
     def index(self):
+        self._rdio.refresh()
         return serve_file(os.path.join(self.staticdir, 'player.html'), content_type='text/html')
-        pass
 
