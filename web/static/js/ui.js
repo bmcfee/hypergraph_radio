@@ -25,7 +25,10 @@ $(document).keydown(function (e) {
             break;
 
         case 77:
-            toggleVolume($("#volume"));
+            if (! $("#search").is(":focus")) {
+                toggleVolume($("#volume"));
+                e.preventDefault();
+            }
             break;
 
         case $.ui.keyCode.SPACE:
