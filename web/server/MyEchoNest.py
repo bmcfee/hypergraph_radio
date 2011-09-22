@@ -1,6 +1,5 @@
 import urllib2
-import cjson as json
-import pprint
+import json
 
 class EN(object):
 
@@ -18,12 +17,14 @@ class EN(object):
 
         url = '%s/artist/images?api_key=%s&id=%s&format=json' % (self.root, self.api_key, artist_id)
 
-        f = urllib2.urlopen(url)
-        S = json.decode(f.read())
-        if 'response' in S and 'images' in S['response'] and len(S['response']['images']) > 0:
+        try:
+            f = urllib2.urlopen(url)
+            S = json.decode(f.read())
             self._images[artist_id] = S['response']['images'][0]['url']
             return self._images[artist_id]
-        pass
+        except:
+            pass
+
 
     def bio(self, artist_id):
 
@@ -31,9 +32,12 @@ class EN(object):
             return self._bio[artist_id]
 
         url = '%s/artist/biographies?api_key=%s&id=%s&format=json' % (self.root, self.api_key, artist_id)
-        f = urllib2.urlopen(url)
-        S = json.decode(f.read())
-        if 'response' in S and 'biographies' in S['response'] and len(S['response']['biographies']) > 0:
+        try:
+            f = urllib2.urlopen(url)
+            S = json.loads(f.read())
             self._bio[artist_id] = S['response']['biographies'][0]['text']
             return self._bio[artist_id]
-        pass
+        except:
+            pass
+
+
