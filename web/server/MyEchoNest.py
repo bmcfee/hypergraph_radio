@@ -19,7 +19,7 @@ class EN(object):
 
         try:
             f = urllib2.urlopen(url)
-            S = json.decode(f.read())
+            S = json.loads(f.read())
             self._images[artist_id] = S['response']['images'][0]['url']
             return self._images[artist_id]
         except:
