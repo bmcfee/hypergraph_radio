@@ -442,6 +442,8 @@ function updatePlayerFromList(changePlayer) {
     if (changePlayer && rdio_id != undefined) { 
         player.rdio_play( rdio_id ); 
         $("#playlistWidget").scrollTo($("li.playing"));
+        getTags(song_id);
+        getArtistInfo(song_id);
     }
 
     
@@ -449,9 +451,6 @@ function updatePlayerFromList(changePlayer) {
         .button("option", "disabled", playing_node.prev().length == 0);
     $("#next")
         .button("option", "disabled", playing_node.next().length == 0);
-    
-    getTags(song_id);
-    getArtistInfo(song_id);
 }
 
 function initRdioPlayer() {
