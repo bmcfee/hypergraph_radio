@@ -48,10 +48,12 @@ function resetPlayerDisplay() {
         .text('');
     $("#album-art")
         .html("<img src='/i/big-loader.gif' alt='' style='width:32px; height:32px; padding:84px' />");
-    $("#artist-image")
-        .addClass("hidden");
-    $("#artist-bio")
-        .text('');
+    $("#artist-info").fadeOut('fast', function() {
+        $("#artist-image")
+            .attr('src', '');
+        $("#artist-bio")
+            .text('');
+    });
 }
 
 function previousTrack() {
@@ -70,6 +72,7 @@ function seekTrack() {
     if (player != null) {
         offset = Math.round($("#trackprogress").slider("option", "value") * trackDuration / 100);
         player.rdio_seek(offset);
+        $("#trackprogess").blur();
     }
 }
 
@@ -409,15 +412,18 @@ function moveBack() {
 
 function getArtistInfo(song_id) {
 
-    $.getJSON('/artist/', {query: song_id}, function(data) {
+    $("#artist-info").fadeOut('fast', function() {
 
-        $("#artist-image")
-            .attr("src", data['image'])
-            .removeClass('hidden');
+        $.getJSON('/artist/', {query: song_id}, function(data) {
 
-        $("#artist-bio")
-            .text(data['bio']);
+            $("#artist-image")
+                .attr("src", data['image']);
+    
+            $("#artist-bio")
+                .text(data['bio']);
 
+            $("#artist-info").fadeIn('fast');
+        });
     });
 }
 
