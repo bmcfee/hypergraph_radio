@@ -107,3 +107,10 @@ li.playing {
     color:      #4488cc;
     margin-top: 4px;
 }
+
+#artist-image {
+    max-width: 200px;
+    max-height: 400px;
+    float: left;
+    margin: 4px;
+}
