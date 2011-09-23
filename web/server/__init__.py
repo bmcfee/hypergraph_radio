@@ -63,7 +63,7 @@ class Root:
     @cherrypy.expose
     def search(self, query=None):
         self._rdio.refresh()
-        return json.encode(self._search.search(query + '*'))
+        return json.encode(self._search.search(query))
 
     @cherrypy.expose
     def tags(self, query=None):

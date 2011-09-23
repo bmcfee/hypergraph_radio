@@ -9,7 +9,7 @@ class Root(object):
 
 
     def search(self, querystring):
-        if querystring == '*':
+        if querystring is None:
             return 
 
         with self.index.searcher() as search:
