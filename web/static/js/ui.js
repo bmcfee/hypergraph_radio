@@ -1,10 +1,11 @@
 // CREATED:2011-09-19 09:00:10 by Brian McFee <bmcfee@cs.ucsd.edu>
 // UI control code for the radio 
 
+var infiniteRadio   = true;
+var volumeOn        = true;
+
 // Handle keyboard events
 $(document).keydown(function (e) {
-
-
     switch (e.which) {
 
         case $.ui.keyCode.LEFT:
@@ -23,6 +24,13 @@ $(document).keydown(function (e) {
         case $.ui.keyCode.UP:
             break;
 
+        case 77:
+            if (! $("#search").is(":focus")) {
+                toggleVolume($("#volume"));
+                e.preventDefault();
+            }
+            break;
+
         case $.ui.keyCode.SPACE:
             if (! $("#search").is(":focus")) {
                 playPauseMusic();
@@ -31,6 +39,30 @@ $(document).keydown(function (e) {
             break
     }
 });
+
+function toggleRadio(buttonNode) {
+
+    infiniteRadio ^= 1;
+
+    console.log("Infinite radio is now: " + infiniteRadio);
+    buttonNode
+        .button("option", "label", "Radio " + (infiniteRadio ? "ON" : "OFF"));
+
+    if (infiniteRadio && $("li.playing").length > 0 && $("li.playing").next().length == 0) {
+        expandPlaylist();
+    }
+
+}
+
+function toggleVolume(buttonNode) {
+
+    volumeOn ^= 1;
+
+    buttonNode
+        .button("option", "icons", { primary: volumeOn ? "ui-icon-volume-on" : "ui-icon-volume-off" });
+
+    setMute(volumeOn);
+}
 
 // Initialize control widgets and start the player
 $(function() {
@@ -51,6 +83,31 @@ $(function() {
     $( "#clear" )
         .button({ text: false, icons: { primary: "ui-icon-trash"}, disabled: true })
         .click(clearSongQueue);
+
+    $( "#volume" )
+        .button({ text: false, icons: { primary: "ui-icon-volume-on"}, disabled: true })
+        .click(function() {toggleVolume($(this));});
+
+    $( "#toolbar" )
+        .buttonset();
+
+    $( "#infinite" )
+        .button({ label: "Radio " + (infiniteRadio ? "ON" : "OFF"), icons: { primary: "ui-icon-signal-diag"}, disabled: false})
+        .click(function() {toggleRadio($(this));});
+
+    $( "#expand" )
+        .button({ text: false, icons: { primary: "ui-icon-triangle-1-s"}, disabled: true })
+        .click(expandPlaylist);
+
+    $( "#playlist" )
+        .sortable({
+                update: function(e, ui) { 
+                            updatePlayerFromList(false); 
+                        },
+                scroll: true,
+                revert: 'invalid'
+        })
+        .disableSelection();
 
     $( "#search" )
         .autocomplete({

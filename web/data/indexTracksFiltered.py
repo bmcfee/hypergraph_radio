@@ -10,8 +10,10 @@ Usage:
 
 import sys, pprint, os
 import sqlite3
-import whoosh, whoosh.fields, whoosh.index
 import cPickle as pickle
+
+import whoosh, whoosh.fields, whoosh.index, whoosh.analysis
+from whoosh.support.charset import accent_map
 
 
 def getTerms(dbc, artist_id):
@@ -30,10 +32,13 @@ def createIndexWriter(indexPath):
     if not os.path.exists(indexPath):
         os.mkdir(indexPath)
 
+    A = whoosh.analysis.StemmingAnalyzer() | whoosh.analysis.CharsetFilter(accent_map)
+
     Schema = whoosh.fields.Schema(  song_id     =   whoosh.fields.ID(stored=True),
-                                    title       =   whoosh.fields.TEXT(stored=True, field_boost=8.0),
-                                    artist      =   whoosh.fields.TEXT(stored=True, field_boost=4.0),
-                                    release     =   whoosh.fields.TEXT(stored=True, field_boost=2.0),
+                                    artist_id   =   whoosh.fields.STORED,
+                                    title       =   whoosh.fields.TEXT(stored=True, field_boost=8.0, analyzer=A),
+                                    artist      =   whoosh.fields.TEXT(stored=True, field_boost=4.0, analyzer=A),
+                                    release     =   whoosh.fields.TEXT(stored=True, field_boost=2.0, analyzer=A),
                                     terms       =   whoosh.fields.KEYWORD(stored=True, scorable=True, commas=True))
 
     index = whoosh.index.create_in(indexPath, Schema)
@@ -55,12 +60,13 @@ def createIndex(songToRdio, dbc_meta, dbc_terms, indexPath):
 
     writer = createIndexWriter(indexPath)
 
-    for (s_id, track_title, artist_name, artist_id, release_name) in cur:
+    for (s_id, track_title, artist_name, a_id, release_name) in cur:
         if s_id not in songToRdio or songToRdio[s_id] is None:
             continue
-        term_array = getTerms(dbc_terms, artist_id)
+        term_array = getTerms(dbc_terms, a_id)
 
         writer.add_document(song_id     =   s_id, 
+                            artist_id   =   a_id,
                             title       =   track_title, 
                             artist      =   artist_name,
                             release     =   release_name,

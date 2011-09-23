@@ -3,13 +3,13 @@ var player = null;
 var paused = true;
 
 var trackDuration       = 0;
-var songQueue           = [];
-var songQueuePosition   = -1;
 
 function playPauseMusic() {
     if (player == null) {
         return;
     }
+
+    startMusic();
 
     if (paused) {
         paused = false;
@@ -20,21 +20,53 @@ function playPauseMusic() {
     }
 }
 
+function startMusic() {
+
+    if ($("li.playing").length == 0) {
+        moveForward();
+    }
+}
+
 function stopMusic() {
     if (player != null) {
         player.rdio_stop();
     }
+    $("li.playing")
+        .removeClass("playing")
+        .addClass("playlist");
+    resetPlayerDisplay();
+}
+
+function resetPlayerDisplay() {
+    $("#song-title")
+        .text('');
+    $("#artist-name")
+        .text('');
+    $("#album-title")
+        .text('');
+    $("#tags")
+        .text('');
+    $("#album-art")
+        .html("<img src='/i/markovoni.png' alt='' style='width:200px; height:200px;' />");
+//         .html("<img src='/i/big-loader.gif' alt='' style='width:32px; height:32px; padding:84px' />");
+    $("#artist-info").fadeOut('fast', function() {
+        $("#artist-image")
+            .attr('src', '');
+        $("#artist-bio")
+            .text('');
+    });
+
 }
 
 function previousTrack() {
     if (player != null) {
-        revertQueue();
+        moveBack();
     }
 }
 
 function nextTrack() {
     if (player != null) {
-        advanceQueue();
+        moveForward();
     }
 }
 
@@ -42,11 +74,20 @@ function seekTrack() {
     if (player != null) {
         offset = Math.round($("#trackprogress").slider("option", "value") * trackDuration / 100);
         player.rdio_seek(offset);
+        $("#trackprogess").blur();
+    }
+}
+
+function setMute(volume) {
+    if (player != null) {
+        player.rdio_setMute(! volume);
     }
 }
 
 radioListener.ready = function() {
     radioListener.is_ready = true;
+    $("#volume")
+        .button("option", "disabled", false);
 
     player = $("#player").get(0);
     console.log('Ready to play.');
@@ -71,6 +112,7 @@ radioListener.playStateChanged = function(playState) {
     if (playState != 2) {
         $("#trackprogress").slider("option", "disabled", false);
     }
+
 }
 
 
@@ -79,21 +121,41 @@ radioListener.playingTrackChanged = function(playingTrack, sourcePosition) {
     //  Track metadata is provided as playingTrack and the position within the playing source as sourcePosition.
 
     if (playingTrack == null) {
+        // we're all out of tracks
+        resetPlayerDisplay();
+        
         return;
+    } else if ( infiniteRadio && $("li.playing").next().length == 0 ) {
+        // we're on the last track, but in radio mode.. add another
+        expandPlaylist();
     }
     console.log('Playing: ' + playingTrack.artist + ' - ' + playingTrack.name );
 
     trackDuration = playingTrack.duration;
 
-    $("#song-title").text(playingTrack.name);
-    $("#artist-name").text(playingTrack.artist);
-    $("#album-art").html("<img id='album-art-img' style='width: 200px; height: 200px;' src='" + playingTrack.icon + "'/>");
+    $("#song-title")
+        .text(playingTrack.name);
+
+    $("#artist-name")
+        .text(playingTrack.artist);
+
+    $("#album-title")
+        .text(playingTrack.album);
+
+    $("#album-art")
+        .html("<img id='album-art-img' style='width: 200px; height: 200px;' src='" + playingTrack.icon + "'/>");
 }
 
 radioListener.playingSourceChanged = function(playingSource) {
     //  The currently playing source changed. 
     //  The source metadata, including a track listing is inside playingSource.
-//     console.log('New source: ' + JSON.stringify(playingSource));
+    if (playingSource == null) {
+        if ($("li.playing").next().length > 0) {
+            moveForward();
+        } else {
+            stopMusic();
+        }
+    }
 }
 
 radioListener.volumeChanged = function(volume) {
@@ -155,96 +217,248 @@ function resetPlayer() {
     $("#trackprogress")
         .slider("option", "disabled", true)
         .slider("option", "value", 0);
-
-    $("#song-title")
-        .text('');
-    $("#artist-name")
-        .text('');
-    $("#album-art")
-        .html("<img src='/i/big-loader.gif' alt='' style='width:32px; height:32px; padding:84px' />");
+    $("#expand")
+        .button("option", "disabled", true);
 
 }
 
 function clearSongQueue() {
     resetPlayer();
 
-    songQueuePosition   = -1;
-    songQueue           = [];
-    $("#playlistWidget > ul > li")
+    $("#playlist  > li")
         .remove();
+
+    $("#howto")
+        .removeClass("hidden");
 }
 
 function importSongs(data, shouldPlay) {
     for (i = 0; i < data.length; i++) {
         appendSong(data[i]);
     }
-    shouldPlay && advanceQueue();
+    shouldPlay && moveForward();
 }
 
 function loadSong(song_id) {
-    $.getJSON('/queue/', {query: song_id}, function(data) { importSongs(data, songQueue.length < 1); });
+    $.getJSON('/queue/', {query: song_id}, function(data) { 
+                                                importSongs(data, $("li.playing").length == 0); 
+                                                updatePlayerFromList(false);
+                                            });
+}
+
+function deleteSong(node) {
+    console.log('Deleting song: ' + node.find('input.song_id').val());
+
+    if (node.hasClass('playing')) {
+        if (node.next().length > 0) {
+            moveForward();
+            node.remove();
+        } else if (node.prev().length > 0) {
+            moveBack();
+            node.remove();
+        } else {
+            clearSongQueue();
+        }
+    } else {
+        node.remove();
+        updatePlayerFromList(false);
+    }
+}
+
+function askForSongs(node, deleteAfter) {
+
+    var before_id   = node.find('.song_id').val();
+    var after_id    = node.next().find('.song_id').val();
+    
+    var bad_ids     = [];
+
+    $('.song_id').each(function() { bad_ids.push($(this).val()); });
+
+    $.post(  '/playlist/', 
+                {
+                    before:     before_id, 
+                    after:      after_id,
+                    not_list:   JSON.stringify(bad_ids)     // XXX: this seems hacky
+                }, 
+                function(data, textStatus, jqXHR) { 
+                    for (var i = data.length - 1; i >= 0; i--) {
+                        node.after(createSongNode(data[i]));
+                    }
+                    if (deleteAfter) {
+                        deleteSong(node);
+                    }
+                    updatePlayerFromList(false);
+                }, 'json');
+}
+
+function expandPlaylist() {
+    if ($("#playlistWidget li").length > 0) {
+        askForSongs($("#playlistWidget li:last"));
+    }
+}
+
+function createSongNode(song) {
+
+    var delButton = $('<button style="float: right;"/>')
+        .text('Delete this song')
+        .button({text: false, icons: {primary: 'ui-icon-cancel'}})
+        .click(function() { deleteSong( $(this).parents('li') ); });
+
+    var addButton = $('<button style="float: right;"/>')
+        .text('Add a song')
+        .button({text: false, icons: {primary: 'ui-icon-plusthick'}})
+        .click(function() { askForSongs( $(this).parents('li'), false ); });
+
+    var replaceButton = $('<button style="float: right;"/>')
+        .text('Replace this song')
+        .button({text: false, icons: {primary: 'ui-icon-arrowreturnthick-1-w'}})
+        .click(function() { askForSongs( $(this).parents('li'), true ); });
+
+    var bs = $('<div style="float: right; font-size: 8pt;"></div>')
+                    .append(delButton)
+                    .append(replaceButton)
+                    .append(addButton)
+                    .buttonset();
+
+    var li = $('<li />')
+        .addClass('playlist')
+        .append(bs)
+        .append('<div class="artistName">' + song.artist + '</div>')
+        .append('<div class="songTitle">' + song.title + '</div>')
+        .append('<input type="hidden" name="rdio_id" class="rdio_id" value="' + song.rdio_id + '"/>')
+        .append('<input type="hidden" name="song_id" class="song_id" value="' + song.song_id + '"/>');
+
+    li.find('button')
+        .addClass('hidden');
+
+    li.bind('dblclick', function() { seekTo( $(this) ); });
+
+    li.hover(function(e) {
+        $(this).find('button').removeClass('hidden');
+    }, function(e) {
+        $(this).find('button').addClass('hidden');
+    });
+
+    return li;
 }
 
 function appendSong(song) {
-    songQueue.push(song);
+    $("#playlist")
+        .append(createSongNode(song));
 
-    $("#playlistWidget > ul")
-        .append('<li class="playlist"><span style="font-weight: bold;">' + song.artist + '</span><br>' + song.title + '</li>');
     $("#clear")
         .button("option", "disabled", false);
+
+    $("#expand")
+        .button("option", "disabled", false);
+
     $("#playpause")
         .button("option", "disabled", false);
-    $("#next")
-        .button("option", "disabled", songQueue.length - 1 <= songQueuePosition);
+
+    $("#howto")
+        .addClass("hidden");
 }
 
-function advanceQueue() {
-    if (songQueue.length < 1 || songQueuePosition == songQueue.length - 1) {
-        return;
+
+function seekTo(node) {
+    $("li.playing")
+        .removeClass('playing')
+        .addClass('playlist');
+
+    node
+        .removeClass('playlist')
+        .addClass('playing');
+
+    updatePlayerFromList(true);
+}
+
+function moveForward() {
+    var currentlyPlaying = $("li.playing");
+
+    if (currentlyPlaying.length > 0) {
+    
+        var next = currentlyPlaying.next();
+
+        if (next.length > 0) {
+            currentlyPlaying
+                .removeClass('playing')
+                .addClass('playlist');
+
+            next
+                .removeClass('playlist')
+                .addClass('playing');
+
+            updatePlayerFromList(true);
+        }
+    } else {
+        $("li.playlist:first")
+            .removeClass('playlist')
+            .addClass('playing');
+        updatePlayerFromList(true);
+    }
+}
+
+function moveBack() {
+    var currentlyPlaying = $("li.playing");
+
+    if (currentlyPlaying.length > 0) {
+        
+        var prev = currentlyPlaying.prev();
+
+        if (prev.length > 0) {
+            currentlyPlaying
+                .removeClass('playing')
+                .addClass('playlist');
+            prev
+                .removeClass('playlist')
+                .addClass('playing');
+
+            updatePlayerFromList(true);
+        }
+    }
+}
+
+function getArtistInfo(song_id) {
+
+    $("#artist-info").fadeOut('fast', function() {
+
+        $.getJSON('/artist/', {query: song_id}, function(data) {
+
+            $("#artist-image")
+                .attr("src", data['image']);
+    
+            $("#artist-bio")
+                .text(data['bio']);
+
+            $("#artist-info").fadeIn('fast');
+        });
+    });
+}
+
+function getTags(song_id) {
+    $.getJSON('/tags/', {query: song_id}, function(data) { 
+        $("#tags")
+            .text(data.join(' '));
+    });
+}
+
+function updatePlayerFromList(changePlayer) {
+    var playing_node    = $("li.playing");
+    var rdio_id         = $("li.playing > input.rdio_id").val();
+    var song_id         = $("li.playing > input.song_id").val();
+
+    if (changePlayer && rdio_id != undefined) { 
+        player.rdio_play( rdio_id ); 
+        $("#playlistWidget").scrollTo($("li.playing"));
+        getTags(song_id);
+        getArtistInfo(song_id);
     }
 
-    songQueuePosition++;
-    song = songQueue[songQueuePosition];
-    player.rdio_play(song.rdio_id);
-
-    updatePlaylistStyle();
-}
-
-function revertQueue() {
-
-    if (songQueue.length < 1 || songQueuePosition == 0) {
-        return;
-    }
-
-    songQueuePosition--;
-    song = songQueue[songQueuePosition];
-    player.rdio_play(song.rdio_id);
-
-    updatePlaylistStyle();
-}
-
-function updatePlaylistStyle() {
-    $("ul.playlist li:lt(" + songQueuePosition + ")")
-        .removeClass("playing")
-        .removeClass("playlist")
-        .addClass("played");
-
-    $("ul.playlist li:eq(" + songQueuePosition + ")")
-        .removeClass("playlist")
-        .removeClass("played")
-        .addClass("playing");
-
-    $("ul.playlist li:gt(" + songQueuePosition + ")")
-        .removeClass("played")
-        .removeClass("playing")
-        .addClass("playlist")
-
+    
     $("#previous")
-        .button("option", "disabled", songQueuePosition == 0);
+        .button("option", "disabled", playing_node.prev().length == 0);
     $("#next")
-        .button("option", "disabled", songQueuePosition == songQueue.length - 1);
-
-    $("#playlistWidget").scrollTo($("ul.playlist li:eq(" + songQueuePosition + ")"));
+        .button("option", "disabled", playing_node.next().length == 0);
 }
 
 function initRdioPlayer() {
@@ -255,7 +469,7 @@ function initRdioPlayer() {
     $.getJSON(url, {}, function(data) {
         if (data) {
             params = {  'playbackToken':    data.playbackToken,
-                        'domain':           encodeURIComponent('localhost'),
+                        'domain':           encodeURIComponent(data.domain),
                         'listener':         'radioListener' };
 
             swfobject.embedSWF(     'http://www.rdio.com/api/swf',  // embed url
