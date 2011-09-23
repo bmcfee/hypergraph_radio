@@ -9,7 +9,7 @@ $(document).keydown(function (e) {
     if ($("#search").is(":focus")) {
         return;
     }
-    console.log(e.which);
+//     console.log(e.which);
     switch (e.which) {
 
         case 75:    // K        (vi keys)
@@ -18,6 +18,10 @@ $(document).keydown(function (e) {
             e.preventDefault();
             break;
 
+        case 191:   // /
+            $("#search").focus();
+            e.preventDefault();
+            break;
 
         case 74:    // J
         case $.ui.keyCode.RIGHT:
