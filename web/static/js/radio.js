@@ -48,8 +48,6 @@ function resetPlayerDisplay() {
         .text('');
     $("#album-art-img")
         .attr('src', '/i/markovoni.png');
-//         .html("<img src='/i/markovoni.png' alt='' style='width:200px; height:200px;' />");
-//         .html("<img src='/i/big-loader.gif' alt='' style='width:32px; height:32px; padding:84px' />");
     $("#artist-info").fadeOut('fast', function() {
         $("#artist-image")
             .attr('src', '');
@@ -248,27 +246,35 @@ function loadSong(song_id) {
                                             });
 }
 
+function killSongNode(node) {
+
+    node.hide('blind', 'fast', function() { node.remove(); });
+
+}
+
 function deleteSong(node) {
     console.log('Deleting song: ' + node.find('input.song_id').val());
 
     if (node.hasClass('playing')) {
         if (node.next().length > 0) {
             moveForward();
-            node.remove();
+            killSongNode(node);
         } else if (node.prev().length > 0) {
             moveBack();
-            node.remove();
+            killSongNode(node);
         } else {
             clearSongQueue();
         }
     } else {
-        node.remove();
+        killSongNode(node);
         updatePlayerFromList(false);
     }
 }
 
 function askForSongs(node, deleteAfter) {
 
+    //     FIXME:  2011-09-23 09:02:09 by Brian McFee <bmcfee@cs.ucsd.edu>
+    // should we get the previous node instead? 
     var before_id   = node.find('.song_id').val();
     var after_id    = node.next().find('.song_id').val();
     
@@ -304,6 +310,8 @@ function replaceCurrentSong() {
     var currentSong = $("li.playing");
 
     if (currentSong.length > 0) {
+        //         FIXME:  2011-09-23 08:58:18 by Brian McFee <bmcfee@cs.ucsd.edu>
+        //  should we be searching with the current or previous song?
         askForSongs(currentSong, true);
     }
 }
@@ -312,7 +320,7 @@ function createSongNode(song) {
 
     var delButton = $('<button style="float: right;"/>')
         .text('Delete this song')
-        .button({text: false, icons: {primary: 'ui-icon-cancel'}})
+        .button({text: false, icons: {primary: 'ui-icon-close'}})
         .click(function() { deleteSong( $(this).parents('li') ); });
 
     var addButton = $('<button style="float: right;"/>')
