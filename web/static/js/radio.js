@@ -46,8 +46,9 @@ function resetPlayerDisplay() {
         .text('');
     $("#tags")
         .text('');
-    $("#album-art")
-        .html("<img src='/i/markovoni.png' alt='' style='width:200px; height:200px;' />");
+    $("#album-art-img")
+        .attr('src', '/i/markovoni.png');
+//         .html("<img src='/i/markovoni.png' alt='' style='width:200px; height:200px;' />");
 //         .html("<img src='/i/big-loader.gif' alt='' style='width:32px; height:32px; padding:84px' />");
     $("#artist-info").fadeOut('fast', function() {
         $("#artist-image")
@@ -142,8 +143,9 @@ radioListener.playingTrackChanged = function(playingTrack, sourcePosition) {
     $("#album-title")
         .text(playingTrack.album);
 
-    $("#album-art")
-        .html("<img id='album-art-img' style='width: 200px; height: 200px;' src='" + playingTrack.icon + "'/>");
+    $("#album-art-img")
+        .attr('src', playingTrack.icon);
+//         .html("<img id='album-art-img' style='width: 200px; height: 200px;' src='" + playingTrack.icon + "'/>");
 }
 
 radioListener.playingSourceChanged = function(playingSource) {
@@ -294,6 +296,15 @@ function askForSongs(node, deleteAfter) {
 function expandPlaylist() {
     if ($("#playlistWidget li").length > 0) {
         askForSongs($("#playlistWidget li:last"));
+    }
+}
+
+function replaceCurrentSong() {
+
+    var currentSong = $("li.playing");
+
+    if (currentSong.length > 0) {
+        askForSongs(currentSong, true);
     }
 }
 

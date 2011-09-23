@@ -6,36 +6,45 @@ var volumeOn        = true;
 
 // Handle keyboard events
 $(document).keydown(function (e) {
+    if ($("#search").is(":focus")) {
+        return;
+    }
+//     console.log(e.which);
     switch (e.which) {
 
+        case 75:    // K        (vi keys)
         case $.ui.keyCode.LEFT:
             previousTrack();
             e.preventDefault();
             break;
 
-        case $.ui.keyCode.DOWN:
+        case 191:   // /
+            $("#search").focus();
+            e.preventDefault();
             break;
 
+        case 74:    // J
         case $.ui.keyCode.RIGHT:
             nextTrack();
             e.preventDefault();
             break;
 
+        case $.ui.keyCode.DOWN:
+            break;
         case $.ui.keyCode.UP:
             break;
 
-        case 77:
-            if (! $("#search").is(":focus")) {
-                toggleVolume($("#volume"));
-                e.preventDefault();
-            }
+        case 77:    // M        (mute)
+            toggleVolume($("#volume"));
+            break;
+
+        case 82:    // R        (replace)
+            replaceCurrentSong();
             break;
 
         case $.ui.keyCode.SPACE:
-            if (! $("#search").is(":focus")) {
-                playPauseMusic();
-                e.preventDefault();
-            }
+            playPauseMusic();
+            e.preventDefault();
             break
     }
 });
