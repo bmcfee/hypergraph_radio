@@ -6,7 +6,6 @@ body, html {
 }
 
 body {
-/*     background-color:   #cc0000; */
     background-color:   #4488cc;
     margin:             0px;
     padding:            0px;
@@ -39,7 +38,7 @@ body {
 }
 
 #searchbox {
-    background-color:   #888888;
+    background-color:   #666666;
     color:              white;
     text-align:         right;
     border-bottom:      solid 1px black;
@@ -124,6 +123,8 @@ li.playing {
 
 #artist-info {
     padding: 8pt;
+    overflow-y: auto;
+    height: 80%;
 }
 
 #howto {
