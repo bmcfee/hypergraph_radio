@@ -9,7 +9,7 @@ $(document).keydown(function (e) {
     if ($("#search").is(":focus")) {
         return;
     }
-    console.log(e.which);
+//     console.log(e.which);
     switch (e.which) {
 
         case 75:    // K        (up/prev)
