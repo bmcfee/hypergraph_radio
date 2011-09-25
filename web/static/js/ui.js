@@ -9,10 +9,10 @@ $(document).keydown(function (e) {
     if ($("#search").is(":focus")) {
         return;
     }
-//     console.log(e.which);
+    console.log(e.which);
     switch (e.which) {
 
-        case 75:    // K        (vi keys)
+        case 75:    // K        (up/prev)
         case $.ui.keyCode.LEFT:
             previousTrack();
             e.preventDefault();
@@ -22,8 +22,13 @@ $(document).keydown(function (e) {
             $("#search").focus();
             e.preventDefault();
             break;
+    
+        case 88:    // X        (delete)
+            deleteCurrentSong();
+            e.preventDefault();
+            break;
 
-        case 74:    // J
+        case 74:    // J        (down/next)
         case $.ui.keyCode.RIGHT:
             nextTrack();
             e.preventDefault();
@@ -32,6 +37,16 @@ $(document).keydown(function (e) {
         case $.ui.keyCode.DOWN:
             break;
         case $.ui.keyCode.UP:
+            break;
+
+        case 65:    // A        (append)
+            expandPlaylist();
+            e.preventDefault();
+            break;
+
+        case 73:    // I        (insert)
+            insertSong();
+            e.preventDefault();
             break;
 
         case 77:    // M        (mute)

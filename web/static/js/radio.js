@@ -270,6 +270,10 @@ function deleteSong(node) {
         updatePlayerFromList(false);
     }
 }
+function deleteCurrentSong() {
+    var currentSong = $("li.playing");
+    deleteSong(currentSong);
+}
 
 function askForSongs(node, deleteAfter) {
 
@@ -297,6 +301,14 @@ function askForSongs(node, deleteAfter) {
                     }
                     updatePlayerFromList(false);
                 }, 'json');
+}
+
+function insertSong() {
+    var currentSong = $("li.playing");
+
+    if (currentSong) {
+        askForSongs(currentSong, false);
+    }
 }
 
 function expandPlaylist() {
