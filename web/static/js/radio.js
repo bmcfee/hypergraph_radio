@@ -439,17 +439,27 @@ function moveBack() {
 
 function getArtistInfo(song_id) {
 
-    $("#artist-info").fadeOut('fast', function() {
+    $.getJSON('/artist/', {query: song_id}, function(data) {
 
-        $.getJSON('/artist/', {query: song_id}, function(data) {
+        var current_song_id = $("li.playing > input.song_id").val();
+        if (data['song_id'] != current_song_id) {
+            return;
+        }
 
+        $("#artist-info").fadeOut('fast', function() {
             $("#artist-image")
                 .attr("src", data['image']);
     
             $("#artist-bio")
                 .text(data['bio']);
 
+            $("#artist-info-artist_id")
+                .attr('value', data['artist_id']);
+            $("#artist-info-song_id")
+                .attr('value', data['song_id']);
+
             $("#artist-info").fadeIn('fast');
+
         });
     });
 }

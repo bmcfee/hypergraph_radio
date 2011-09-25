@@ -47,6 +47,6 @@ class Root(object):
             images      = EN.images(artist_id)
             biography   = EN.bio(artist_id)
 
-            return {'image': images, 'bio': biography}
+            return {'image': images, 'bio': biography, 'song_id': query, 'artist_id': artist_id}
         pass
 
