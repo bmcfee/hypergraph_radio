@@ -1,10 +1,17 @@
-import whoosh, whoosh.index, whoosh.qparser
+import whoosh, whoosh.index, whoosh.qparser, whoosh.query
 import cPickle as pickle
 import random
+import pprint
 
 class Root(object):
 
     def __init__(self, indexPath, songMeta, rdioMap, model):
+        '''
+            indexPath:  path to the whoosh index directory
+            songMeta:   path to the song metadata pickle
+            rdioMap:    path to the song->rdio_id pickle
+            model:      path to the playlist model pickle
+        '''
         self.index  = whoosh.index.open_dir(indexPath)
         self.parser = whoosh.qparser.MultifieldParser(['title', 'artist', 'release', 'terms'], self.index.schema)
         
@@ -27,15 +34,21 @@ class Root(object):
         pass
 
 
-    def terms(self):
+    def all_terms(self):
+        '''
+            return all artist terms in the index
+        '''
         return self.termlist
 
     def search(self, querystring):
+        '''
+            whoosh search for tracks
+        '''
         if querystring is None:
             return 
 
-        with self.index.searcher() as search:
-            results = search.search(self.parser.parse(unicode(querystring)), limit=10)
+        with self.index.searcher() as searcher:
+            results = searcher.search(self.parser.parse(unicode(querystring)), limit=10)
             output = []
             for r in results:
                 output.append({     'title':    r['title'],
@@ -48,20 +61,25 @@ class Root(object):
 
 
     def tags(self, query):
-        with self.index.searcher() as search:
-            docnum = search.document_number(song_id=query)
+        '''
+            get the artist terms for a specific song
+        '''
+        with self.index.searcher() as searcher:
+            docnum = searcher.document_number(song_id=query)
             if docnum is None:
                 return
             else:
-                kw = search.key_terms([docnum], 'terms', numterms=10)
+                kw = searcher.key_terms([docnum], 'terms', numterms=10)
                 return [u for (u,v) in kw]
         pass
 
 
     def artist(self, EN, query):
-
-        with self.index.searcher() as search:
-            results = search.document(song_id=query)
+        '''
+            get artist info for a given song
+        '''
+        with self.index.searcher() as searcher:
+            results = searcher.document(song_id=query)
             if results is None:
                 return
 
@@ -76,40 +94,63 @@ class Root(object):
 
 
     def sample(self, before, after, not_list, tag_filter):
-
-        if before is None and after is None:
-            return []
-
+        '''
+            sample from the playlist model
+        '''
         # TODO:   2011-09-20 12:59:44 by Brian McFee <bmcfee@cs.ucsd.edu>
         # this is where markov smarts goes  
 
+        #   search logic:
+        #       song_id in self.model[before]
+        #       song_id not in not_list
+        #       matching tag_filter
+
+
+        # Build the neighbor part of the query
+        q_neighbor = whoosh.query.NullQuery
         if before in self.model:
-            S = self.model[before]
-            if len(tag_filter) > 0:
-                # TODO:   2011-09-26 11:49:33 by Brian McFee <bmcfee@cs.ucsd.edu>
-                # put tag filter in here
-                # use whoosh queries to do it
-                pass
-            while True:
-                if len(S) == 0:
-                    break
-                x = random.choice(S)
-                if x not in not_list:
-                    return [self.package(x)]
-                S.remove(x)
+            for n in self.model[before]:
+                q_neighbor |= whoosh.query.Term("song_id", n)
+            
+        # Build the exlusion list
+        q_notlist = whoosh.query.NullQuery
+        for x in not_list:
+            q_notlist |= whoosh.query.Term("song_id", x)
 
-            return [self.package(random.choice(S))]
+        # Build the tag list
+        q_taglist = whoosh.query.NullQuery
+        for t in tag_filter:
+            q_taglist |= whoosh.query.Term("terms", t)
 
+        query = (q_neighbor - q_notlist) & q_taglist
+
+        with self.index.searcher() as searcher:
+            results = searcher.search(query)
+            
+            ids = [r['song_id'] for r in results]
+            if len(ids) > 0:
+                return [self.package(random.choice(ids))]
+            pass
+
+        # if we fail, return some garbage
         return [self.package('SOITXNB12A8C144ECD')]
 
+
     def package(self, song_id):
+        '''
+            package a song with ids and metadata
+        '''
         S = {   'song_id':  song_id, 
                 'rdio_id':  self.songToRdio[song_id],
                 'artist':   unicode(self.songMeta[song_id]['artist'], 'utf-8', errors='replace'),
                 'title':    unicode(self.songMeta[song_id]['title'], 'utf-8', errors='replace') }
         return S
 
+
     def queue(self, qid):
+        '''
+            wrapper for song access
+        '''
         if qid in self.songToRdio and self.songToRdio[qid] is not None:
             return [self.package(qid)]
         else:

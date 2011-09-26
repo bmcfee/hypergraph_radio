@@ -60,7 +60,7 @@ class Root:
 
     @cherrypy.expose
     def terms(self):
-        return json.encode(self._search.terms())
+        return json.encode(self._search.all_terms())
 
     @cherrypy.expose
     def tags(self, query=None):
