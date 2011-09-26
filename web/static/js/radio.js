@@ -478,8 +478,21 @@ function getArtistInfo(song_id) {
 
 function getTags(song_id) {
     $.getJSON('/tags/', {query: song_id}, function(data) { 
-        $("#tags")
-            .text(data.join(' '));
+        var tagbox = $("#tags");
+        $("#tags > a").remove();
+        $.each(data, function(i, v) {
+            var link = $("<a class='artist-tag'></a>")
+                            .text(v)
+                            .click(function() {
+                                if (addTerm(v)) {
+                                    // create a popup
+
+                                    notify("Added " + v + " to tag filter");
+                                }
+                            });
+            tagbox.append(link);
+            tagbox.append(' ');
+        });
     });
 }
 

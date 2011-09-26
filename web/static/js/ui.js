@@ -115,8 +115,8 @@ $(function() {
     $( "#toolbar" )
         .buttonset();
 
-    $( "#infinite" )
-        .button({ label: "Radio " + (infiniteRadio ? "ON" : "OFF"), icons: { primary: "ui-icon-signal-diag"}, disabled: false})
+    $( "#autopilot" )
+        .button({ label: "Auto-pilot " + (infiniteRadio ? "ON" : "OFF"), icons: { primary: "ui-icon-signal-diag"}, disabled: false})
         .click(function() {toggleRadio($(this));});
 
     $( "#expand" )
@@ -132,6 +132,7 @@ $(function() {
                 revert: 'invalid'
         })
         .disableSelection();
+
 
     $( "#search" )
         .autocomplete({
@@ -161,6 +162,27 @@ $(function() {
                     .appendTo( ul );
         };
 
+
+    $( "#tag-dialog" )
+        .dialog({   autoOpen:   false, 
+                    modal:      true,
+                    title:      'Modify your playlist tag filter',
+                    buttons:    {
+                        "Clear tags": function() {
+                            $("#activetags > div.tag-item").remove();
+                        },
+                        Done: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                });
+    $( "#showtagdialog" )
+        .button({ label: 'Tag filter', icons: {primary: 'ui-icon-plus'}, disabled: false})
+        .click(function() {
+            $("#tag-dialog").dialog("open");
+            return false;
+        });
+
     initTagSearch();
     initRdioPlayer();
 });
@@ -181,24 +203,32 @@ function tagExists(term) {
 }
 
 function addTerm(term) {
-    if (tagExists(term.value)) {
-        return;
+    if (tagExists(term)) {
+        return false;
     }
 
-    console.log('Adding term: ' + term.value);
+    console.log('Adding term: ' + term);
 
     var tagNode = $("<div class='tag-item'></div>");
 
-    tagNode.text(term.value);
-    var killButton = $("<button style='font-size: 5pt; float:right;'>Delete tag</button>");
+    tagNode.text(term);
+    var killButton = $("<button style='font-size: 5pt; float:right; margin-left: 4pt;'>Delete tag</button>");
     killButton.button({text: false, icons: { primary: "ui-icon-close"}})
         .click(function() {$(this).parent().remove();});
     tagNode.append(killButton);
 
     tagNode.append($('<input type="hidden" class="tag-item-name" />')
-                        .attr('value', term.value));
+                        .attr('value', term));
     $("#activetags")
         .append(tagNode);
+    return true;
+}
+
+function notify(message) {
+    var D = $('<div></div>');
+    D.dialog({autoOpen: true, dialogClass: 'alert', resizable: false, });
+    D.append(message);
+    D.delay(500).hide('fade', 'slow', function() { D.remove(); });
 }
 
 function initTagSearch() {
@@ -209,10 +239,13 @@ function initTagSearch() {
             .autocomplete({ 
                 source:     data, 
                 minLength:  2, 
+                closeOnEscape: false,
                 select:     function(e, ui) {
                     if (ui.item) {
-                        addTerm(ui.item);
+                        addTerm(ui.item.value);
                     }
+                    $(this).val('');
+                    return false;
                 }
             });
     });

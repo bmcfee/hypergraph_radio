@@ -135,24 +135,33 @@ li.playing {
     font-size:  14pt;
 }
 
+
 #activetags {
-    column-count:           3;
-    -moz-column-count:      3;
-    -webkit-column-count:   3;
-    min-height:             4em;
-    width:                  100%;
+    min-height:             8em;
+    overflow-x:             hidden;
     overflow-y:             auto;
-    column-fill:            balance;
-    -moz-column-fill:       balance;
-    -webkit-column-fill:    balance;
+}
+
+#tag-dialog {
+    text-align:             center;
+}
+
+#tagsearch {
+    width: 100%;
 }
 
 .tag-item {
-    background-color: red;
+    background-color: #4488cc;
     color: white;
     font-weight: bold;
     padding: 4pt;
     margin: 2pt;
     border-radius: 4pt;
-    max-width: 20em;
+    max-width: 26em;
+    text-align: left;
+    float: left;
+}
+
+a.artist-tag:hover {
+    text-decoration: underline;
 }
