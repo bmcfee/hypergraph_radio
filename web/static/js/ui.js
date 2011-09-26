@@ -230,17 +230,16 @@ function addTerm(term) {
 }
 
 function notify(message) {
-    var D = $('<div style="text-align: center;" class="alert"></div>');
-        D.append(message);
-        D.dialog({   autoOpen:       true, 
-                    dialogClass:    'alert', 
-                    hide: 'fade',
-                    resizable:      false, });
-        D.delay(500)
-        .hide('fade', 'slow',   function() { 
-                                    D.dialog("close"); 
-                                    D.remove();
-                                });
+    var D = $('<div style="text-align: center;"></div>');
+        
+    D.append(message);
+    D.dialog({  autoOpen:       true, 
+                dialogClass:    'alert', 
+                hide:           'fade',
+                resizable:      false });
+    D.delay(1000).queue(function() {
+        D.dialog("close");
+    });
 }
 
 function initTagSearch() {

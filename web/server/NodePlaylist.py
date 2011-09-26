@@ -16,7 +16,7 @@ class Root(object):
             self.model = pickle.load(f)
         pass
 
-    def sample(self, before, after, not_list):
+    def sample(self, before, after, not_list, tag_filter):
 
         if before is None and after is None:
             return []

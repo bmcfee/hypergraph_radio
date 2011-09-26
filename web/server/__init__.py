@@ -50,9 +50,9 @@ class Root:
         pass
 
     @cherrypy.expose
-    def playlist(self, before=None, after=None, not_list=None):
+    def playlist(self, before=None, after=None, not_list=None, tag_filter=None):
         self._rdio.refresh()
-        return json.encode(self._playlist.sample(before, after, json.decode(not_list)))
+        return json.encode(self._playlist.sample(before, after, json.decode(not_list), json.decode(tag_filter)))
         pass
     
     @cherrypy.expose

@@ -275,6 +275,15 @@ function deleteCurrentSong() {
     deleteSong(currentSong);
 }
 
+function getActiveTags() {
+    var taglist = [];
+
+    $(".tag-item-name").each(function() {
+        taglist.push($(this).val());
+    });
+
+    return taglist;
+}
 function askForSongs(node, deleteAfter) {
 
     //     FIXME:  2011-09-23 09:02:09 by Brian McFee <bmcfee@cs.ucsd.edu>
@@ -290,7 +299,8 @@ function askForSongs(node, deleteAfter) {
                 {
                     before:     before_id, 
                     after:      after_id,
-                    not_list:   JSON.stringify(bad_ids)     // XXX: this seems hacky
+                    not_list:   JSON.stringify(bad_ids),     // XXX: this seems hacky
+                    tag_filter: JSON.stringify(getActiveTags())
                 }, 
                 function(data, textStatus, jqXHR) { 
                     for (var i = data.length - 1; i >= 0; i--) {
