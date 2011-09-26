@@ -230,6 +230,15 @@ function addTerm(term) {
     return true;
 }
 
+function removeTerm(term) {
+    $("input.tag-item-name").each(function(i,E) {
+        if (term == E.value) {
+            $(E).parent().remove();
+            return false;
+        }
+    });
+}
+
 function notify(message) {
     var D = $('<div style="text-align: center;"></div>');
         

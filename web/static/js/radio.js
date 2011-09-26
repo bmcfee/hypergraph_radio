@@ -499,6 +499,11 @@ function getTags(song_id) {
                                     
                                     notify("Added <span style='font-weight: bold; color: #4488cc;'>" + v + "</span> to tag filter");
                                     $("#showtagdialog").addClass("update");
+                                } else {
+                                    removeTerm(v);
+                                    notify("Removed <span style='font-weight: bold; color: red;'>" + v + "</span> from tag filter");
+                                    $("#showtagdialog").addClass("update");
+
                                 }
                             });
             tagbox.append(link);

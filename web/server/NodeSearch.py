@@ -32,13 +32,13 @@ class Root(object):
 
 
     def tags(self, query):
-
         with self.index.searcher() as search:
-            results = search.document(song_id=query)
-            if results is None:
+            docnum = search.document_number(song_id=query)
+            if docnum is None:
                 return
             else:
-                return results['terms'].split(',')
+                kw = search.key_terms([docnum], 'terms', numterms=10)
+                return [u for (u,v) in kw]
         pass
 
 
