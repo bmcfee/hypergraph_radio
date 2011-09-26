@@ -134,3 +134,25 @@ li.playing {
     padding-top: 20%;
     font-size:  14pt;
 }
+
+#activetags {
+    column-count:           3;
+    -moz-column-count:      3;
+    -webkit-column-count:   3;
+    min-height:             4em;
+    width:                  100%;
+    overflow-y:             auto;
+    column-fill:            balance;
+    -moz-column-fill:       balance;
+    -webkit-column-fill:    balance;
+}
+
+.tag-item {
+    background-color: red;
+    color: white;
+    font-weight: bold;
+    padding: 4pt;
+    margin: 2pt;
+    border-radius: 4pt;
+    max-width: 20em;
+}

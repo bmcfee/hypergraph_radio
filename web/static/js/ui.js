@@ -6,7 +6,7 @@ var volumeOn        = true;
 
 // Handle keyboard events
 $(document).keydown(function (e) {
-    if ($("#search").is(":focus")) {
+    if ($("#search").is(":focus") || $("#tagsearch").is(":focus")) {
         return;
     }
 //     console.log(e.which);
@@ -161,6 +161,59 @@ $(function() {
                     .appendTo( ul );
         };
 
-
+    initTagSearch();
     initRdioPlayer();
 });
+
+function tagExists(term) {
+
+    var match = false;
+
+    /* check for existing tag */
+    $("input.tag-item-name").each( function(i, E) {
+        if (term == E.value) {
+            match = true;
+            return false;
+        }
+    });
+
+    return match;
+}
+
+function addTerm(term) {
+    if (tagExists(term.value)) {
+        return;
+    }
+
+    console.log('Adding term: ' + term.value);
+
+    var tagNode = $("<div class='tag-item'></div>");
+
+    tagNode.text(term.value);
+    var killButton = $("<button style='font-size: 5pt; float:right;'>Delete tag</button>");
+    killButton.button({text: false, icons: { primary: "ui-icon-close"}})
+        .click(function() {$(this).parent().remove();});
+    tagNode.append(killButton);
+
+    tagNode.append($('<input type="hidden" class="tag-item-name" />')
+                        .attr('value', term.value));
+    $("#activetags")
+        .append(tagNode);
+}
+
+function initTagSearch() {
+    var terms;
+
+    $.getJSON('/terms/', {}, function(data) {
+        $("#tagsearch")
+            .autocomplete({ 
+                source:     data, 
+                minLength:  2, 
+                select:     function(e, ui) {
+                    if (ui.item) {
+                        addTerm(ui.item);
+                    }
+                }
+            });
+    });
+}

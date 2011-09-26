@@ -66,6 +66,10 @@ class Root:
         return json.encode(self._search.search(query))
 
     @cherrypy.expose
+    def terms(self):
+        return json.encode(self._search.terms())
+
+    @cherrypy.expose
     def tags(self, query=None):
         self._rdio.refresh()
         return json.encode(self._search.tags(query))
@@ -79,4 +83,5 @@ class Root:
     def index(self):
         self._rdio.refresh()
         return serve_file(os.path.join(self.staticdir, 'player.html'), content_type='text/html')
+
 

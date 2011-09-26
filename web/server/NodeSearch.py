@@ -5,8 +5,14 @@ class Root(object):
     def __init__(self, indexPath):
         self.index  = whoosh.index.open_dir(indexPath)
         self.parser = whoosh.qparser.MultifieldParser(['title', 'artist', 'release', 'terms'], self.index.schema)
+        self.termlist  = []
+        with self.index.reader() as reader:
+            for term in reader.lexicon('terms'):
+                self.termlist.append(term)
         pass
 
+    def terms(self):
+        return self.termlist
 
     def search(self, querystring):
         if querystring is None:
