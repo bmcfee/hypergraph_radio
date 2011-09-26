@@ -3,10 +3,11 @@
 
 var infiniteRadio   = true;
 var volumeOn        = true;
+var tagDialogOn     = false;
 
 // Handle keyboard events
 $(document).keydown(function (e) {
-    if ($("#search").is(":focus") || $("#tagsearch").is(":focus")) {
+    if ($("#search").is(":focus") || tagDialogOn) {
         return;
     }
 //     console.log(e.which);
@@ -174,11 +175,15 @@ $(function() {
                         Done: function() {
                             $( this ).dialog( "close" );
                         }
+                    },
+                    close: function(e, ui) {
+                        tagDialogOn = false;
                     }
                 });
     $( "#showtagdialog" )
         .button({ label: 'Tag filter', icons: {primary: 'ui-icon-plus'}, disabled: false})
         .click(function() {
+            tagDialogOn = true;
             $("#tag-dialog").dialog("open");
             return false;
         });
@@ -225,10 +230,17 @@ function addTerm(term) {
 }
 
 function notify(message) {
-    var D = $('<div></div>');
-    D.dialog({autoOpen: true, dialogClass: 'alert', resizable: false, });
-    D.append(message);
-    D.delay(500).hide('fade', 'slow', function() { D.remove(); });
+    var D = $('<div style="text-align: center;" class="alert"></div>');
+        D.append(message);
+        D.dialog({   autoOpen:       true, 
+                    dialogClass:    'alert', 
+                    hide: 'fade',
+                    resizable:      false, });
+        D.delay(500)
+        .hide('fade', 'slow',   function() { 
+                                    D.dialog("close"); 
+                                    D.remove();
+                                });
 }
 
 function initTagSearch() {

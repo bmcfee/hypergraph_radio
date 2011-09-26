@@ -486,8 +486,8 @@ function getTags(song_id) {
                             .click(function() {
                                 if (addTerm(v)) {
                                     // create a popup
-
-                                    notify("Added " + v + " to tag filter");
+                                    
+                                    notify("Added <span style='font-weight: bold; color: #4488cc;'>" + v + "</span> to tag filter");
                                 }
                             });
             tagbox.append(link);
