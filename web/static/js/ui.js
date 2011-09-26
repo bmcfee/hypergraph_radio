@@ -185,6 +185,7 @@ $(function() {
         .click(function() {
             tagDialogOn = true;
             $("#tag-dialog").dialog("open");
+            $(this).removeClass("update");
             return false;
         });
 

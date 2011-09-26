@@ -165,3 +165,7 @@ li.playing {
 a.artist-tag:hover {
     text-decoration: underline;
 }
+
+.update{
+    color: red;
+}

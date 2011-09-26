@@ -498,6 +498,7 @@ function getTags(song_id) {
                                     // create a popup
                                     
                                     notify("Added <span style='font-weight: bold; color: #4488cc;'>" + v + "</span> to tag filter");
+                                    $("#showtagdialog").addClass("update");
                                 }
                             });
             tagbox.append(link);
