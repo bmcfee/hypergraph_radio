@@ -267,7 +267,7 @@ function initTagSearch() {
                     }
                     $(this).val('');
                     return false;
-                }
+                },
             });
     });
 }

@@ -11,6 +11,11 @@ body {
     padding:            0px;
 }
 
+.ui-autocomplete {
+    max-height: 50%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
 .ui-autocomplete-loading { 
     background:         white url('/i/loader.gif') right center no-repeat; 
 }
