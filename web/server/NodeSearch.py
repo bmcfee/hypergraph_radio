@@ -120,7 +120,7 @@ class Root(object):
         # Build the tag list
         q_taglist = whoosh.query.NullQuery
         for t in tag_filter:
-            q_taglist |= whoosh.query.Term("terms", t)
+            q_taglist &= whoosh.query.Term("terms", t)
 
         query = (q_neighbor - q_notlist) & q_taglist
 
