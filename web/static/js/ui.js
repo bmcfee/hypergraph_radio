@@ -182,16 +182,23 @@ $(function() {
                 });
     $( "#showtagdialog" )
         .button({ label: 'Tag filter', icons: {primary: 'ui-icon-plus'}, disabled: false})
-        .click(function() {
-            tagDialogOn = true;
-            $("#tag-dialog").dialog("open");
-            $(this).removeClass("update");
-            return false;
-        });
+        .click(showTagDialog);
 
     initTagSearch();
     initRdioPlayer();
 });
+
+
+function showTagDialog() {
+    $("#no-songs-message")
+        .addClass("hidden");
+    tagDialogOn         = true;
+    $("#tag-dialog")
+        .dialog("open");
+    $("#showtagdialog")
+        .removeClass("update");
+    return false;
+}
 
 function tagExists(term) {
 

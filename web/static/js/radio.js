@@ -241,6 +241,13 @@ function importSongs(data, shouldPlay) {
 
 function loadSong(song_id) {
     $.getJSON('/queue/', {query: song_id}, function(data) { 
+                                                if (data.length == 0) {
+                                                    // no songs!
+                                                    showTagDialog();
+                                                    $("#no-songs-message")
+                                                        .removeClass("hidden");
+                                                    return;
+                                                }
                                                 importSongs(data, $("li.playing").length == 0); 
                                                 updatePlayerFromList(false);
                                             });
@@ -303,6 +310,13 @@ function askForSongs(node, deleteAfter) {
                     tag_filter: JSON.stringify(getActiveTags())
                 }, 
                 function(data, textStatus, jqXHR) { 
+                    if (data.length == 0) {
+                        // no songs!
+                        showTagDialog();
+                        $("#no-songs-message")
+                            .removeClass("hidden");
+                        return;
+                    }
                     for (var i = data.length - 1; i >= 0; i--) {
                         node.after(createSongNode(data[i]));
                     }

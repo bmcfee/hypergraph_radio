@@ -105,35 +105,41 @@ class Root(object):
         #       song_id not in not_list
         #       matching tag_filter
 
-
+        not_list = set(not_list)
         # Build the neighbor part of the query
         q_neighbor = whoosh.query.NullQuery
         if before in self.model:
             for n in self.model[before]:
-                q_neighbor |= whoosh.query.Term("song_id", n)
+                if n not in not_list:
+                    q_neighbor |= whoosh.query.Term("song_id", unicode(n))
             
-        # Build the exlusion list
-        q_notlist = whoosh.query.NullQuery
-        for x in not_list:
-            q_notlist |= whoosh.query.Term("song_id", x)
-
         # Build the tag list
         q_taglist = whoosh.query.NullQuery
         for t in tag_filter:
-            q_taglist &= whoosh.query.Term("terms", t)
+            q_taglist &= whoosh.query.Term("terms", unicode(t))
 
-        query = (q_neighbor - q_notlist) & q_taglist
+        # Build the exclusion list
+#         q_notlist = whoosh.query.NullQuery
+#         for x in not_list:
+#             q_notlist |= whoosh.query.Term("song_id", unicode(x))
+
+#         query = q_taglist & q_neighbor - q_notlist
+        query = q_taglist & q_neighbor 
+
+        print query
 
         with self.index.searcher() as searcher:
             results = searcher.search(query)
             
             ids = [r['song_id'] for r in results]
+
+            pprint.pprint(ids)
             if len(ids) > 0:
                 return [self.package(random.choice(ids))]
             pass
 
         # if we fail, return some garbage
-        return [self.package('SOITXNB12A8C144ECD')]
+        return []
 
 
     def package(self, song_id):
@@ -154,4 +160,5 @@ class Root(object):
         if qid in self.songToRdio and self.songToRdio[qid] is not None:
             return [self.package(qid)]
         else:
-            return [self.package('SOCWJDB12A58A776AF')]
+            return []
+

@@ -6,8 +6,8 @@
 
         <script type="text/javascript" src="http://www.google.com/jsapi"></script> 
         <script type="text/javascript"> google.load("swfobject", "2.2");    </script>
-        <script type="text/javascript"> google.load("jquery", "1.6.2");     </script>
-        <script type="text/javascript"> google.load("jqueryui", "1.8.16");  </script> 
+        <script type="text/javascript"> google.load("jquery", "1.6");     </script>
+        <script type="text/javascript"> google.load("jqueryui", "1.8");  </script> 
 
         <link   rel     ="stylesheet"
                 href    ="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-darkness/jquery-ui.css"
@@ -87,8 +87,15 @@
             </div>
 
             <div id="tag-dialog">
+                <div id="no-songs-message" class="hidden">
+                    <h3>No songs could be found!</h3>
+
+                    Try removing some tags.
+                </div>
                 <input id="tagsearch" />
-                <div id="activetags"></div>
+                <div id="activetags">
+                    <h4>Play songs matching:</h4>
+                </div>
             </div>
         </div>
     </body>
