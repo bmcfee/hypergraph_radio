@@ -4,11 +4,6 @@
 		<title>Markovoni Radio</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 
-        <script type="text/javascript" src="http://www.google.com/jsapi"></script> 
-        <script type="text/javascript"> google.load("swfobject", "2.2");    </script>
-        <script type="text/javascript"> google.load("jquery", "1.6");     </script>
-        <script type="text/javascript"> google.load("jqueryui", "1.8");  </script> 
-
         <link   rel     ="stylesheet"
                 href    ="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-darkness/jquery-ui.css"
                 type    ="text/css"
@@ -20,6 +15,11 @@
                 type    ="text/css"
                 media   ="all"
         />
+
+        <script type="text/javascript" src="http://www.google.com/jsapi"></script> 
+        <script type="text/javascript"> google.load("swfobject", "2.2");    </script>
+        <script type="text/javascript"> google.load("jquery", "1.6");     </script>
+        <script type="text/javascript"> google.load("jqueryui", "1.8");  </script> 
 
         <script type="text/javascript" src="js/radio.js"></script>
         <script type="text/javascript" src="js/ui.js"></script>
@@ -73,7 +73,7 @@
             </div>
 
             <div id="howto">
-            Empty playlist?  Try searching for some music!
+                Empty playlist?  Try searching for some music!
             </div>
             <div id="artist-info">
                 <img id="artist-image" />
@@ -89,12 +89,11 @@
             <div id="tag-dialog">
                 <div id="no-songs-message" class="hidden">
                     <h3>No songs could be found!</h3>
-
                     Try removing some tags.
                 </div>
                 <input id="tagsearch" />
                 <div id="activetags">
-                    <h4>Play songs matching:</h4>
+                    <h4 style="text-align:left">Songs must match:</h4>
                 </div>
             </div>
         </div>

@@ -5,6 +5,8 @@ var infiniteRadio   = true;
 var volumeOn        = true;
 var tagDialogOn     = false;
 
+var sliding         = false;
+
 // Handle keyboard events
 $(document).keydown(function (e) {
     if ($("#search").is(":focus") || tagDialogOn) {
@@ -91,7 +93,14 @@ function toggleVolume(buttonNode) {
 
 // Initialize control widgets and start the player
 $(function() {
-    $( "#trackprogress" ).slider({slide: seekTrack, animate: true, disabled: true, range: "min", step: 1});
+    $( "#trackprogress" )
+        .slider({   slide:      seekTrack, 
+                    animate:    false, 
+                    disabled:   true, 
+                    range:      "min", 
+                    start:      function() { sliding = true; },
+                    stop:       function() { sliding = false;},
+        });
 
     $( "#previous" )
         .button({ text: false, icons: { primary: "ui-icon-seek-start" }, disabled: true })

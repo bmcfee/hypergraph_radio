@@ -118,27 +118,18 @@ class Root(object):
         for t in tag_filter:
             q_taglist &= whoosh.query.Term("terms", unicode(t))
 
-        # Build the exclusion list
-#         q_notlist = whoosh.query.NullQuery
-#         for x in not_list:
-#             q_notlist |= whoosh.query.Term("song_id", unicode(x))
-
-#         query = q_taglist & q_neighbor - q_notlist
         query = q_taglist & q_neighbor 
 
-        print query
 
         with self.index.searcher() as searcher:
             results = searcher.search(query)
             
             ids = [r['song_id'] for r in results]
 
-            pprint.pprint(ids)
             if len(ids) > 0:
                 return [self.package(random.choice(ids))]
             pass
 
-        # if we fail, return some garbage
         return []
 
 
@@ -149,16 +140,15 @@ class Root(object):
         S = {   'song_id':  song_id, 
                 'rdio_id':  self.songToRdio[song_id],
                 'artist':   unicode(self.songMeta[song_id]['artist'], 'utf-8', errors='replace'),
-                'title':    unicode(self.songMeta[song_id]['title'], 'utf-8', errors='replace') }
+                'title':    unicode(self.songMeta[song_id]['title'],  'utf-8', errors='replace') }
         return S
 
 
-    def queue(self, qid):
+    def song(self, qid):
         '''
             wrapper for song access
         '''
         if qid in self.songToRdio and self.songToRdio[qid] is not None:
             return [self.package(qid)]
-        else:
-            return []
+        return []
 

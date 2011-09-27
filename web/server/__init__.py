@@ -49,9 +49,9 @@ class Root:
         pass
     
     @cherrypy.expose
-    def queue(self, query=None):
+    def song(self, query=None):
         self._rdio.refresh()
-        return json.encode(self._search.queue(query))
+        return json.encode(self._search.song(query))
 
     @cherrypy.expose
     def search(self, query=None):
