@@ -43,7 +43,7 @@ def filterThisPlaylist(P, searcher, qa, qt):
     # First, map the playlist to a sequence of song ids or nones
     songs = []
     for (artist, song) in P['playlist']:
-        results = searcher.search(qa.parse(artist) & qt.parse(song))
+        results = searcher.search(qa.parse(artist) & qt.parse(song), limit=1)
         if len(results) > 0:
             songs.append(results[0]['song_id'])
         else:
