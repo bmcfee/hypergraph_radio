@@ -62,8 +62,9 @@ def filterPlaylists(playlist_dir, index_dir, filterpickle):
     with index.searcher() as searcher:
         qa = whoosh.qparser.QueryParser('artist', index.schema)
         qt = whoosh.qparser.QueryParser('title', index.schema)
-        for P in playlistGenerator(playlist_dir):
+        for (i, P) in enumerate(playlistGenerator(playlist_dir)):
             filtered_playlists.append(filterThisPlaylist(P, searcher, qa, qt))
+            print '%6d' % i
 
     with open(filterpickle, 'w') as f:
         pickle.dump(filtered_playlists, f)
