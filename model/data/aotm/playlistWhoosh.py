@@ -30,25 +30,31 @@ def splitPlaylists(S):
         yield q
 
 
-bkiller = re.compile('\(.*?\)|\[.*?\]')
+bkiller = re.compile('\(.*?\)|\[.*?\]|\{.*?\}')
 
 def filterThisPlaylist(P, searcher, qa, qt):
 
     # First, map the playlist to a sequence of song ids or nones
     songs = []
     for (artist, song) in P['playlist']:
-        song = bkiller.sub(' ', song)
-
+        song = bkiller.sub(' ', song).strip()
+        artist = bkiller.sub(' ', artist).strip()
         if len(artist) == 0 or len(song) == 0:
             continue
 
         # Kill song title bits in brackets or parentheses
-        results = searcher.search(qa.parse(artist) & qt.parse(song), limit=1)
+
+        q_artist    = qa.parse(artist)
+        q_title     = qt.parse(song)
+        results     = searcher.search(q_artist & q_title, limit=1)
+
         if len(results) > 0:
             songs.append(results[0]['song_id'])
+            pprint.pprint((artist, song, songs[-1], results[0]['artist'], results[0]['title']))
         else:
             songs.append(None)
-        pprint.pprint((artist, song, songs[-1]))
+            pprint.pprint((artist, song, None))
+
     # Now, split the sequence by Nones
     P['filtered_lists'] = [x for x in splitPlaylists(songs)]
     return P
@@ -65,16 +71,10 @@ def filterPlaylists(playlist_pickle, index_dir, filterpickle):
     index = whoosh.index.open_dir(index_dir)
 
     with index.searcher() as searcher:
-        qa = whoosh.qparser.QueryParser('artist', index.schema)
-        qt = whoosh.qparser.QueryParser('title', index.schema)
+        qa = whoosh.qparser.SimpleParser('artist', index.schema)
+        qt = whoosh.qparser.SimpleParser('title', index.schema)
         
         for x in [qa, qt]:
-            x.remove_plugin_class(whoosh.qparser.WildcardPlugin)
-            x.remove_plugin_class(whoosh.qparser.PrefixPlugin)
-            x.remove_plugin_class(whoosh.qparser.RegexPlugin)
-            x.remove_plugin_class(whoosh.qparser.BoostPlugin)
-            x.remove_plugin_class(whoosh.qparser.OperatorsPlugin)
-            x.remove_plugin_class(whoosh.qparser.FieldsPlugin)
             x.remove_plugin_class(whoosh.qparser.PlusMinusPlugin)
 
         for (i, P) in enumerate(playlists):
