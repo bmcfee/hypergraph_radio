@@ -13,6 +13,7 @@ Usage:
 import cPickle as pickle
 import sys, os, glob
 import pprint
+import re
 
 import whoosh, whoosh.index, whoosh.qparser
 
@@ -28,14 +29,20 @@ def splitPlaylists(S):
     if len(q) > 0:
         yield q
 
+
+bkiller = re.compile('\(.*?\)|\[.*?\]')
+
 def filterThisPlaylist(P, searcher, qa, qt):
 
     # First, map the playlist to a sequence of song ids or nones
     songs = []
     for (artist, song) in P['playlist']:
+        song = bkiller.sub(' ', song)
+
         if len(artist) == 0 or len(song) == 0:
             continue
-#         pprint.pprint((artist, song))
+
+        # Kill song title bits in brackets or parentheses
         results = searcher.search(qa.parse(artist) & qt.parse(song), limit=1)
         if len(results) > 0:
             songs.append(results[0]['song_id'])

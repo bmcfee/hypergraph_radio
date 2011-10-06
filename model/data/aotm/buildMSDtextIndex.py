@@ -21,7 +21,7 @@ def createIndexWriter(indexPath):
     if not os.path.exists(indexPath):
         os.mkdir(indexPath)
 
-    A = whoosh.analysis.StemmingAnalyzer() | whoosh.analysis.CharsetFilter(accent_map)
+    A = whoosh.analysis.FancyAnalyzer() | whoosh.analysis.CharsetFilter(accent_map)
 
     Schema = whoosh.fields.Schema(  song_id     = whoosh.fields.ID(stored=True),
                                     artist      = whoosh.fields.TEXT(stored=True, analyzer=A),
@@ -43,11 +43,13 @@ def createIndex(trackfile, indexPath):
         
     writer = createIndexWriter(indexPath)
 
-    for (s, a, t) in parseTracks(trackfile):
+    for (i, (s, a, t)) in enumerate(parseTracks(trackfile)):
 
         writer.add_document(song_id     =   s,
                             artist      =   a,
                             title       =   t)
+        if i % 1000 == 0:
+            print '%6d...' % i
     writer.commit()
     pass
 
