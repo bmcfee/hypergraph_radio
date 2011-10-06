@@ -31,9 +31,9 @@ def splitPlaylists(S):
 
 
 def processResults(results):
-'''
-Only count a match if it hits on both artist and title
-'''
+    '''
+    Only count a match if it hits on both artist and title
+    '''
     output = (None,)
     for r in results:
         if len(r.matched_terms()) < 2:
@@ -87,6 +87,7 @@ def filterPlaylists(playlist_pickle, index_dir, filterpickle):
     index = whoosh.index.open_dir(index_dir)
 
     with index.searcher() as searcher:
+        searcher.set_caching_policy(save=False)
         qa = whoosh.qparser.SimpleParser('artist', index.schema)
         qt = whoosh.qparser.SimpleParser('title', index.schema)
         
