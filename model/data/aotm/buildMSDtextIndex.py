@@ -35,7 +35,7 @@ def parseTracks(trackfile):
 
     with open(trackfile, 'r') as f:
         for line in f:
-            (track, song, artist, title) = map(lambda x: unicode(x, 'latin-1', errors='replace'), line.strip().split('<SEP>', 4))
+            (track, song, artist, title) = map(lambda x: unicode(x, 'utf-8', errors='replace'), line.strip().split('<SEP>', 4))
             yield (song, artist, title)
     pass
 
