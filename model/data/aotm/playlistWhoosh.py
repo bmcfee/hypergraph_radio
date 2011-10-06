@@ -30,6 +30,19 @@ def splitPlaylists(S):
         yield q
 
 
+def processResults(results):
+'''
+Only count a match if it hits on both artist and title
+'''
+    output = (None,)
+    for r in results:
+        if len(r.matched_terms()) < 2:
+            continue
+        output = (r['song_id'], r['artist'], r['title'])
+        break
+    return output
+
+
 bkiller = re.compile('\(.*?\)|\[.*?\]|\{.*?\}')
 
 def filterThisPlaylist(P, searcher, qa, qt):
@@ -46,15 +59,18 @@ def filterThisPlaylist(P, searcher, qa, qt):
 
         q_artist    = qa.parse(artist)
         q_title     = qt.parse(song)
-        results     = searcher.search(q_artist & q_title, limit=1)
+        results     = searcher.search(q_artist & q_title, terms=True)
 
-        if len(results) > 0:
-            songs.append(results[0]['song_id'])
-            pprint.pprint((artist, song, songs[-1], results[0]['artist'], results[0]['title']))
-        else:
-            songs.append(None)
-            pprint.pprint((artist, song, None))
-
+#         hit = False
+#         if len(results) > 0:
+#             songs.append(results[0]['song_id'])
+#             pprint.pprint((artist, song, songs[-1], results[0]['artist'], results[0]['title']))
+#         else:
+#             songs.append(None)
+#             pprint.pprint((artist, song, None))
+        output = processResults(results)
+        songs.append(output[0])
+        pprint.pprint((artist, song, output))
     # Now, split the sequence by Nones
     P['filtered_lists'] = [x for x in splitPlaylists(songs)]
     return P

@@ -10,8 +10,8 @@ if __name__ == '__main__':
 
     with index.searcher() as search:
         q = whoosh.qparser.MultifieldParser(['title', 'artist'], index.schema).parse(unicode(' '.join(sys.argv[2:])))
-        results = search.search(q)
-        if len(results) > 0:
-            for r in results:
-                pprint.pprint(r)
-                print '---'
+        results = search.search(q, terms=True)
+        for r in results:
+            pprint.pprint(r)
+            pprint.pprint(r.matched_terms())
+            print '---'
