@@ -59,19 +59,14 @@ def filterThisPlaylist(P, searcher, qa, qt):
 
         q_artist    = qa.parse(artist)
         q_title     = qt.parse(song)
-        results     = searcher.search(q_artist & q_title, terms=True)
-
-#         hit = False
-#         if len(results) > 0:
-#             songs.append(results[0]['song_id'])
-#             pprint.pprint((artist, song, songs[-1], results[0]['artist'], results[0]['title']))
-#         else:
-#             songs.append(None)
-#             pprint.pprint((artist, song, None))
-        output = processResults(results)
+        if q_artist == whoosh.query.NullQuery() or q_title == whoosh.query.NullQuery():
+            output = (None,)
+        else:
+            output = processResults(searcher.search(q_artist & q_title, terms=True))
         songs.append(output[0])
-        pprint.pprint((artist, song, output))
+#         pprint.pprint((artist, song, output))
     # Now, split the sequence by Nones
+    P['playlist'] = zip(P['playlist'], songs)
     P['filtered_lists'] = [x for x in splitPlaylists(songs)]
     return P
 
@@ -98,6 +93,8 @@ def filterPlaylists(playlist_pickle, index_dir, filterpickle):
             filtered_playlists.append(filterThisPlaylist(P, searcher, qa, qt))
             if i % 10 == 0:
                 print '%5d/%5d' % (i, N)
+            if i > 20:
+                break;
 
     with open(filterpickle, 'w') as f:
         pickle.dump(filtered_playlists, f)
