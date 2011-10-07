@@ -3,16 +3,19 @@
 
 var infiniteRadio   = true;
 var volumeOn        = true;
+var tagDialogOn     = false;
+
+var sliding         = false;
 
 // Handle keyboard events
 $(document).keydown(function (e) {
-    if ($("#search").is(":focus")) {
+    if ($("#search").is(":focus") || tagDialogOn) {
         return;
     }
 //     console.log(e.which);
     switch (e.which) {
 
-        case 75:    // K        (vi keys)
+        case 75:    // K        (up/prev)
         case $.ui.keyCode.LEFT:
             previousTrack();
             e.preventDefault();
@@ -22,8 +25,13 @@ $(document).keydown(function (e) {
             $("#search").focus();
             e.preventDefault();
             break;
+    
+        case 88:    // X        (delete)
+            deleteCurrentSong();
+            e.preventDefault();
+            break;
 
-        case 74:    // J
+        case 74:    // J        (down/next)
         case $.ui.keyCode.RIGHT:
             nextTrack();
             e.preventDefault();
@@ -32,6 +40,16 @@ $(document).keydown(function (e) {
         case $.ui.keyCode.DOWN:
             break;
         case $.ui.keyCode.UP:
+            break;
+
+        case 65:    // A        (append)
+            expandPlaylist();
+            e.preventDefault();
+            break;
+
+        case 73:    // I        (insert)
+            insertSong();
+            e.preventDefault();
             break;
 
         case 77:    // M        (mute)
@@ -75,7 +93,14 @@ function toggleVolume(buttonNode) {
 
 // Initialize control widgets and start the player
 $(function() {
-    $( "#trackprogress" ).slider({slide: seekTrack, animate: true, disabled: true, range: "min", step: 1});
+    $( "#trackprogress" )
+        .slider({   slide:      seekTrack, 
+                    animate:    false, 
+                    disabled:   true, 
+                    range:      "min", 
+                    start:      function() { sliding = true; },
+                    stop:       function() { sliding = false;},
+        });
 
     $( "#previous" )
         .button({ text: false, icons: { primary: "ui-icon-seek-start" }, disabled: true })
@@ -100,8 +125,8 @@ $(function() {
     $( "#toolbar" )
         .buttonset();
 
-    $( "#infinite" )
-        .button({ label: "Radio " + (infiniteRadio ? "ON" : "OFF"), icons: { primary: "ui-icon-signal-diag"}, disabled: false})
+    $( "#autopilot" )
+        .button({ label: "Auto-pilot " + (infiniteRadio ? "ON" : "OFF"), icons: { primary: "ui-icon-signal-diag"}, disabled: false})
         .click(function() {toggleRadio($(this));});
 
     $( "#expand" )
@@ -117,6 +142,7 @@ $(function() {
                 revert: 'invalid'
         })
         .disableSelection();
+
 
     $( "#search" )
         .autocomplete({
@@ -147,5 +173,117 @@ $(function() {
         };
 
 
+    $( "#tag-dialog" )
+        .dialog({   autoOpen:   false, 
+                    modal:      true,
+                    title:      'Modify your playlist tag filter',
+                    buttons:    {
+                        "Clear tags": function() {
+                            $("#activetags > div.tag-item").remove();
+                        },
+                        Done: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    },
+                    close: function(e, ui) {
+                        tagDialogOn = false;
+                    }
+                });
+    $( "#showtagdialog" )
+        .button({ label: 'Tag filter', icons: {primary: 'ui-icon-plus'}, disabled: false})
+        .click(showTagDialog);
+
+    initTagSearch();
     initRdioPlayer();
 });
+
+
+function showTagDialog() {
+    $("#no-songs-message")
+        .addClass("hidden");
+    tagDialogOn         = true;
+    $("#tag-dialog")
+        .dialog("open");
+    $("#showtagdialog")
+        .removeClass("update");
+    return false;
+}
+
+function tagExists(term) {
+
+    var match = false;
+
+    /* check for existing tag */
+    $("input.tag-item-name").each( function(i, E) {
+        if (term == E.value) {
+            match = true;
+            return false;
+        }
+    });
+
+    return match;
+}
+
+function addTerm(term) {
+    if (tagExists(term)) {
+        return false;
+    }
+
+    console.log('Adding term: ' + term);
+
+    var tagNode = $("<div class='tag-item'></div>");
+
+    tagNode.text(term);
+    var killButton = $("<button style='font-size: 5pt; float:right; margin-left: 4pt;'>Delete tag</button>");
+    killButton.button({text: false, icons: { primary: "ui-icon-close"}})
+        .click(function() {$(this).parent().remove();});
+    tagNode.append(killButton);
+
+    tagNode.append($('<input type="hidden" class="tag-item-name" />')
+                        .attr('value', term));
+    $("#activetags")
+        .append(tagNode);
+    return true;
+}
+
+function removeTerm(term) {
+    $("input.tag-item-name").each(function(i,E) {
+        if (term == E.value) {
+            $(E).parent().remove();
+            return false;
+        }
+    });
+}
+
+function notify(message) {
+    var D = $('<div style="text-align: center;"></div>');
+        
+    D.append(message);
+    D.dialog({  autoOpen:       true, 
+                dialogClass:    'alert', 
+                hide:           'fade',
+                resizable:      false });
+    D.delay(1000).queue(function() {
+        D.dialog("close");
+    });
+}
+
+function initTagSearch() {
+    var terms;
+
+    $.getJSON('/terms/', {}, function(data) {
+        $("#tagsearch")
+            .autocomplete({ 
+                source:     data, 
+                minLength:  2, 
+                closeOnEscape: false,
+                select:     function(e, ui) {
+                    if (ui.item) {
+                        addTerm(ui.item.value);
+                    }
+                    $(this).val('');
+                    return false;
+                },
+            });
+    });
+}

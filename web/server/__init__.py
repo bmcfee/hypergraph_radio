@@ -5,13 +5,8 @@ from ConfigParser import SafeConfigParser
 import os
 import cjson as json
 
-import NodeRdio
-import NodePlaylist
-import NodeSearch
-
+import NodeRdio, NodeSearch
 import MyEchoNest
-
-
 
 
 class Root:
@@ -24,18 +19,16 @@ class Root:
         self.basedir    = self.config.get('server', 'root')
         self.staticdir  = os.path.join(self.basedir, self.config.get('server', 'static'))
 
-
-        self._playlist  = NodePlaylist.Root( 
-            os.path.join(self.basedir, self.config.get('server', 'song_meta')),
-            os.path.join(self.basedir, self.config.get('server', 'rdio_index')),
-            os.path.join(self.basedir, self.config.get('server', 'playlist_model')))
-
         self._rdio      = NodeRdio.Root(    self.config.get('rdio', 'api_key'), 
                                             self.config.get('rdio', 'secret'),
                                             self.config.get('rdio', 'domain'),
                                             self.config.get('rdio', 'playback_ttl'))
 
-        self._search    = NodeSearch.Root(  os.path.join(self.basedir, self.config.get('server', 'text_index')))
+        self._search    = NodeSearch.Root(  
+                                os.path.join(self.basedir, self.config.get('server', 'text_index')),
+                                os.path.join(self.basedir, self.config.get('server', 'song_meta')),
+                                os.path.join(self.basedir, self.config.get('server', 'rdio_index')),
+                                os.path.join(self.basedir, self.config.get('server', 'playlist_model')))
 
         self._EN        = MyEchoNest.EN(self.config.get('echonest', 'api_key'))
 
@@ -50,20 +43,24 @@ class Root:
         pass
 
     @cherrypy.expose
-    def playlist(self, before=None, after=None, not_list=None):
+    def playlist(self, before=None, after=None, not_list=None, tag_filter=None):
         self._rdio.refresh()
-        return json.encode(self._playlist.sample(before, after, json.decode(not_list)))
+        return json.encode(self._search.sample(before, after, json.decode(not_list), json.decode(tag_filter)))
         pass
     
     @cherrypy.expose
-    def queue(self, query=None):
+    def song(self, query=None):
         self._rdio.refresh()
-        return json.encode(self._playlist.queue(query))
+        return json.encode(self._search.song(query))
 
     @cherrypy.expose
     def search(self, query=None):
         self._rdio.refresh()
-        return json.encode(self._search.search(query + '*'))
+        return json.encode(self._search.search(query))
+
+    @cherrypy.expose
+    def terms(self):
+        return json.encode(self._search.all_terms())
 
     @cherrypy.expose
     def tags(self, query=None):
@@ -79,4 +76,5 @@ class Root:
     def index(self):
         self._rdio.refresh()
         return serve_file(os.path.join(self.staticdir, 'player.html'), content_type='text/html')
+
 
