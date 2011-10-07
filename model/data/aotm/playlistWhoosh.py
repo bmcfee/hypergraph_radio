@@ -93,8 +93,6 @@ def filterPlaylists(playlist_pickle, index_dir, filterpickle):
             filtered_playlists.append(filterThisPlaylist(P, searcher, qa, qt))
             if i % 10 == 0:
                 print '%5d/%5d' % (i, N)
-            if i > 20:
-                break;
 
     with open(filterpickle, 'w') as f:
         pickle.dump(filtered_playlists, f)
