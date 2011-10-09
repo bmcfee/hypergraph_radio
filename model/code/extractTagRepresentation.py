@@ -8,6 +8,7 @@ Usage: ./extractTagRepresentation.py tag_metric.pickle songs.txt /1mil/ output.p
 """
 
 import sys, os, numpy
+import cPickle as pickle
 
 import pprint
 import sqlite3
@@ -29,7 +30,7 @@ def getTagVector(dbc, vocab, artist_id):
 def getArtistIDs(insongs, basedir):
     
     artistList = {}
-    with sqlite3.connect(basedir + '/AdditionalFiles/subset_track_metadata.db') as dbc:
+    with sqlite3.connect(basedir + '/AdditionalFiles/track_metadata.db') as dbc:
         cur = dbc.cursor()
 
         for song_id in insongs:
