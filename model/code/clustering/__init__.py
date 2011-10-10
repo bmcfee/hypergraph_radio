@@ -121,6 +121,19 @@ class Clustering(object):
             pass
         return R
 
+    def addpoint(self, x_id, x_vec):
+
+        d = numpy.infty
+        closest = 0
+        for c in self:
+            d_c = c.distance(x_vec)
+            if d_c < d:
+                d       = d_c
+                closest = c
+            pass
+
+        closest.add(x_id)
+        pass
 
 
 
@@ -172,9 +185,12 @@ class Cluster(object):
 
         # add data to the clustering
         for x in self.__points:
-            C.add(x, X[x])
+            C.addpoint(x, X[x])
 
         return C
+
+    def __iter__(self):
+        return self.__points.__iter__()
 
 
 def onlineKmeans(k, points, X, use_lloyd=False):
@@ -184,7 +200,7 @@ def onlineKmeans(k, points, X, use_lloyd=False):
         return sum((mu -x)**2)
         
     def hartigan(mu, x, n):
-        return lloyd(my, x, n) * n / (n + 1.0)
+        return lloyd(mu, x, n) * n / (n + 1.0)
 
     # 1: randomly permute the point set
     points = list(points)
@@ -194,7 +210,7 @@ def onlineKmeans(k, points, X, use_lloyd=False):
     counters = numpy.zeros(k)
 
     # 3. allocate centroids
-    centroids = numpy.zeros(k, X.dimension())
+    centroids = numpy.zeros([k, X.dimension()])
 
     score = hartigan
     if use_lloyd:
@@ -204,7 +220,7 @@ def onlineKmeans(k, points, X, use_lloyd=False):
     for (i, x) in enumerate(points):
         # Initialize centroids to the first k points
         if i < k:
-            centroids[i]    = x
+            centroids[i,:]  = X[x].copy()
             counters[i]     = 1.0
             continue
 
@@ -219,7 +235,7 @@ def onlineKmeans(k, points, X, use_lloyd=False):
             pass
 
         # Update centroid
-        centroids[closest] = (centroids[closest] * counters[closest] + X[x]) / (counters[closest] + 1.0)
+        centroids[closest,:] = (centroids[closest,:] * counters[closest] + X[x]) / (counters[closest] + 1.0)
         counters[closest] += 1.0
 
         pass

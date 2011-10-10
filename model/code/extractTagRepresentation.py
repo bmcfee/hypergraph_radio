@@ -59,7 +59,7 @@ def crunchData(parameters, song_list, basedir, outfile, dbc):
     data = clustering.FeatureMap()
     for (i, s) in enumerate(song_ids):
         print '%6d/%6d %s' % (i, len(song_ids), s)
-        data[i] = getTagVector(dbc, P['vocab'], artists[s], P['L'])
+        data[s] = getTagVector(dbc, P['vocab'], artists[s], P['L'])
 
     with open(outfile, 'w') as f:
         pickle.dump({'X': data}, f)
