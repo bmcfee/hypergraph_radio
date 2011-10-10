@@ -55,7 +55,7 @@ class Clustering(object):
     
     def __init__(self, points=None, description=None):
         self.__clusters     = []
-        self.__description  = 'Clustering_' + time.time()
+        self.__description  = 'Clustering_' + str(time.time())
 
         if points is not None:
             if type(points) is not set:
