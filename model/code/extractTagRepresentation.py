@@ -13,9 +13,10 @@ import cPickle as pickle
 import pprint
 import sqlite3
 
+import clustering
 
 
-def getTagVector(dbc, vocab, artist_id):
+def getTagVector(dbc, vocab, artist_id, L):
 
     vector = numpy.zeros(len(vocab))
 
@@ -25,20 +26,20 @@ def getTagVector(dbc, vocab, artist_id):
         if term in vocab:
             vector[vocab[term]] = 1
 
-    return vector
+    return numpy.dot(L, vector)
+
 
 def getArtistIDs(insongs, basedir):
-    
     artistList = {}
+    insongs = set(insongs)
     with sqlite3.connect(basedir + '/AdditionalFiles/track_metadata.db') as dbc:
         cur = dbc.cursor()
-
-        for song_id in insongs:
-            cur.execute('''SELECT artist_id FROM songs WHERE song_id = ?''', (song_id,))
-            (artist_id,) = cur.fetchone()
-            artistList[song_id] = artist_id
-
+        cur.execute('''SELECT song_id, artist_id FROM songs''')
+        for (song_id, artist_id) in cur:
+            if song_id in insongs:
+                artistList[song_id] = artist_id
     return artistList
+
 
 
 def crunchData(parameters, song_list, basedir, outfile, dbc):
@@ -55,13 +56,13 @@ def crunchData(parameters, song_list, basedir, outfile, dbc):
     artists = getArtistIDs(song_ids, basedir)
 
     # Step 4: get tags for each artist
-    data = len(song_ids) * [None]
+    data = clustering.FeatureMap()
     for (i, s) in enumerate(song_ids):
         print '%6d/%6d %s' % (i, len(song_ids), s)
-        data[i] = P['L'] * getTagVector(dbc, P['vocab'], artists[s])
+        data[i] = getTagVector(dbc, P['vocab'], artists[s], P['L'])
 
     with open(outfile, 'w') as f:
-        pickle.dump({'data': data, 'song_ids': song_ids, 'artist_ids': [artists[x] for x in song_ids]}, f)
+        pickle.dump({'X': data}, f)
 
     pass
 

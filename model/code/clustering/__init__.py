@@ -187,7 +187,7 @@ def onlineKmeans(k, points, X, use_lloyd=False):
         return lloyd(my, x, n) * n / (n + 1.0)
 
     # 1: randomly permute the point set
-    points = [x for x in points]
+    points = list(points)
     random.shuffle(points)
 
     # 2. allocate cluster counters
