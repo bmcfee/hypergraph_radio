@@ -60,7 +60,7 @@ class Clustering(object):
         if points is not None:
             if type(points) is not set:
                 raise TypeError('points must be of type: set')
-            self.__clusters.append(Cluster(points))
+            self.__clusters.append(Cluster(None, points))
 
         if description is not None:
             if type(description) is not str:
@@ -177,7 +177,14 @@ class Cluster(object):
         return C
 
 
-def onlineKmeans(k, points, X):
+def onlineKmeans(k, points, X, use_lloyd=False):
+
+
+    def lloyd(mu,x,n):
+        return sum((mu -x)**2)
+        
+    def hartigan(mu, x, n):
+        return lloyd(my, x, n) * n / (n + 1.0)
 
     # 1: randomly permute the point set
     points = [x for x in points]
@@ -188,6 +195,11 @@ def onlineKmeans(k, points, X):
 
     # 3. allocate centroids
     centroids = numpy.zeros(k, X.dimension())
+
+    score = hartigan
+    if use_lloyd:
+        score = lloyd
+        pass
 
     for (i, x) in enumerate(points):
         # Initialize centroids to the first k points
@@ -200,8 +212,10 @@ def onlineKmeans(k, points, X):
         distance    = numpy.infty
         closest     = 0
         for (j, mu) in enumerate(centroids):
-            if sum((mu - X[x])**2) < distance:
-                closest = j
+            nd = score(mu, X[x], counters[j])
+            if nd < distance:
+                closest     = j
+                distance    = nd
             pass
 
         # Update centroid
