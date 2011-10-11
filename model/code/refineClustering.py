@@ -9,7 +9,7 @@ Usage:
 ./refineClustering.py clustering.pickle featuremap.pickle k DESCRIPTION_STRING output_clustering.pickle
 '''
 
-import sys
+import sys, os
 import cPickle as pickle
 import clustering
 
@@ -26,10 +26,9 @@ def refine(clustering_pickle, features_pickle, k, description, outpickle):
         features    = pickle.load(f)
     print ' done.'
 
-    print 'Refining clustering into %d...' % k,
+    print 'Refining each cluster into %d clusters...' % k
     C_new = clustering['C'].refine(k, features['X'])
     C_new.setDescription(description)
-    print ' done.'
 
     print 'Saving %s...' % outpickle,
     with open(outpickle, 'w') as f:
@@ -38,4 +37,5 @@ def refine(clustering_pickle, features_pickle, k, description, outpickle):
     pass
 
 if __name__ == '__main__':
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     refine(sys.argv[1], sys.argv[2], int(sys.argv[3]), sys.argv[4], sys.argv[5])
