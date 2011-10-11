@@ -1,11 +1,16 @@
 import numpy
 import clustering
+import pprint
 
 class Playlist(object):
     
     def __init__(self, songs):
         self.__songs = songs
         pass
+
+    def __len__(self):
+        return len(self.__songs)
+
 
     def likelihood(self, clusterings, model):
         # clusterings = list of m clusterings
@@ -14,6 +19,7 @@ class Playlist(object):
 
         (gamma, xi, ll) = self.forwardBackward(clusterings, model)
         return ll
+
 
     def forwardBackward(self, clusterings, model):
         n = len(clusterings)
@@ -35,6 +41,7 @@ class Playlist(object):
             c[t]            =   numpy.sum(alpha_hat[t,:])
             alpha_hat[t,:]  /=  c[t]
             ll              +=  numpy.log(c[t])
+
             pass
 
 
@@ -42,23 +49,20 @@ class Playlist(object):
         beta_hat[-1,:]      = 1.0 
         for t in range(T-2,-1,-1):
             beta_hat[t,:]   = [C.probability(self.__songs[t], self.__songs[t+1]) for C in clusterings]
-            beta_hat[t,:]   = beta_hat[t+1,:] * numpy.dot(beta_hat[t,:], model['A']) / c[t+1]
+            beta_hat[t,:]   = beta_hat[t+1,:] * numpy.dot(model['A'], beta_hat[t,:]) / c[t+1]
+
             pass
+
 
         gamma   = alpha_hat * beta_hat
         xi      = numpy.zeros((n,n))
 
         for t in range(1,T):
-            # c(t)^-1 * alpha(t-1) * p(xt | xt-1, zt) * p(zt | zt-1) * beta(t)
+            xi_new  =   beta_hat[t] * [C.probability(self.__songs[t-1], self.__songs[t]) for C in clusterings]
+            xi_new  =   numpy.outer(alpha_hat[t-1], xi_new) * model['A'] / c[t]
 
-            # z_t dependent
-            xi_new  =   beta_hat[t]
-            xi_new  *=  [C.probability(self.__songs[t-1], self.__songs[t]) for C in clusterings]
-
-            # z_t-1 dependent
-            xi_new  =   numpy.outer(alpha_hat[t-1], xi_new)
-            xi      += xi_new * model['A'] / c[t]
+            xi      += xi_new / sum(sum(xi_new))
             pass
     
-        return (gamma[0,:] / sum(gamma[0,:]), xi / sum(sum(xi)), ll)
+        return (gamma[0,:] / sum(gamma[0,:]), xi / (T-1), ll)
         pass
