@@ -12,38 +12,8 @@ class Playlist(object):
         # model = hash {'pi': initial clustering distribution over m clusterings
         #               'A': m-by-m transition matrix
 
-        (gamma, xi, l) = self.forwardBackward(clusterings, model)
-        return l
-
-
-    def forwardBackward_unnormalized(self, clusterings, model):
-
-        n = len(clusterings)
-        T = len(self.__songs)
-
-        # initialization
-        alpha       = numpy.zeros((T,n))
-        alpha[0,:]  = model['pi'] * [c.probability(self.__songs[0]) for c in clusterings]
-
-        beta        = numpy.zeros((T,n))
-        beta[T-1,:] = 1
-
-
-        for t in range(1,T):
-            # forward pass
-            alpha[t,:] = [c.probability(self.__songs[t-1], self.__songs[t]) for c in clusterings]
-            alpha[t,:] = alpha[t,:] * numpy.dot(alpha[t-1,:], model['A'])
-
-            # backward pass
-            beta[T-t,:] = [c.probability(self.__songs[T-t], self.__songs[T-t+1]) for c in clusterings]
-            beta[T-t,:] = beta[T-t+1,:] * numpy.dot(beta[T-t,:], model['A'])
-            pass
-
-        l       = numpy.sum(alpha[T-1,:])       # likelihood of the observation
-        gamma   = alpha * beta                  # state posteriors
-        xi      = numpy.zeros((n,n))            # transition joint probabilities
-        pass
-
+        (gamma, xi, ll) = self.forwardBackward(clusterings, model)
+        return ll
 
     def forwardBackward(self, clusterings, model):
         n = len(clusterings)
@@ -52,27 +22,27 @@ class Playlist(object):
         alpha_hat       = numpy.zeros((T,n))
         beta_hat        = numpy.zeros((T,n))
         c               = numpy.zeros(T)
-        likelihood      = 1.0
 
         # initialization
-        alpha_hat[0,:]  = model['pi'] * [c.probability(self.__songs[0]) for c in clusterings]
+        alpha_hat[0,:]  = model['pi'] * [C.probability(self.__songs[0]) for C in clusterings]
         c[0]            = numpy.sum(alpha_hat[0,:])
-        likelihood     *= c[0]
+        ll              = numpy.log(c[0])
 
         # forward pass
         for t in range(1,T):
-            alpha_hat[t,:]  =   [c.probability(self.__songs[t-1], self.__songs[t]) for c in clusterings]
+            alpha_hat[t,:]  =   [C.probability(self.__songs[t-1], self.__songs[t]) for C in clusterings]
             alpha_hat[t,:]  =   alpha_hat[t,:] * numpy.dot(alpha_hat[t-1,:], model['A'])
             c[t]            =   numpy.sum(alpha_hat[t,:])
             alpha_hat[t,:]  /=  c[t]
-            likelihood      *=  c[t]
+            ll              +=  numpy.log(c[t])
             pass
+
 
         # backward pass
         beta_hat[-1,:]      = 1.0 
-        for t in range(T-1):
-            beta_hat[T-t,:]   = [c.probability(self.__songs[T-t], self.__songs[T-t+1]) for c in clusterings]
-            beta_hat[T-t,:]   = beta_hat[T-t+1,:] * numpy.dot(beta[T-t,:], model['A']) / c[T-t+1]
+        for t in range(T-2,-1,-1):
+            beta_hat[t,:]   = [C.probability(self.__songs[t], self.__songs[t+1]) for C in clusterings]
+            beta_hat[t,:]   = beta_hat[t+1,:] * numpy.dot(beta_hat[t,:], model['A']) / c[t+1]
             pass
 
         gamma   = alpha_hat * beta_hat
@@ -83,12 +53,12 @@ class Playlist(object):
 
             # z_t dependent
             xi_new  =   beta_hat[t]
-            xi_new  *=  [c.probability(self.__songs[t-1], self.__songs[t]) for c in clusterings]
+            xi_new  *=  [C.probability(self.__songs[t-1], self.__songs[t]) for C in clusterings]
 
             # z_t-1 dependent
             xi_new  =   numpy.outer(alpha_hat[t-1], xi_new)
             xi      += xi_new * model['A'] / c[t]
             pass
     
-        return (gamma[0,:], xi, likelihood)
+        return (gamma[0,:] / sum(gamma[0,:]), xi / sum(sum(xi)), ll)
         pass
