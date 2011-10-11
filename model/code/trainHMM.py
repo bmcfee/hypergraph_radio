@@ -27,7 +27,7 @@ def loadPlaylists(inpickle):
 
     for q in playlists:
         P.append(playlist.Playlist(q))
-    return P[:50]
+    return P[:500]
 
 def loadClusterings(cluster_pickles):
 
@@ -70,7 +70,7 @@ def trainHMM(training_set_pickle, clustering_pickles):
             if k % step == 0:
                 print '\b.',
 
-        print '\b]: LL: %.5e, Delta=%.5e' % (e_mll, abs(mll - e_mll))
+        print '\b]: LL: %.5e, Delta=%.5e' % (e_mll, e_mll - mll)
         if abs(e_mll - mll) < TOLERANCE:
             break
 
