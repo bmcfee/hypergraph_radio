@@ -91,10 +91,16 @@ class Clustering(object):
         return self.__description
 
     
-    def probability(self, x1, x2):
-        for c in self:
-            if x1 in c and x2 in c:
-                return 1.0 / (len(c) - 1)
+    def probability(self, x1, x2=None):
+
+        if x2 is None:
+            for c in self:
+                if x1 in c:
+                    return 1.0 / (len(self) * len(c))
+        else:
+            for c in self:
+                if x1 in c and x2 in c:
+                    return 1.0 / (len(c) - 1)
         return 0.0
 
 
