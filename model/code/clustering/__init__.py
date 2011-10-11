@@ -113,12 +113,15 @@ class Clustering(object):
 
     def refine(self, k, X):
         R = None
+        print 'Refining clusters: [%s]%s' % (' ' * len(self), '\b' * (len(self)+1)),
         for c in self:
             if R is None:
                 R = c.refine(k, X)
             else:
                 R.adjoin(c.refine(k, X))
+            print '\b#',
             pass
+        print 
         return R
 
     def addpoint(self, x_id, x_vec):
@@ -135,6 +138,12 @@ class Clustering(object):
         closest.add(x_id)
         pass
 
+    def sample(self, x_id):
+        for c in self:
+            if x_id in c:
+                return c.sample(x_id)
+        raise IndexError('%d not found in clustering' % x_id)
+        pass
 
 
 
@@ -155,6 +164,7 @@ class Cluster(object):
             self.__points.update(points)
 
         pass
+
 
     def __contains__(self, x):
         return x in self.__points
@@ -191,6 +201,14 @@ class Cluster(object):
 
     def __iter__(self):
         return self.__points.__iter__()
+
+    def sample(self, x_id):
+        if x_id in self:
+            return random.sample(self.__points - set([x_id]), 1)
+        
+        raise IndexError('%s not found in cluster' % x_id)
+        pass
+
 
 
 def onlineKmeans(k, points, X, use_lloyd=False):
