@@ -27,7 +27,7 @@ def loadPlaylists(inpickle):
 
     for q in playlists:
         P.append(playlist.Playlist(q))
-    return P[:500]
+    return P
 
 def loadClusterings(cluster_pickles):
 
