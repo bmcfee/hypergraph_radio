@@ -64,5 +64,5 @@ class Playlist(object):
             xi      += xi_new / sum(sum(xi_new))
             pass
     
-        return (gamma[0,:] / sum(gamma[0,:]), xi / (T-1), ll)
+        return (gamma[0,:] / sum(gamma[0,:]), xi, ll)
         pass
