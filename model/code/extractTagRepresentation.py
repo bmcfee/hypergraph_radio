@@ -4,7 +4,7 @@ CREATED:2011-10-09 12:32:41 by Brian McFee <bmcfee@cs.ucsd.edu>
  
 Construct optimized tag descriptors for MSD songs
 
-Usage: ./extractTagRepresentation.py tag_metric.pickle songs.txt /1mil/ output.pickle
+Usage: ./extractTagRepresentation.py tag_metric.pickle playlistSet.pickle /1mil/ output.pickle
 """
 
 import sys, os, numpy
@@ -42,15 +42,15 @@ def getArtistIDs(insongs, basedir):
 
 
 
-def crunchData(parameters, song_list, basedir, outfile, dbc):
+def crunchData(parameters, song_pickle, basedir, outfile, dbc):
 
     # Step 1: load tag vocabulary
     with open(parameters, 'r') as f:
         P = pickle.load(f)
 
     # Step 2: load filenames
-    with open(song_list, 'r') as f:
-        song_ids = [x.strip() for x in f.readlines()]
+    with open(song_pickle, 'r') as f:
+        song_ids = pickle.load(f)['songs']
 
     # Step 3: map filenames to artist ids
     artists = getArtistIDs(song_ids, basedir)
@@ -68,7 +68,7 @@ def crunchData(parameters, song_list, basedir, outfile, dbc):
 
 if __name__ == '__main__':
     '''
-    Usage: ./extractTagRepresentation.py tag_metric.pickle songs.txt /1mil/ output.pickle
+    Usage: ./extractTagRepresentation.py tag_metric.pickle playlistSet.pickle /1mil/ output.pickle
     '''
 
     with sqlite3.connect(sys.argv[3] + '/AdditionalFiles/artist_term.db') as dbc:

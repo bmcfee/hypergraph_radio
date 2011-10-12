@@ -26,7 +26,7 @@ def getLists(P, ids):
 def splitPlaylists(inpickle, fractrain, train_out, test_out):
 
     with open(inpickle, 'r') as f:
-        P = pickle.load(f)
+        P = pickle.load(f)['P']
 
     ids         = P.keys()
     random.shuffle(ids)

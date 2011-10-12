@@ -4,7 +4,7 @@ CREATED:2011-10-11 09:51:39 by Brian McFee <bmcfee@cs.ucsd.edu>
  
 Construct optimized audio descriptors for MSD songs
 
-Usage: ./extractAudioRepresentation.py songs.txt /data/1mil/ sql.ini output.pickle
+Usage: ./extractAudioRepresentation.py playlistSet.pickle /data/1mil/ sql.ini output.pickle
 """
 
 import sys, os, numpy
@@ -31,12 +31,13 @@ def getTrackIDs(insongs, basedir):
 
 
 
-def crunchData(song_list, basedir, dbc, outfile):
+def crunchData(playlistPickle, basedir, dbc, outfile):
 
 
     # Step 1: load filenames
-    with open(song_list, 'r') as f:
-        song_ids = [x.strip() for x in f.readlines()]
+    with open(playlistPickle, 'r') as f:
+#         song_ids = [x.strip() for x in f.readlines()]
+        song_ids = pickle.load(f)['songs']
 
     # Step 2: map track ids to song ids
     track_ids = getTrackIDs(song_ids, basedir)
@@ -60,7 +61,7 @@ def crunchData(song_list, basedir, dbc, outfile):
 
 if __name__ == '__main__':
     '''
-    Usage: ./extractAudioRepresentation.py songs.txt /data/1mil/ sql.ini output.pickle
+    Usage: ./extractAudioRepresentation.py playlistPickle /data/1mil/ sql.ini output.pickle
     '''
     config = ConfigParser.SafeConfigParser()
     config.read(sys.argv[3])

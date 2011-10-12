@@ -7,13 +7,20 @@ Get just the playlists we care about, indexed by mix_id
 Usage:
 
 ./getPlaylistSet.py output.pickle PLAYLIST1.pickle PLAYLIST2.pickle ...
+
+
+Output pickle contains hash:
+    playlists: hash mix_id => list of playlists
+    songs:  set of song_ids
 '''
 
 import sys
 import cPickle as pickle
 
-MIN_LENGTH = 4
-BAD_CATEGORIES = set([u'Single Artist', u'Alternating DJ', u'Cover'])
+# MIN_LENGTH = 4
+# BAD_CATEGORIES = set([u'Single Artist', u'Alternating DJ', u'Cover'])
+MIN_LENGTH = 3
+BAD_CATEGORIES = set([u'Single Artist', u'Cover'])
 
 def loadlist(inpickle):
     X = []
@@ -27,7 +34,9 @@ def getPlaylistSet(output, inpickles):
     for x in inpickles:
         P.extend(loadlist(x))
 
-    playlists = {}
+    playlists   = {}
+    songs       = set()
+
     for l in P:
         if l['category'] in BAD_CATEGORIES:
             continue
@@ -35,12 +44,13 @@ def getPlaylistSet(output, inpickles):
         for sublist in l['filtered_lists']:
             if len(sublist) >= MIN_LENGTH:
                 new_lists.append(sublist)
+                songs.update(sublist)
         if len(new_lists) > 0:
             playlists[l['mix_id']] = new_lists
         pass
 
     with open(output, 'w') as f:
-        pickle.dump(playlists, f)
+        pickle.dump({'P': playlists, 'songs': songs}, f)
     pass
 
 if __name__ == '__main__':
