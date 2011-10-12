@@ -19,7 +19,7 @@ import itertools
 
 import multiprocessing as mp
 
-TOLERANCE = 1e-5
+TOLERANCE = 1e-4
 
 def loadPlaylists(inpickle):
 
