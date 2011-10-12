@@ -201,7 +201,8 @@ class Cluster(object):
 
         # add data to the clustering
         for x in self.__points:
-            C.addpoint(x, X[x])
+            if x in X:
+                C.addpoint(x, X[x])
 
         return C
 
@@ -227,7 +228,8 @@ def onlineKmeans(k, points, X, use_lloyd=False):
         return lloyd(mu, x, n) * n / (n + 1.0)
 
     # 1: randomly permute the point set
-    points = list(points)
+    #   only retain points with feature representation
+    points = filter(lambda p: p in X, points)
     random.shuffle(points)
 
     # 2. allocate cluster counters
