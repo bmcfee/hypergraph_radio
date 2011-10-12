@@ -84,7 +84,7 @@ def testHMM(num_threads, model_pickle, test_pickle):
         k += 1
         pass
 
-    print ']: Average log-likelihood: %.5e' % e_ll
+    print '\b]: Average log-likelihood: %.5e' % e_ll
 
 
 if __name__ == '__main__':
