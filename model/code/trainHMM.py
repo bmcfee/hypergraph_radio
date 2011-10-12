@@ -62,10 +62,10 @@ def trainHMM(training_set_pickle, clustering_pickles):
         
         print 'R%03d: [%s]%s' % (i, ' ' * 10, '\b' * 11),
         for (k, p) in enumerate(playlists):
-            (g,xi,ll) = p.forwardBackward(model['C'], model)
+            (g,xi,ll) = p.forwardBackward(model)
             e_gamma += g  / m
             e_xi    += xi / m
-            e_mll   += ll / m
+            e_mll   += (ll / len(p)) / m
 
             if k % step == 0:
                 print '\b.',
