@@ -32,6 +32,7 @@ class Playlist(object):
         # initialization
         alpha_hat[0,:]  = model['pi'] * [C.probability(self.__songs[0]) for C in model['C']]
         c[0]            = numpy.sum(alpha_hat[0,:])
+        alpha_hat[0,:]  /= c[0]
         ll              = numpy.log(c[0])
 
         # forward pass
@@ -43,7 +44,6 @@ class Playlist(object):
             ll              +=  numpy.log(c[t])
 
             pass
-
 
         # backward pass
         beta_hat[-1,:]      = 1.0 
