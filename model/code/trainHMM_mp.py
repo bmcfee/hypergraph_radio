@@ -108,7 +108,7 @@ def trainHMM(num_threads, training_set_pickle, clustering_pickles):
         print '%04d: ' % i,
         (e_gamma, e_xi, e_mll) = mt_estep(num_threads, playlists, model, step, n, m)
 
-        print u"\b]: LL: %.5e, Delta=%.5e" % (e_mll, e_mll - mll)
+        print (u"\b]: \u2112: %.5f, \u0394=%.5e" % (e_mll, e_mll - mll)).encode('utf-8')
         if abs(e_mll - mll) < TOLERANCE:
             break
 
