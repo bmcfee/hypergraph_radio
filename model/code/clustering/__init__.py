@@ -218,19 +218,14 @@ class Cluster(object):
 
 
 
-def onlineKmeans(k, points, X, use_lloyd=False):
+def onlineKmeans(k, points, X, minCount=5000):
 
-
-    def lloyd(mu,x,n):
-        return sum((mu -x)**2)
-        
-    def hartigan(mu, x, n):
-        return lloyd(mu, x, n) * n / (n + 1.0)
+    def score(mu, x, n):
+        return sum((mu -x)**2) * n / (n + 1.0)
 
     # 1: randomly permute the point set
     #   only retain points with feature representation
     points = filter(lambda p: p in X, points)
-    random.shuffle(points)
 
     # 2. allocate cluster counters
     counters = numpy.zeros(k)
@@ -238,32 +233,28 @@ def onlineKmeans(k, points, X, use_lloyd=False):
     # 3. allocate centroids
     centroids = numpy.zeros([k, X.dimension()])
 
-    score = hartigan
-    if use_lloyd:
-        score = lloyd
-        pass
 
-    for (i, x) in enumerate(points):
-        # Initialize centroids to the first k points
-        if i < k:
-            centroids[i,:]  = X[x].copy()
-            counters[i]     = 1.0
-            continue
+    count = 0
+    while count < minCount:
+        random.shuffle(points)
+        for (i, x) in enumerate(points):
+            # Find the closest centroid
+            # This will initialize centroids to the first k points 
+            distance    = numpy.infty
+            closest     = 0
+            for (j, mu) in enumerate(centroids):
+                nd = score(mu, X[x], counters[j])
+                if nd < distance:
+                    closest     = j
+                    distance    = nd
+                pass
 
-        # Find the closest centroid
-        distance    = numpy.infty
-        closest     = 0
-        for (j, mu) in enumerate(centroids):
-            nd = score(mu, X[x], counters[j])
-            if nd < distance:
-                closest     = j
-                distance    = nd
+            # Update centroid
+            centroids[closest,:] = (centroids[closest,:] * counters[closest] + X[x]) / (counters[closest] + 1.0)
+            counters[closest] += 1.0
+            count += 1
+
             pass
-
-        # Update centroid
-        centroids[closest,:] = (centroids[closest,:] * counters[closest] + X[x]) / (counters[closest] + 1.0)
-        counters[closest] += 1.0
-
         pass
 
     return centroids
