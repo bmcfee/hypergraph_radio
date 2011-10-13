@@ -29,16 +29,23 @@ class Playlist(object):
         beta_hat        = numpy.zeros((T,n))
         c               = numpy.zeros(T)
 
+        trans_prob      = numpy.zeros((T,n))
+
         # initialization
-        alpha_hat[0,:]  = model['pi'] * [C.probability(self.__songs[0]) for C in model['C']]
+        trans_prob[0,:]     = [C.probability(self.__songs[0]) for C in model['C']]
+        for t in range(1,T):
+            trans_prob[t,:] = [C.probability(self.__songs[t-1], self.__songs[t]) for C in model['C']]
+            pass
+
+
+        alpha_hat[0,:]  = model['pi'] * trans_prob[0,:]
         c[0]            = numpy.sum(alpha_hat[0,:])
         alpha_hat[0,:]  /= c[0]
         ll              = numpy.log(c[0])
 
         # forward pass
         for t in range(1,T):
-            alpha_hat[t,:]  =   [C.probability(self.__songs[t-1], self.__songs[t]) for C in model['C']]
-            alpha_hat[t,:]  =   alpha_hat[t,:] * numpy.dot(alpha_hat[t-1,:], model['A'])
+            alpha_hat[t,:]  =   trans_prob[t,:] * numpy.dot(alpha_hat[t-1,:], model['A'])
             c[t]            =   numpy.sum(alpha_hat[t,:])
             alpha_hat[t,:]  /=  c[t]
             ll              +=  numpy.log(c[t])
@@ -48,8 +55,7 @@ class Playlist(object):
         # backward pass
         beta_hat[-1,:]      = 1.0 
         for t in range(T-2,-1,-1):
-            beta_hat[t,:]   = [C.probability(self.__songs[t], self.__songs[t+1]) for C in model['C']]
-            beta_hat[t,:]   = beta_hat[t+1,:] * numpy.dot(model['A'], beta_hat[t,:]) / c[t+1]
+            beta_hat[t,:]   = beta_hat[t+1,:] * numpy.dot(model['A'], trans_prob[t+1,:]) / c[t+1]
 
             pass
 
