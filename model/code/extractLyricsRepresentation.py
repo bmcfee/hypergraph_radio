@@ -28,7 +28,8 @@ def extractLyrics(playlistFile, vwfile, outfile):
             song_id = features[-1]
             if song_id not in mysongs:
                 continue
-            data[song_id] = map(float, features[:-1])
+            v = numpy.array(map(float, features[:-1]))
+            data[song_id] = (v / numpy.sum(v))**0.5
             pass
 
     print 'Imported %d songs' % len(data)
