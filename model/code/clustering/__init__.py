@@ -233,6 +233,8 @@ def onlineKmeans(k, points, X, minCount=5000):
     # 3. allocate centroids
     centroids = numpy.zeros([k, X.dimension()])
 
+    if len(points) == 0:
+        return centroids
 
     count = 0
     while count < minCount:
