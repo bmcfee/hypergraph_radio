@@ -151,6 +151,10 @@ class Clustering(object):
         raise IndexError('%d not found in clustering' % x_id)
         pass
 
+    def prune(self):
+        self.__clusters = filter(lambda c: len(c) > 0, self.__clusters)
+        pass
+
 
 
 class Cluster(object):
@@ -204,6 +208,7 @@ class Cluster(object):
             if x in X:
                 C.addpoint(x, X[x])
 
+        C.prune()
         return C
 
     def __iter__(self):
