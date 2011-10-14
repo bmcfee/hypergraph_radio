@@ -6,7 +6,7 @@ Initialize a uniform clustering from a playlist set
 
 Usage:
 
-./initClustering playlistSet.pickle clustering_uniform.pickle
+./initClustering clustering_uniform.pickle playlist_set1.pickle playlist_set2.pickle ...
 
 '''
 
@@ -15,10 +15,12 @@ import cPickle as pickle
 import clustering
 
 
-def initClustering(playlistSet, outpickle):
+def initClustering(outpickle, playlistSet):
 
-    with open(playlistSet, 'r') as f:
-        songs = pickle.load(f)['songs']
+    songs = set()
+    for p in playlistSet:
+        with open(p, 'r') as f:
+            songs.update(pickle.load(f)['songs'])
         pass
 
     C = clustering.Clustering(songs)
@@ -31,5 +33,5 @@ def initClustering(playlistSet, outpickle):
 
 
 if __name__ == '__main__':
-    initClustering(sys.argv[1], sys.argv[2])
+    initClustering(sys.argv[1], sys.argv[2:])
     pass

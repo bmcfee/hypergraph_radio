@@ -37,6 +37,8 @@ def splitPlaylists(inpickle, fractrain, train_out, test_out):
     lists_train = getLists(P, ids[:numtrain])
     lists_test  = getLists(P, ids[numtrain:])
 
+    print '%d train\n%d test' % (numtrain, n - numtrain)
+
     with open(train_out, 'w') as f:
         pickle.dump(lists_train, f)
 

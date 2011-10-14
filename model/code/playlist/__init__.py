@@ -40,6 +40,9 @@ class Playlist(object):
 
         alpha_hat[0,:]  = model['pi'] * trans_prob[0,:]
         c[0]            = numpy.sum(alpha_hat[0,:])
+        if c[0] == 0:
+            pprint.pprint(self.__songs[0])
+            raise ValueError('Divide by zero!')
         alpha_hat[0,:]  /= c[0]
         ll              = numpy.log(c[0])
 
