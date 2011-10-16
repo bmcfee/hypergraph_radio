@@ -93,15 +93,27 @@ class Clustering(object):
     
     def probability(self, x1, x2=None):
 
+        activeSets  = filter(lambda c: x1 in c, self)
+        nSets       = len(activeSets)
+        if nSets == 0:
+            return 0.0
+
+        P   = 0.0
+
         if x2 is None:
-            for c in self:
-                if x1 in c:
-                    return 1.0 / (len(self) * len(c))
+            for c in activeSets:
+                # Probability of choosing this set * probability choosing x1
+                P += 1.0 / (len(self) * len(c)) 
+                pass
+
         else:
-            for c in self:
-                if x1 in c and x2 in c:
-                    return 1.0 / (len(c) - 1)
-        return 0.0
+            for c in activeSets:
+                if x2 in c:
+                    # Probability of choosing this set * probability choosing x2
+                    P += 1.0 / (nSets * (len(c) - 1))
+                pass
+
+        return P
 
 
     def adjoin(self, C2):
