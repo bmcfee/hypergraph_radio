@@ -163,7 +163,7 @@ class Clustering(object):
         if len(activeSets) == 0:
             raise IndexError('%s not found in clustering' % x_id)
 
-        return random.sample(activeSets, 1).sample(x_id)
+        return random.sample(activeSets, 1)[0].sample(x_id)
         pass
 
     def prune(self):
@@ -291,10 +291,7 @@ class Cluster(object):
         pass
 
     def __repr__(self):
-        return self.__points.__repr__()
-
-    def __str__(self):
-        return str(self.__points)
+        return 'Cluster(None, %s)' % (self.__points.__repr__())
 
 
     def onlineKmeans(k, points, X, minCount=5000):
