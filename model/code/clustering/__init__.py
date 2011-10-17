@@ -48,7 +48,7 @@ class Clustering(object):
         self.__description  = 'Clustering_' + str(time.time())
 
         if points is not None:
-            self.__clusters.append(Cluster(None, points))
+            self.__clusters.append(Cluster(points=points))
             pass
 
         if description is not None:
@@ -95,9 +95,9 @@ class Clustering(object):
                     P += 1.0 / (len(self) * len(c)) 
                     pass
 
-            else:
+            elif x2 != x1:
                 for c in activeSets:
-                    if x2 in c:
+                    if x2 in c and len(c) > 1:
                         # Probability of choosing this set * probability choosing x2
                         P += 1.0 / (nSets * (len(c) - 1))
                     pass
@@ -135,23 +135,6 @@ class Clustering(object):
         print 
         return R
 
-    def addpoint(self, x_id, x_vec):
-
-        if len(self) == 0:
-            self.__clusters.append(Cluster(x_vec, x_id))
-        d       = numpy.infty
-        closest = None
-
-        for c in self:
-            d_c = c.distance(x_vec)
-            if d_c < d:
-                d       = d_c
-                closest = c
-            pass
-
-        closest.add(x_id)
-        pass
-
     def sample(self, x_id=None):
         if x_id is None:
             activeSets  = self.__clusters
@@ -171,11 +154,7 @@ class Clustering(object):
         pass
 
     def __repr__(self):
-        return str(self)
-
-    def __str__(self):
-        return '%s [%d members]' % (self.getDescription(), len(self.__clusters))
-
+        return self[:].__repr__()
 
 class SpillTree(Clustering):
     
@@ -216,10 +195,6 @@ class SpillTree(Clustering):
         print
         return R
 
-    def addpoint(self, x_id, x_vec):
-        raise NotImplementedError('Cannot insert points directly to SpillTree')
-        pass
-
 
 #---#
 
@@ -256,28 +231,6 @@ class Cluster(object):
         pass
 
 
-    def distance(self, v):
-        return sum((self.__centroid - v)**2)
-
-
-    def refine(self, k, X):
-        
-        # get the new centroids
-        centers = self.onlineKmeans(k, self.__points, X)
-
-        # construct a new clustering
-        C = Clustering()
-        for mu in centers:
-            C.add(Cluster(mu))
-
-        # add data to the clustering
-        for x in self.__points:
-            if x in X:
-                C.addpoint(x, X[x])
-
-        C.prune()
-        return C
-
     def __iter__(self):
         return self.__points.__iter__()
 
@@ -291,13 +244,38 @@ class Cluster(object):
         pass
 
     def __repr__(self):
-        return 'Cluster(None, %s)' % (self.__points.__repr__())
+        return 'Cluster(points=%s)' % (self.__points.__repr__())
 
 
-    def onlineKmeans(k, points, X, minCount=5000):
+    def distance(self, v, mu=None):
+        if mu is None:
+            mu = self.__centroid
+        return sum((mu - v)**2)
 
-        def score(mu, x, n):
-            return sum((mu -x)**2) * n / (n + 1.0)
+
+    def refine(self, k, X):
+        
+        # get the new centroids
+        clusters    = [Cluster(centroid=mu) for mu in self.onlineKmeans(k, self.__points, X)]
+
+        # add data to the clustering
+        for x_id in self.__points:
+            if x_id in X:
+                j = numpy.argmin([c.distance(X[x_id]) for c in clusters])
+                clusters[j].add(x_id)
+            pass
+
+        # construct a new clustering
+        C = Clustering()
+        for c in clusters:
+            C.add(c)
+            pass
+
+        C.prune()
+        return C
+
+
+    def onlineKmeans(self, k, points, X, minCount=5000):
 
         # 1: randomly permute the point set
         #   only retain points with feature representation
@@ -321,7 +299,7 @@ class Cluster(object):
                 distance    = numpy.infty
                 closest     = 0
                 for (j, mu) in enumerate(centroids):
-                    nd = score(mu, X[x], counters[j])
+                    nd = self.distance(mu, X[x]) * counters[j] / (counters[j] + 1.0)
                     if nd < distance:
                         closest     = j
                         distance    = nd
@@ -338,3 +316,5 @@ class Cluster(object):
         return centroids
 
 
+# class SpillNode(Cluster):
+    
