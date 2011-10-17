@@ -58,12 +58,12 @@ class Clustering(object):
         self.__description  = 'Clustering_' + str(time.time())
 
         if points is not None:
-            if type(points) is not set:
+            if not isinstance(points, set):
                 raise TypeError('points must be of type: set')
             self.__clusters.append(Cluster(None, points))
 
         if description is not None:
-            if type(description) is not str:
+            if not isinstance(description, str):
                 raise TypeError('description must be of type: str')
             self.__description = description
         pass
@@ -80,7 +80,7 @@ class Clustering(object):
 
     
     def setDescription(self, desc):
-        if type(desc) is not str:
+        if not isinstance(desc, str):
             raise TypeError('description must be of type: str')
 
         self.__description = desc
@@ -123,7 +123,7 @@ class Clustering(object):
 
 
     def add(self, c):
-        if type(c) is not Cluster:
+        if not isinstance(c, Cluster):
             raise TypeError('attempting to add non-Cluster to Clustering')
         self.__clusters.append(c)
         pass
@@ -176,12 +176,12 @@ class Cluster(object):
         self.__centroid = None
 
         if centroid is not None:
-            if type(centroid) is not numpy.ndarray:
+            if not isinstance(centroid, numpy.ndarray):
                 raise TypeError('centroid must be of type: numpy.ndarray')
             self.__centroid = centroid
 
         if points is not None:
-            if type(points) is not set:
+            if not isinstance(points, set):
                 raise TypeError('points must be of type: set')
             self.__points.update(points)
 
