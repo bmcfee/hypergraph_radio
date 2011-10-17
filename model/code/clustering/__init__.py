@@ -5,46 +5,23 @@ import numpy
 import random
 
 
-class FeatureMap(object):
+class FeatureMap(dict):
 
-    def __init__(self):
-        self.__dimension = 0
-        self.__data = {}
+    def __init__(self, **kwargs):
+        self.__dimension = None
+        super(FeatureMap, self).__init__(kwargs)
         pass
 
     def __setitem__(self, key, value):
         if len(self) == 0:
-            self.__data[key] = value
             self.__dimension = len(value)
-            return
 
-        if len(value) != self.__dimension:
+        elif len(value) != self.__dimension:
             raise ValueError('Dimension mismatch: dimension=%d, given d=%d' % (self.__dimension, len(value)))
 
-        self.__data[key] = value
+        super(FeatureMap, self).__setitem__(key, value)
 
         pass
-
-    def __getitem__(self, key):
-        return self.__data[key]
-
-
-    def __contains__(self, key):
-        return key in self.__data
-
-
-    def __len__(self):
-        return len(self.__data)
-
-    def __delitem__(self, key):
-        del self.__data[key]
-        pass
-
-    def __iter__(self):
-        return self.__data.__iter__()
-
-    def iterkeys(self):
-        return self.__data.iterkeys()
 
     def dimension(self):
         return self.__dimension
