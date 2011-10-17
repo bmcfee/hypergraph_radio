@@ -3,12 +3,18 @@
 import time
 import numpy
 import random
-
+import pprint
 
 class FeatureMap(dict):
 
     def __init__(self, **kwargs):
         self.__dimension = None
+        for (k,v) in kwargs.iteritems():
+            if self.__dimension is None:
+                self.__dimension = len(v)
+            elif len(v) != self.__dimension:
+                raise ValueError('Inconsistent dimensions in input data.')
+
         super(FeatureMap, self).__init__(kwargs)
         pass
 
