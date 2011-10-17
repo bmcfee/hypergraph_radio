@@ -38,6 +38,8 @@ class FeatureMap(dict):
         return self.__dimension
 
 
+#---#
+
 
 class Clustering(object):
     
@@ -64,6 +66,8 @@ class Clustering(object):
     def __len__(self):
         return len(self.__clusters)
 
+    def __getitem__(self, key):
+        return self.__clusters[key]
     
     def setDescription(self, desc):
         if not isinstance(desc, str):
@@ -133,8 +137,11 @@ class Clustering(object):
 
     def addpoint(self, x_id, x_vec):
 
-        d = numpy.infty
-        closest = 0
+        if len(self) == 0:
+            self.__clusters.append(Cluster(x_vec, x_id))
+        d       = numpy.infty
+        closest = None
+
         for c in self:
             d_c = c.distance(x_vec)
             if d_c < d:
@@ -163,6 +170,58 @@ class Clustering(object):
         self.__clusters = filter(lambda c: len(c) > 0, self.__clusters)
         pass
 
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        return '%s [%d members]' % (self.getDescription(), len(self.__clusters))
+
+
+class SpillTree(Clustering):
+    
+    def __init__(self, points=None, description=None):
+        super(SpillTree, self).__init__(None, description)
+
+        if points is not None:
+            self.__clusters.append(SpillNode(None, points))
+
+        pass
+
+    def adjoin(self, C2):
+
+        if not isinstance(C2, SpillTree):
+            raise TypeError('Trying to adjoin from non-SpillTree')
+
+        for c in C2:
+            self.add(c)
+
+        pass
+
+    def add(self, c):
+        if not isinstance(c, SpillNode):
+            raise TypeError('attempting to add non-SpillNode to SpillTree')
+        self.__clusters.append(c)
+        pass
+
+    def refine(self, X):
+        R = None
+        print 'Refining SpillTree: [%s]%s' % (' ' * len(self), '\b' * (len(self)+1)),
+        for c in self:
+            if R is None:
+                R = c.refine(X)
+            else:
+                R.adjoin(c.refine(X))
+            print '\b#',
+            pass
+        print
+        return R
+
+    def addpoint(self, x_id, x_vec):
+        raise NotImplementedError('Cannot insert points directly to SpillTree')
+        pass
+
+
+#---#
 
 
 class Cluster(object):
@@ -204,7 +263,7 @@ class Cluster(object):
     def refine(self, k, X):
         
         # get the new centroids
-        centers = onlineKmeans(k, self.__points, X)
+        centers = self.onlineKmeans(k, self.__points, X)
 
         # construct a new clustering
         C = Clustering()
@@ -231,47 +290,54 @@ class Cluster(object):
         raise IndexError('%s not found in cluster' % x_id)
         pass
 
+    def __repr__(self):
+        return self.__points.__repr__()
+
+    def __str__(self):
+        return str(self.__points)
 
 
-def onlineKmeans(k, points, X, minCount=5000):
+    def onlineKmeans(k, points, X, minCount=5000):
 
-    def score(mu, x, n):
-        return sum((mu -x)**2) * n / (n + 1.0)
+        def score(mu, x, n):
+            return sum((mu -x)**2) * n / (n + 1.0)
 
-    # 1: randomly permute the point set
-    #   only retain points with feature representation
-    points = filter(lambda p: p in X, points)
+        # 1: randomly permute the point set
+        #   only retain points with feature representation
+        points = filter(lambda p: p in X, points)
 
-    # 2. allocate cluster counters
-    counters = numpy.zeros(k)
+        # 2. allocate cluster counters
+        counters = numpy.zeros(k)
 
-    # 3. allocate centroids
-    centroids = numpy.zeros([k, X.dimension()])
+        # 3. allocate centroids
+        centroids = numpy.zeros([k, X.dimension()])
 
-    if len(points) == 0:
+        if len(points) == 0:
+            return centroids
+
+        count = 0
+        while count < minCount:
+            random.shuffle(points)
+            for (i, x) in enumerate(points):
+                # Find the closest centroid
+                # This will initialize centroids to the first k points 
+                distance    = numpy.infty
+                closest     = 0
+                for (j, mu) in enumerate(centroids):
+                    nd = score(mu, X[x], counters[j])
+                    if nd < distance:
+                        closest     = j
+                        distance    = nd
+                    pass
+    
+                # Update centroid
+                centroids[closest,:] = (centroids[closest,:] * counters[closest] + X[x]) / (counters[closest] + 1.0)
+                counters[closest] += 1.0
+                count += 1
+    
+                pass
+            pass
+    
         return centroids
 
-    count = 0
-    while count < minCount:
-        random.shuffle(points)
-        for (i, x) in enumerate(points):
-            # Find the closest centroid
-            # This will initialize centroids to the first k points 
-            distance    = numpy.infty
-            closest     = 0
-            for (j, mu) in enumerate(centroids):
-                nd = score(mu, X[x], counters[j])
-                if nd < distance:
-                    closest     = j
-                    distance    = nd
-                pass
 
-            # Update centroid
-            centroids[closest,:] = (centroids[closest,:] * counters[closest] + X[x]) / (counters[closest] + 1.0)
-            counters[closest] += 1.0
-            count += 1
-
-            pass
-        pass
-
-    return centroids
