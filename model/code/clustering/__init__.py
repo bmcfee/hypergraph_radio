@@ -19,7 +19,7 @@ class FeatureMap(dict):
         pass
 
     def __setitem__(self, key, value):
-        if len(self) == 0:
+        if self.__dimension is None:
             self.__dimension = len(value)
 
         elif len(value) != self.__dimension:
