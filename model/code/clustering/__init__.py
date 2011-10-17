@@ -140,7 +140,7 @@ class Clustering(object):
             activeSets  = self.__clusters
             pass
         else:
-            activeSets  = filter(lambda c: x_id in c, self)
+            activeSets  = filter(lambda c: x_id in c and len(c) > 1, self)
             pass
 
         if len(activeSets) == 0:
@@ -188,16 +188,14 @@ class SpillTree(Clustering):
 class Cluster(object):
 
     def __init__(self, centroid=None, points=None):
-        self.__centroid = None
 
-        if centroid is not None:
-            if not isinstance(centroid, numpy.ndarray):
-                raise TypeError('centroid must be of type: numpy.ndarray')
-            self.__centroid = centroid
-            pass
+        if centroid is not None and not isinstance(centroid, numpy.ndarray):
+            raise TypeError('centroid must be of type: numpy.ndarray')
+
+        self.__centroid = centroid
 
         if points is not None:
-            self.__points = set(points)
+            self.__points   = set(points)
         else:
             self.__points   = set()
 
@@ -222,9 +220,9 @@ class Cluster(object):
 
     def sample(self, x_id=None):
         if x_id is None:
-            return random.sample(self.__points, 1)
+            return random.sample(self.__points, 1)[0]
         elif x_id in self:
-            return random.sample(self.__points - set([x_id]), 1)
+            return random.sample(self.__points - set([x_id]), 1)[0]
         
         raise IndexError('%s not found in cluster' % x_id)
         pass
@@ -241,11 +239,49 @@ class Cluster(object):
 
     def refine(self, **kwargs):
         
-        X = kwargs.get('X')
-        k = kwargs.get('k', 2)
+        X           = kwargs.get('X')
+        k           = kwargs.get('k', 2)
+        minCount    = kwargs.get('minCount', 5000)
+
+        def onlineKmeans(points):
+
+            # 1: randomly permute the point set
+            #   only retain points with feature representation
+            points      = filter(lambda p: p in X, points)
+
+            # 2. allocate cluster counters
+            counters    = numpy.zeros(k)
+
+            # 3. allocate centroids
+            centroids   = numpy.zeros([k, X.dimension()])
+
+            if len(points) > 0:
+                for count in range(0, minCount, len(points)):
+                    random.shuffle(points)
+                    for (i, x) in enumerate(points):
+                        # Find the closest centroid
+                        # This will initialize centroids to the first k points 
+                        distance    = numpy.infty
+                        closest     = 0
+                        for (j, mu) in enumerate(centroids):
+                            nd      = self.distance(X[x], mu) * counters[j] / (counters[j] + 1.0)
+                            if nd < distance:
+                                closest     = j
+                                distance    = nd
+                            pass
+    
+                        # Update centroid
+                        centroids[closest,:] = (centroids[closest,:] * counters[closest] + X[x]) / (counters[closest] + 1.0)
+                        counters[closest]   += 1.0
+    
+                        pass
+                    pass
+    
+            return centroids
+
 
         # get the new centroids
-        clusters    = [Cluster(centroid=mu) for mu in self.onlineKmeans(k, self.__points, X)]
+        clusters    = [Cluster(centroid=mu) for mu in onlineKmeans(self.__points)]
 
         # add data to the clustering
         for x_id in self.__points:
@@ -263,46 +299,6 @@ class Cluster(object):
         C.prune()
         return C
 
-
-    def onlineKmeans(self, k, points, X, minCount=5000):
-
-        # 1: randomly permute the point set
-        #   only retain points with feature representation
-        points      = filter(lambda p: p in X, points)
-
-        # 2. allocate cluster counters
-        counters    = numpy.zeros(k)
-
-        # 3. allocate centroids
-        centroids   = numpy.zeros([k, X.dimension()])
-
-        if len(points) == 0:
-            return centroids
-
-        count = 0
-        while count < minCount:
-            random.shuffle(points)
-            for (i, x) in enumerate(points):
-                # Find the closest centroid
-                # This will initialize centroids to the first k points 
-                distance    = numpy.infty
-                closest     = 0
-                for (j, mu) in enumerate(centroids):
-                    nd      = self.distance(X[x], mu) * counters[j] / (counters[j] + 1.0)
-                    if nd < distance:
-                        closest     = j
-                        distance    = nd
-                    pass
-    
-                # Update centroid
-                centroids[closest,:] = (centroids[closest,:] * counters[closest] + X[x]) / (counters[closest] + 1.0)
-                counters[closest]   += 1.0
-                count               += 1
-    
-                pass
-            pass
-    
-        return centroids
 
 
 # class SpillNode(Cluster):
