@@ -27,7 +27,7 @@ def refine(clustering_pickle, features_pickle, k, description, outpickle):
     print ' done.'
 
     print 'Refining each cluster into %d clusters...' % k
-    C_new = clustering['C'].refine(k, features['X'])
+    C_new = clustering['C'].refine(k=k, X=features['X'])
     C_new.setDescription(description)
 
     print 'Saving %s...' % outpickle,

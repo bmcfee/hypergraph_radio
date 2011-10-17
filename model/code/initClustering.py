@@ -23,8 +23,7 @@ def initClustering(outpickle, playlistSet):
             songs.update(pickle.load(f)['songs'])
         pass
 
-    C = clustering.Clustering(songs)
-    C.setDescription('Uniform')
+    C = clustering.Clustering(points=songs, description='Uniform')
 
     with open(outpickle, 'w') as f:
         pickle.dump({'C': C}, f)
