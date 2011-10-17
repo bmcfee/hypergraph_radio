@@ -107,7 +107,7 @@ class Clustering(object):
 
     def adjoin(self, C2):
         if not isinstance(C2, Clustering):
-            raise TypeError('Trying to adjoin from non-clustering')
+            raise TypeError('Attempting to adjoin from non-Clustering')
 
         for c in C2:
             self.add(c)
@@ -117,19 +117,19 @@ class Clustering(object):
 
     def add(self, c):
         if not isinstance(c, Cluster):
-            raise TypeError('attempting to add non-Cluster to Clustering')
+            raise TypeError('Attempting to add non-Cluster to Clustering')
         self.__clusters.append(c)
         pass
 
 
-    def refine(self, k, X):
+    def refine(self, **kwargs):
         R = None
         print 'Refining clusters: [%s]%s' % (' ' * len(self), '\b' * (len(self)+1)),
         for c in self:
             if R is None:
-                R = c.refine(k, X)
+                R = c.refine(**kwargs)
             else:
-                R.adjoin(c.refine(k, X))
+                R.adjoin(c.refine(**kwargs))
             print '\b#',
             pass
         print 
@@ -181,20 +181,6 @@ class SpillTree(Clustering):
             raise TypeError('attempting to add non-SpillNode to SpillTree')
         self.__clusters.append(c)
         pass
-
-    def refine(self, X):
-        R = None
-        print 'Refining SpillTree: [%s]%s' % (' ' * len(self), '\b' * (len(self)+1)),
-        for c in self:
-            if R is None:
-                R = c.refine(X)
-            else:
-                R.adjoin(c.refine(X))
-            print '\b#',
-            pass
-        print
-        return R
-
 
 #---#
 
@@ -253,8 +239,11 @@ class Cluster(object):
         return sum((mu - v)**2)
 
 
-    def refine(self, k, X):
+    def refine(self, **kwargs):
         
+        X = kwargs.get('X')
+        k = kwargs.get('k', 2)
+
         # get the new centroids
         clusters    = [Cluster(centroid=mu) for mu in self.onlineKmeans(k, self.__points, X)]
 
@@ -279,13 +268,13 @@ class Cluster(object):
 
         # 1: randomly permute the point set
         #   only retain points with feature representation
-        points = filter(lambda p: p in X, points)
+        points      = filter(lambda p: p in X, points)
 
         # 2. allocate cluster counters
-        counters = numpy.zeros(k)
+        counters    = numpy.zeros(k)
 
         # 3. allocate centroids
-        centroids = numpy.zeros([k, X.dimension()])
+        centroids   = numpy.zeros([k, X.dimension()])
 
         if len(points) == 0:
             return centroids
@@ -299,7 +288,7 @@ class Cluster(object):
                 distance    = numpy.infty
                 closest     = 0
                 for (j, mu) in enumerate(centroids):
-                    nd = self.distance(mu, X[x]) * counters[j] / (counters[j] + 1.0)
+                    nd      = self.distance(X[x], mu) * counters[j] / (counters[j] + 1.0)
                     if nd < distance:
                         closest     = j
                         distance    = nd
@@ -307,8 +296,8 @@ class Cluster(object):
     
                 # Update centroid
                 centroids[closest,:] = (centroids[closest,:] * counters[closest] + X[x]) / (counters[closest] + 1.0)
-                counters[closest] += 1.0
-                count += 1
+                counters[closest]   += 1.0
+                count               += 1
     
                 pass
             pass
