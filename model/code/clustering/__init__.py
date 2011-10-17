@@ -29,6 +29,11 @@ class FeatureMap(dict):
 
         pass
 
+    def clear(self):
+        self.__dimension = None
+        super(FeatureMap, self).clear()
+        pass
+
     def dimension(self):
         return self.__dimension
 
@@ -41,14 +46,12 @@ class Clustering(object):
         self.__description  = 'Clustering_' + str(time.time())
 
         if points is not None:
-            if not isinstance(points, set):
-                raise TypeError('points must be of type: set')
             self.__clusters.append(Cluster(None, points))
+            pass
 
         if description is not None:
-            if not isinstance(description, str):
-                raise TypeError('description must be of type: str')
-            self.__description = description
+            self.setDescription(description)
+            pass
         pass
 
 
@@ -78,30 +81,33 @@ class Clustering(object):
 
         activeSets  = filter(lambda c: x1 in c, self)
         nSets       = len(activeSets)
-        if nSets == 0:
-            return 0.0
 
-        P   = 0.0
+        P           = 0.0
 
-        if x2 is None:
-            for c in activeSets:
-                # Probability of choosing this set * probability choosing x1
-                P += 1.0 / (len(self) * len(c)) 
-                pass
+        if nSets > 0:
+            if x2 is None:
+                for c in activeSets:
+                    # Probability of choosing this set * probability choosing x1
+                    P += 1.0 / (len(self) * len(c)) 
+                    pass
 
-        else:
-            for c in activeSets:
-                if x2 in c:
-                    # Probability of choosing this set * probability choosing x2
-                    P += 1.0 / (nSets * (len(c) - 1))
-                pass
-
+            else:
+                for c in activeSets:
+                    if x2 in c:
+                        # Probability of choosing this set * probability choosing x2
+                        P += 1.0 / (nSets * (len(c) - 1))
+                    pass
+            pass
         return P
 
 
     def adjoin(self, C2):
+        if not isinstance(C2, Clustering):
+            raise TypeError('Trying to adjoin from non-clustering')
+
         for c in C2:
             self.add(c)
+
         pass
 
 
@@ -139,11 +145,18 @@ class Clustering(object):
         closest.add(x_id)
         pass
 
-    def sample(self, x_id):
-        for c in self:
-            if x_id in c:
-                return c.sample(x_id)
-        raise IndexError('%d not found in clustering' % x_id)
+    def sample(self, x_id=None):
+        if x_id is None:
+            activeSets  = self.__clusters
+            pass
+        else:
+            activeSets  = filter(lambda c: x_id in c, self)
+            pass
+
+        if len(activeSets) == 0:
+            raise IndexError('%s not found in clustering' % x_id)
+
+        return random.sample(activeSets, 1).sample(x_id)
         pass
 
     def prune(self):
@@ -155,18 +168,18 @@ class Clustering(object):
 class Cluster(object):
 
     def __init__(self, centroid=None, points=None):
-        self.__points   = set()
         self.__centroid = None
 
         if centroid is not None:
             if not isinstance(centroid, numpy.ndarray):
                 raise TypeError('centroid must be of type: numpy.ndarray')
             self.__centroid = centroid
+            pass
 
         if points is not None:
-            if not isinstance(points, set):
-                raise TypeError('points must be of type: set')
-            self.__points.update(points)
+            self.__points = set(points)
+        else:
+            self.__points   = set()
 
         pass
 
@@ -209,8 +222,10 @@ class Cluster(object):
     def __iter__(self):
         return self.__points.__iter__()
 
-    def sample(self, x_id):
-        if x_id in self:
+    def sample(self, x_id=None):
+        if x_id is None:
+            return random.sample(self.__points, 1)
+        elif x_id in self:
             return random.sample(self.__points - set([x_id]), 1)
         
         raise IndexError('%s not found in cluster' % x_id)
