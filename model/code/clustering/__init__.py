@@ -224,17 +224,12 @@ class Cluster(object):
         elif x_id in self:
             return random.sample(self.__points - set([x_id]), 1)[0]
         
-        raise IndexError('%s not found in cluster' % x_id)
+        raise IndexError('key %s not found' % x_id)
         pass
 
     def __repr__(self):
         return 'Cluster(points=%s)' % (self.__points.__repr__())
 
-
-    def distance(self, v, mu=None):
-        if mu is None:
-            mu = self.__centroid
-        return sum((mu - v)**2)
 
 
     def refine(self, **kwargs):
@@ -243,51 +238,47 @@ class Cluster(object):
         k           = kwargs.get('k', 2)
         minCount    = kwargs.get('minCount', 5000)
 
+        def D(u, v):
+            return sum((u - v)**2)
+
         def onlineKmeans(points):
 
-            # 1: randomly permute the point set
-            #   only retain points with feature representation
-            points      = filter(lambda p: p in X, points)
-
-            # 2. allocate cluster counters
+            # 1. allocate cluster counters
             counters    = numpy.zeros(k)
 
-            # 3. allocate centroids
+            # 2. allocate centroids
             centroids   = numpy.zeros([k, X.dimension()])
 
-            if len(points) > 0:
-                for count in range(0, minCount, len(points)):
-                    random.shuffle(points)
-                    for (i, x) in enumerate(points):
-                        # Find the closest centroid
-                        # This will initialize centroids to the first k points 
-                        distance    = numpy.infty
-                        closest     = 0
-                        for (j, mu) in enumerate(centroids):
-                            nd      = self.distance(X[x], mu) * counters[j] / (counters[j] + 1.0)
-                            if nd < distance:
-                                closest     = j
-                                distance    = nd
-                            pass
-    
-                        # Update centroid
-                        centroids[closest,:] = (centroids[closest,:] * counters[closest] + X[x]) / (counters[closest] + 1.0)
-                        counters[closest]   += 1.0
-    
-                        pass
+            if len(points) == 0:
+                return centroids
+
+            for count in range(0, minCount, len(points)):
+                random.shuffle(points)
+                for x in points:
+                    # Find the closest centroid
+                    # Hartigan initializes centroids to the first k distinct points 
+                    j_min = numpy.argmin([D(X[x], mu) * c / (c+1.0) for (mu, c) in zip(centroids, counters)]) 
+
+                    # Update centroid
+                    centroids[j_min,:] = (centroids[j_min,:] * counters[j_min] + X[x]) / (counters[j_min] + 1.0)
+                    counters[j_min]   += 1.0
+
                     pass
+                pass
     
             return centroids
 
 
         # get the new centroids
-        clusters    = [Cluster(centroid=mu) for mu in onlineKmeans(self.__points)]
+        #   only retain points with feature representation
+        points      = filter(lambda p: p in X, self.__points)
+        centroids   = onlineKmeans(points)
+        clusters    = [Cluster(centroid=mu) for mu in centroids]
 
         # add data to the clustering
-        for x_id in self.__points:
-            if x_id in X:
-                j = numpy.argmin([c.distance(X[x_id]) for c in clusters])
-                clusters[j].add(x_id)
+        for x_id in points:
+            j = numpy.argmin([D(X[x_id], mu) for (c, mu) in zip(clusters, centroids)])
+            clusters[j].add(x_id)
             pass
 
         # construct a new clustering
