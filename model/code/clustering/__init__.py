@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
 import time
-import numpy
+import numpy, scipy.stats
 import random
-import pprint
 
 class FeatureMap(dict):
 
@@ -44,11 +43,11 @@ class FeatureMap(dict):
 class Clustering(object):
     
     def __init__(self, points=None, description=None):
-        self.__clusters     = []
-        self.__description  = 'Clustering_' + str(time.time())
+        self._clusters     = []
+        self._description  = 'Clustering_' + str(time.time())
 
         if points is not None:
-            self.__clusters.append(Cluster(points=points))
+            self._clusters.append(Cluster(points=points))
             pass
 
         if description is not None:
@@ -58,27 +57,27 @@ class Clustering(object):
 
 
     def __iter__(self):
-        for c in self.__clusters:
+        for c in self._clusters:
             yield c
         pass
 
 
     def __len__(self):
-        return len(self.__clusters)
+        return len(self._clusters)
 
     def __getitem__(self, key):
-        return self.__clusters[key]
+        return self._clusters[key]
     
     def setDescription(self, desc):
         if not isinstance(desc, str):
             raise TypeError('description must be of type: str')
 
-        self.__description = desc
+        self._description = desc
         pass
 
     
     def getDescription(self):
-        return self.__description
+        return self._description
 
     
     def probability(self, x1, x2=None):
@@ -118,13 +117,13 @@ class Clustering(object):
     def add(self, c):
         if not isinstance(c, Cluster):
             raise TypeError('Attempting to add non-Cluster to Clustering')
-        self.__clusters.append(c)
+        self._clusters.append(c)
         pass
 
 
     def refine(self, **kwargs):
         R = None
-        print 'Refining clusters: [%s]%s' % (' ' * len(self), '\b' * (len(self)+1)),
+        print 'Refining sets: [%s]%s' % (' ' * len(self), '\b' * (len(self)+1)),
         for c in self:
             if R is None:
                 R = c.refine(**kwargs)
@@ -137,7 +136,7 @@ class Clustering(object):
 
     def sample(self, x_id=None):
         if x_id is None:
-            activeSets  = self.__clusters
+            activeSets  = self._clusters
             pass
         else:
             activeSets  = filter(lambda c: x_id in c and len(c) > 1, self)
@@ -150,11 +149,13 @@ class Clustering(object):
         pass
 
     def prune(self):
-        self.__clusters = filter(lambda c: len(c) > 0, self.__clusters)
+        self._clusters = filter(lambda c: len(c) > 0, self._clusters)
         pass
 
     def __repr__(self):
         return self[:].__repr__()
+
+
 
 class SpillTree(Clustering):
     
@@ -162,7 +163,7 @@ class SpillTree(Clustering):
         super(SpillTree, self).__init__(None, description)
 
         if points is not None:
-            self.__clusters.append(SpillNode(None, points))
+            self._clusters.append(SpillNode(None, points))
 
         pass
 
@@ -179,7 +180,7 @@ class SpillTree(Clustering):
     def add(self, c):
         if not isinstance(c, SpillNode):
             raise TypeError('attempting to add non-SpillNode to SpillTree')
-        self.__clusters.append(c)
+        self._clusters.append(c)
         pass
 
 #---#
@@ -195,40 +196,40 @@ class Cluster(object):
         self.__centroid = centroid
 
         if points is not None:
-            self.__points   = set(points)
+            self._points   = set(points)
         else:
-            self.__points   = set()
+            self._points   = set()
 
         pass
 
 
     def __contains__(self, x):
-        return x in self.__points
+        return x in self._points
 
 
     def __len__(self):
-        return len(self.__points)
+        return len(self._points)
 
 
     def add(self, x):
-        self.__points.add(x)
+        self._points.add(x)
         pass
 
 
     def __iter__(self):
-        return self.__points.__iter__()
+        return self._points.__iter__()
 
     def sample(self, x_id=None):
         if x_id is None:
-            return random.sample(self.__points, 1)[0]
+            return random.sample(self._points, 1)[0]
         elif x_id in self:
-            return random.sample(self.__points - set([x_id]), 1)[0]
+            return random.sample(self._points - set([x_id]), 1)[0]
         
         raise IndexError('key %s not found' % x_id)
         pass
 
     def __repr__(self):
-        return 'Cluster(points=%s)' % (self.__points.__repr__())
+        return 'Cluster(points=%s)' % (self._points.__repr__())
 
 
 
@@ -271,7 +272,7 @@ class Cluster(object):
 
         # get the new centroids
         #   only retain points with feature representation
-        points      = filter(lambda p: p in X, self.__points)
+        points      = filter(lambda p: p in X, self._points)
         centroids   = onlineKmeans(points)
         clusters    = [Cluster(centroid=mu) for mu in centroids]
 
@@ -292,5 +293,64 @@ class Cluster(object):
 
 
 
-# class SpillNode(Cluster):
+class SpillNode(Cluster):
     
+    def refine(self, **kwargs):
+        X   = kwargs.get('X')
+        tau = kwargs.get('tau', 0.1)
+
+        def topPCA(points):
+            d           = X.dimension()
+            m1          = numpy.zeros(d)
+            m2          = numpy.zeros([d, d])
+            n           = 1.0 * len(points)
+
+            for x_id in points:
+                m1      +=  X[x_id]
+                m2      +=  numpy.outer(X[x_id], X[x_id].T)
+
+            m1          /=  n
+            sigma       =   (m2 - ( n * numpy.outer(m1, m1.T) ) ) / (n - 1.0)
+            
+            (l,v)   =   numpy.linalg.eigh(sigma)
+            w           =   v[:,numpy.argmax(l)]
+            return w
+            
+        def splitPCA(points):
+            # 1. compute PCA direction
+            w               =   topPCA(points)
+
+            # 2. compute bias points
+            wx = {}
+            for x_id in points:
+                wx[x_id]    =   numpy.dot(w, X[x_id])
+
+            b               =   scipy.stats.mstats.mquantiles(wx.values(), [0.5 - tau, 0.5 + tau])
+            
+            # 3. partition the set
+            left_set    = set()
+            right_set   = set()
+
+            for (x_id, score) in wx.iteritems():
+                if score <= b[-1]:
+                    left_set.update(x_id)
+                if score >  b[0]:
+                    right_set.update(x_id)
+                pass
+            
+            return (left_set, right_set)
+
+        points          = filter(lambda p: p in X, self._points)
+
+        (L, R)          = splitPCA(points)
+
+        C               = SpillTree()
+        C.add(SpillNode(points=L))
+        C.add(SpillNode(points=R))
+        C.prune()
+
+        return C
+
+    def __repr__(self):
+        return 'SpillNode(points=%s)' % (self._points.__repr__())
+
