@@ -333,9 +333,9 @@ class SpillNode(Cluster):
 
             for (x_id, score) in wx.iteritems():
                 if score <= b[-1]:
-                    left_set.update(x_id)
+                    left_set.add(x_id)
                 if score >  b[0]:
-                    right_set.update(x_id)
+                    right_set.add(x_id)
                 pass
             
             return (left_set, right_set)
