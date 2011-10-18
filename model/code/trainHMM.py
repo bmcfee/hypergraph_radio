@@ -42,11 +42,11 @@ def loadClusterings(cluster_pickles):
 def trainHMM(training_set_pickle, clustering_pickles):
 
     playlists   = loadPlaylists(training_set_pickle)
-    m           = len(playlists)
+    m           = len(playlists) * 1.0
     step        = numpy.ceil(m / 10.0)
 
     model       = {'C': loadClusterings(clustering_pickles)}
-    n           = len(model['C'])
+    n           = len(model['C']) + 0.0
     model['A']  = numpy.ones((n,n)) / n
     model['pi'] = numpy.ones(n) / n
 
@@ -71,7 +71,7 @@ def trainHMM(training_set_pickle, clustering_pickles):
                 print '\b.',
 
         print '\b]: LL: %.5e, Delta=%.5e' % (e_mll, e_mll - mll)
-        if abs(e_mll - mll) < TOLERANCE:
+        if e_mll - mll < TOLERANCE:
             break
 
         # M-step
