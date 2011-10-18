@@ -27,6 +27,24 @@ def loadlist(inpickle):
         X = pickle.load(f)
     return X
 
+def cleanGenerator(l):
+    def cleanlist(p):
+        q = [p[0]]
+        for (i, s) in enumerate(p[1:]):
+            if s == q[-1]:
+                yield q
+                q = []
+            q.append(s)
+        yield q
+        pass
+
+    for p in l:
+        for q in cleanlist(p):
+            yield q
+    pass
+
+
+
 def getPlaylistSet(output, inpickles):
 
     P = []
@@ -43,7 +61,7 @@ def getPlaylistSet(output, inpickles):
         C = l['category']
 
         new_lists = []
-        for sublist in l['filtered_lists']:
+        for sublist in cleanGenerator(l['filtered_lists']):
             if len(sublist) >= MIN_LENGTH:
                 new_lists.append(sublist)
                 Q[C]['songs'].update(sublist)
