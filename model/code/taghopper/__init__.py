@@ -41,7 +41,7 @@ class FeatureMap(dict):
 
     def __setitem__(self, key, value):
         idx = [self.__vocabIndex[v] for v in value]
-        super(FeatureMap, self).__setitem__(key, TagVector(v))
+        super(FeatureMap, self).__setitem__(key, TagVector(idx))
         pass
 
     def clear(self):
