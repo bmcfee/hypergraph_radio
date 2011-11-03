@@ -16,30 +16,41 @@ import numpy
 import sys
 import cPickle as pickle
 
-TOLERANCE   = 1e-3
+TOLERANCE   = 1e-4
 MAXITER     = 1000
 
+def evaluateModel(mu, Pv):
 
-def evaluateModel(M, P):
-
-    S = len(P)
+    S = len(Pv)
     f = 0
 
-    for p in P:
-        f += M.playlistlikelihood(p) / S
+    for pv in Pv:
+        m   = len(pv) + 1
+        fn  = numpy.log(numpy.dot(mu, pv[0][1]))
+        for (v1, v2) in pv:
+            fn  += numpy.log(numpy.dot(mu, v1)) - numpy.log(numpy.dot(mu, v2))
+        f   += fn / m
+        pass
 
-    return f
+    return f / S
 
-
-def computeGradient(M, P):
+def computeGradient(mu, Pv):
 
     S   = len(P)
     df  = 0
 
-    for p in P:
-        df += M.gradient(p) / S
+    for pv in Pv:
+        m = len(pv) + 1
+        
+        dfn = pv[0][1] / numpy.dot(mu, pv[0][1])
 
-    return df
+        for (v1, v2) in pv:
+            dfn += v1 / numpy.dot(mu, v1)
+            dfn -= v2 / numpy.dot(mu, v2)
+
+        df += dfn / m
+
+    return df / S
 
 def reducedGradient(mu, v):
 
@@ -58,17 +69,15 @@ def reducedGradient(mu, v):
 
     return (rg, max_step)
 
-def lineSearch(M, P, rdf, max_step):
+def lineSearch(M, Pv, rdf, max_step):
 
     tmax = 0
     vmax = -numpy.inf
     for t in numpy.linspace(0, max_step):
-        M.mu += t * rdf
-        v = evaluateModel(M, P)
+        v = evaluateModel(M.mu + t * rdf, Pv)
         if v > vmax:
             tmax = t
             vmax = v
-        M.mu -= t * rdf
         pass
 
     return tmax
@@ -81,6 +90,15 @@ def displayVector(X, v):
 
     pass
 
+def vectorize(M, P):
+    Pv = []
+    for p in P:
+        Pvn = []
+        for i in range(0, len(p)-1):
+            Pvn.append(M.transitionVectors(p[i], p[i+1]))
+        Pv.append(Pvn)
+        pass
+    return Pv
 
 def trainModel(X, P):
 
@@ -91,29 +109,29 @@ def trainModel(X, P):
     converged   = False
 
     print '%5d playlists' % len(P)
-    # TODO:   2011-11-03 11:58:33 by Brian McFee <bmcfee@cs.ucsd.edu>
-    # move gradient/objective computations out of Model
-    # cache the update vectors
-    # double-check the reduced gradient computation
+
+    # pre-compute the playlist vectors
+    Pv = vectorize(M, P)
 
     for iteration in xrange(MAXITER):
 
         # Correct numerical errors
-        M.mu[M.mu < 0] = 0
-        M.mu    /= sum(M.mu)
+        M.mu[M.mu < 0]  = 0
+        M.mu            /= sum(M.mu)
 
-        f   = evaluateModel(M, P)
+        f               = evaluateModel(M.mu, Pv)
 
         if numpy.abs(f - fold) < TOLERANCE:
             converged = True
             break
 
         print (u"%5d: \u2112: %.5f, \u0394=%.5e" % (iteration, f, f - fold)).encode('utf-8')
-        df  = computeGradient(M, P)
+        df  = computeGradient(M.mu, Pv)
 
         (rdf, max_step) = reducedGradient(M.mu, df)
 
-        t       = lineSearch(M, P, rdf, max_step)
+        t       = lineSearch(M, Pv, rdf, max_step)
+
         muold   = M.mu
         fold    = f
         M.mu    = M.mu.copy() + t * rdf
