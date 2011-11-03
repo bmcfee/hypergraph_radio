@@ -6,7 +6,7 @@ Generate a tag-hopper playlist
 
 Usage:
 
-./sampleTaghopper.py featuremap.pickle songhash.pickle N [model.pickle]
+./sampleTaghopper.py model.pickle songhash.pickle N 
 
 '''
 
@@ -24,16 +24,11 @@ def samplePlaylist(M, N, songs):
     pass
 
 if __name__ == '__main__':
+    with open(sys.argv[1], 'r') as f:
+        M = pickle.load(f)
     with open(sys.argv[2], 'r') as f:
         songs = pickle.load(f)
     N = int(sys.argv[3])
-
-    if len(sys.argv) > 4:
-        M = pickle.load(f)
-    else:
-        with open(sys.argv[1], 'r') as f:
-            X = pickle.load(f)['X']
-        M = taghopper.Model(X)
 
     samplePlaylist(M, N, songs)
     pass

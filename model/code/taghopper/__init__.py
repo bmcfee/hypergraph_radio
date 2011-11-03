@@ -130,6 +130,20 @@ class Model(object):
             return numpy.log(numpy.dot(self.mu, v1)) - numpy.log(numpy.dot(self.mu, v2))
         pass
 
+    def gradient(self, P):
+        m       = len(P)
+
+        v2      = self.X[P[0]] * self.__nu
+        dx      = v2 / numpy.dot(self.mu, v2)
+
+        for i in range(0, m-1):
+            (v1, v2) = self.transitionVectors(P[i], P[i+1])
+            dx      += v1 / numpy.dot(self.mu, v1) 
+            dx      -= v2 / numpy.dot(self.mu, v2)
+            pass
+
+        return dx / m
+
     def playlistlikelihood(self, P):
         m   = len(P)
         ll  = self.loglikelihood(P[0])
@@ -137,6 +151,7 @@ class Model(object):
             ll += self.loglikelihood(P[i], P[i+1])
             pass
         return ll / m
+
 
     def sample(self, m):
         # Pick an initial tag
