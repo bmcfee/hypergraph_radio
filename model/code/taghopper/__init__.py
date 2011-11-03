@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 
+import random
 import numpy
+
+def sampleFromMultinomial(p):
+    for (i,v) in enumerate(numpy.random.multinomial(1, p)):
+        if v > 0:
+            return i
+    pass
 
 class TagVector(set):
     def __init__(self, a):
@@ -52,6 +59,9 @@ class FeatureMap(dict):
     def getVocab(self):
         return self.__vocabulary
 
+    def tagnum(self, k):
+        return self.__vocabulary[k]
+
     def tagItem(self, x):
         return [self.__vocabulary[i] for i in x]
 
@@ -59,3 +69,85 @@ class FeatureMap(dict):
         return len(self.__vocabulary)
 
 #---#
+
+class Model(object):
+
+    # This is where model parameters go:
+    #   featuremap
+    #   size of each tag set
+    #   weighting over tags
+
+    # methods:
+    #   likelihood of a single point:   P(x)
+    #   likelihood of a transition:     P(x2 | x1)
+    #   transition vectors: ( (x1 * x2 * nu * rho), (x1 * nu) )
+    def __init__(self, X, mu=None):
+        self.X          = X
+        self.__numtags  = X.dimension()
+        if mu is None:
+            self.mu     = numpy.ones(self.__numtags) / (1.0 * self.__numtags)
+        else:
+            self.mu     = mu
+            pass
+        
+        self.counts     = numpy.zeros(self.__numtags)
+        self.__tagsets  = [set() for i in range(len(self.counts))]
+
+        for x in self.X:
+            for v in X[x]:
+                self.counts[v] += 1
+                self.__tagsets[v].add(x)
+                pass
+            pass
+
+        for v in range(self.__numtags):
+            if self.counts[v] <= 1:
+                self.mu[v] = 0
+            pass
+        self.mu /= numpy.sum(self.mu)
+
+        self.__nu       = numpy.zeros(self.__numtags)
+        self.__rho      = numpy.zeros(self.__numtags)
+        for i in range(self.__numtags):
+            if self.counts[i] > 0:
+                self.__nu[i] = 1.0 / self.counts[i]
+                if self.counts[i] > 1:
+                    self.__rho[i] = 1.0 / (self.counts[i] - 1)
+                    pass
+                pass
+            pass
+        pass
+
+    def transitionVectors(self, x1, x2):
+        x1nu = self.X[x1] * self.__nu
+        return ( self.X[x2] * self.__rho * x1nu, x1nu)
+
+    def loglikelihood(self, x1, x2=None):
+        if x2 is None:
+            return numpy.log(numpy.dot(self.mu, self.X[x1] * self.__nu))
+        else:
+            (v1, v2) = self.transitionVectors(x1, x2)
+            return numpy.log(numpy.dot(self.mu, v1)) - numpy.log(numpy.dot(self.mu, v2))
+        pass
+
+    def playlistlikelihood(self, P):
+        m   = len(P)
+        ll  = self.loglikelihood(P[0])
+        for i in range(0, m-1):
+            ll += self.loglikelihood(P[i], P[i+1])
+            pass
+        return ll / m
+
+    def sample(self, m):
+        # Pick an initial tag
+        tags    = [sampleFromMultinomial(self.mu)]
+        songs   = random.sample(self.__tagsets[tags[-1]], 1)
+        for i in range(m):
+            mu  = self.X[songs[-1]] * self.mu
+            mu /= numpy.sum(mu)
+            tags.append(sampleFromMultinomial(mu))
+            songs.extend(random.sample(self.__tagsets[tags[-1]] - set([songs[-1]]), 1))
+        return (songs, tags)
+
+#---#
+
