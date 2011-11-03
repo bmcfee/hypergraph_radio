@@ -51,7 +51,6 @@ def reducedGradient(mu, v):
             rg[i] = v[i] - v[z]
             rg[z] -= rg[i]
 
-
     max_step = numpy.inf
     for i in xrange(len(mu)):
         if rg[i] < 0 and max_step > -mu[i] / rg[i]:
@@ -77,7 +76,7 @@ def lineSearch(M, P, rdf, max_step):
 def displayVector(X, v):
 
     for t in xrange(len(v)):
-        if v[t] != 0:
+        if v[t] > 0:
             print '%30s: %.3f' % (X.tagnum(t), v[t])
 
     pass
@@ -99,6 +98,10 @@ def trainModel(X, P):
 
     for iteration in xrange(MAXITER):
 
+        # Correct numerical errors
+        M.mu[M.mu < 0] = 0
+        M.mu    /= sum(M.mu)
+
         f   = evaluateModel(M, P)
 
         if numpy.abs(f - fold) < TOLERANCE:
@@ -114,12 +117,8 @@ def trainModel(X, P):
         muold   = M.mu
         fold    = f
         M.mu    = M.mu.copy() + t * rdf
-        # Correct numerical errors
-        M.mu[M.mu < 0] = 0
-        M.mu    /= sum(M.mu)
         pass
 
-#     displayVector(X, M.mu)
     return M
 
 
