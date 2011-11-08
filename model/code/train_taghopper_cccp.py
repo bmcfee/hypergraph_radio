@@ -43,38 +43,32 @@ def f_major(mu, *args):
     global dv_eta
     if dv_eta is None:
         # Compute dv_eta
-        dv_eta  = numpy.ones_like(eta) / numpy.sum(eta)
+        dv_eta  = S * numpy.ones_like(eta) / numpy.sum(eta)
         for pv in Pv:
             for (v1, v2) in pv:
-                dv_eta += v2 / (S * numpy.dot(eta, v2))
+                dv_eta += v2 / numpy.dot(eta, v2)
                 pass
             pass
+        dv_eta /= S
         pass
+
 
     g       =   0
     dg      =   numpy.zeros_like(mu)
 
     for pv in Pv:
-
-        # compute u(mu), grad_u(mu)
-        u           =   numpy.log(numpy.dot(mu, pv[0][1]))
-        du          =   pv[0][1] / numpy.dot(mu, pv[0][1])
+        muv1        =   numpy.dot(mu, pv[0][1])
+        g           -=  numpy.log(muv1)
+        dg          -=  pv[0][1] / muv1
 
         for (v1, v2) in pv:
             muv1    =   numpy.dot(mu, v1)
-            u       +=  numpy.log(muv1)
-            du      +=  v1 / muv1
+            g       -=  numpy.log(muv1)
+            dg      -=  v1 / muv1
 
             pass
-
-#         g   -= (u   - numpy.dot(mu, dv_eta))
-#         dg  -= (du  - dv_eta)
-        g   -= u
-        dg  -= du
-
         pass
 
-#     return g / S , dg / S
     return g / S + numpy.dot(mu, dv_eta), dg / S + dv_eta
 
 
