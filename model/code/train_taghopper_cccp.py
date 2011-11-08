@@ -17,7 +17,7 @@ import sys
 import cPickle as pickle
 
 TOLERANCE   = 1e-4
-MAXITER     = 20
+MAXITER     = 40
 
 dv_eta      = None
 
