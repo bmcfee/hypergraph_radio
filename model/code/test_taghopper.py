@@ -33,10 +33,10 @@ def evaluateModel(mu, Pv):
 
 def displayVector(X, v):
 
-    for t in xrange(len(v)):
-        if v[t] > 1e-4:
-            print '%30s: %.3f' % (X.tagnum(t), v[t])
-
+    dv = zip(v, range(len(v)))
+    dv.sort(reverse=True)
+    for (p, i) in dv[:10]:
+        print '%30s: %.3f' % (X.tagnum(i), p)
     pass
 
 def vectorize(M, P):

@@ -23,22 +23,23 @@ def f_obj(mu, Pv):
     f = 0
     g = numpy.zeros_like(mu)
 
+    summu       = numpy.sum(mu)
+    logsummu    = numpy.log(summu)
+
     for pv in Pv:
-        muv1    = numpy.dot(mu, pv[0][1])
-        fn      = numpy.log(numpy.dot(mu, pv[0][1])) - numpy.log(sum(mu))
-        gn      = pv[0][1] / muv1 - numpy.ones_like(mu) / numpy.sum(mu)
+        muv2    = numpy.dot(mu, pv[0][1])
+        f      += numpy.log(muv2) 
+        g      += pv[0][1] / muv2
 
         for (v1, v2) in pv:
             muv1 = numpy.dot(mu, v1)
             muv2 = numpy.dot(mu, v2)
-            fn  += numpy.log(muv1) - numpy.log(muv2)
-            gn  += v1 / muv1 - v2 / muv2
+            f   += numpy.log(muv1) - numpy.log(muv2)
+            g   += v1 / muv1 - v2 / muv2
             pass
-        f   += fn 
-        g   += gn
         pass
 
-    return -f / S, -g / S
+    return -f / S + logsummu, -g / S + numpy.ones_like(mu)/summu
 
 def vectorize(M, P):
     Pv = []
@@ -52,7 +53,6 @@ def vectorize(M, P):
 
 def trainModel(X, P):
 
-    global dv_eta
     M           = taghopper.Model(X)
 
     print '%5d playlists' % len(P)
@@ -64,7 +64,8 @@ def trainModel(X, P):
                                                     x0      =   M.mu, 
                                                     fprime  =   None, 
                                                     args    =   (Pv,),
-                                                    bounds  =   [(0, None)] * len(M.mu))
+                                                    bounds  =   [(0, None)] * len(M.mu),
+                                                    iprint  =   1)
 
     print (u"\u2112: %.5f, calls=%d" % (f, d['funcalls'])).encode('utf-8')
 
