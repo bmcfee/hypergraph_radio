@@ -19,6 +19,8 @@ import cPickle as pickle
 TOLERANCE   = 1e-4
 MAXITER     = 20
 
+dv_eta      = None
+
 def evaluateModel(mu, Pv):
 
     S = len(Pv)
@@ -33,28 +35,21 @@ def evaluateModel(mu, Pv):
 
     return f / S
 
-def computeGradient(mu, Pv):
-
-    S   = len(Pv)
-    df  = 0
-
-    for pv in Pv:
-        
-        dfn = pv[0][1] / numpy.dot(mu, pv[0][1])
-
-        for (v1, v2) in pv:
-            dfn += v1 / numpy.dot(mu, v1)
-            dfn -= v2 / numpy.dot(mu, v2)
-
-        df += dfn 
-
-    return df / S
-
-
 def f_major(mu, *args):
 
     Pv, eta =   list(args)
     S       =   len(Pv)
+
+    global dv_eta
+    if dv_eta is None:
+        # Compute dv_eta
+        dv_eta  = numpy.ones_like(eta) / numpy.sum(eta)
+        for pv in Pv:
+            for (v1, v2) in pv:
+                dv_eta += v2 / (S * numpy.dot(eta, v2))
+                pass
+            pass
+        pass
 
     g       =   0
     dg      =   numpy.zeros_like(mu)
@@ -62,25 +57,25 @@ def f_major(mu, *args):
     for pv in Pv:
 
         # compute u(mu), grad_u(mu)
-        u           = numpy.log(numpy.dot(mu, pv[0][1]))
-        du          = pv[0][1] / numpy.dot(mu, pv[0][1])
+        u           =   numpy.log(numpy.dot(mu, pv[0][1]))
+        du          =   pv[0][1] / numpy.dot(mu, pv[0][1])
 
-        # compute grad_v(mu), mu' grad_v(mu)
-        dv_eta      = numpy.ones_like(eta) / numpy.sum(eta)
-        
         for (v1, v2) in pv:
-            u       += numpy.log(numpy.dot(mu, v1))
-            du      += v1 / numpy.dot(mu, v1)
+            muv1    =   numpy.dot(mu, v1)
+            u       +=  numpy.log(muv1)
+            du      +=  v1 / muv1
 
-            dv_eta  += v2 / numpy.dot(eta, v2)
             pass
 
-        g   -= (u   - numpy.dot(mu, dv_eta))
-        dg  -= (du  - dv_eta)
+#         g   -= (u   - numpy.dot(mu, dv_eta))
+#         dg  -= (du  - dv_eta)
+        g   -= u
+        dg  -= du
 
         pass
 
-    return g / S, dg / S
+#     return g / S , dg / S
+    return g / S + numpy.dot(mu, dv_eta), dg / S + dv_eta
 
 
 def vectorize(M, P):
@@ -95,6 +90,7 @@ def vectorize(M, P):
 
 def trainModel(X, P):
 
+    global dv_eta
     M           = taghopper.Model(X)
 
     print '%5d playlists' % len(P)
@@ -106,6 +102,7 @@ def trainModel(X, P):
 
     for iteration in xrange(MAXITER):
 
+        dv_eta  = None
         mu_new, f_hat, d = scipy.optimize.fmin_l_bfgs_b(    func    =   f_major, 
                                                             x0      =   M.mu, 
                                                             fprime  =   None, 
