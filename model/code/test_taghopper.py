@@ -23,7 +23,7 @@ def evaluateModel(mu, Pv):
 
     for pv in Pv:
         m   = len(pv) + 1
-        fn  = numpy.log(numpy.dot(mu, pv[0][1]))
+        fn  = numpy.log(numpy.dot(mu, pv[0][1])) - numpy.log(sum(mu))
         for (v1, v2) in pv:
             fn  += numpy.log(numpy.dot(mu, v1)) - numpy.log(numpy.dot(mu, v2))
         f   += fn / m
@@ -34,7 +34,7 @@ def evaluateModel(mu, Pv):
 def displayVector(X, v):
 
     for t in xrange(len(v)):
-        if v[t] > 0:
+        if v[t] > 1e-4:
             print '%30s: %.3f' % (X.tagnum(t), v[t])
 
     pass
@@ -51,6 +51,7 @@ def vectorize(M, P):
 
 def testModel(M, P):
 
+    displayVector(M.X, M.mu)
     print '%5d playlists' % len(P)
 
     # pre-compute the playlist vectors

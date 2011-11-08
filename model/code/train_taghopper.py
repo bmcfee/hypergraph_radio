@@ -25,11 +25,11 @@ def evaluateModel(mu, Pv):
     f = 0
 
     for pv in Pv:
-        m   = len(pv) + 1
-        fn  = numpy.log(numpy.dot(mu, pv[0][1]))
+#         m   = len(pv) + 1
+        fn  = numpy.log(numpy.dot(mu, pv[0][1])) - numpy.log(sum(mu))
         for (v1, v2) in pv:
             fn  += numpy.log(numpy.dot(mu, v1)) - numpy.log(numpy.dot(mu, v2))
-        f   += fn / m
+        f   += fn 
         pass
 
     return f / S
@@ -40,7 +40,7 @@ def computeGradient(mu, Pv):
     df  = 0
 
     for pv in Pv:
-        m = len(pv) + 1
+#         m = len(pv) + 1
         
         dfn = pv[0][1] / numpy.dot(mu, pv[0][1])
 
@@ -48,7 +48,7 @@ def computeGradient(mu, Pv):
             dfn += v1 / numpy.dot(mu, v1)
             dfn -= v2 / numpy.dot(mu, v2)
 
-        df += dfn / m
+        df += dfn 
 
     return df / S
 
