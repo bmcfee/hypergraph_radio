@@ -59,6 +59,9 @@ class FeatureMap(dict):
     def getVocab(self):
         return self.__vocabulary
 
+    def getVocabIndex(self):
+        return self.__vocabIndex
+
     def tagnum(self, k):
         return self.__vocabulary[k]
 
@@ -69,24 +72,29 @@ class FeatureMap(dict):
         return len(self.__vocabulary)
 
     def condense(self):
+
+        MIN_USAGE = 10
         # Find all the used tags
-        used = [False] * self.dimension()
+        n = self.dimension()
+
+        used = [0] * n
         for (k, x) in self.iteritems():
             for tag in x:
-                used[tag] = True
+                used[tag] += 1
 
         # Build a new featuremap with condensed representation
         newvocab = []
-        for i in xrange(len(used)):
-            if used[i]:
+        for i in xrange(n):
+            if used[i] > MIN_USAGE:
                 newvocab.append(self.__vocabulary[i])
             pass
 
         F = FeatureMap(newvocab)
         
         # Populate new featuremap 
+        vi = F.getVocabIndex()
         for (k, x) in self.iteritems():
-            F[k] = self.tagItem(x)
+            F[k] = filter(lambda t: t in vi, self.tagItem(x))
             pass
         return F
 #---#
