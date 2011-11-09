@@ -91,27 +91,26 @@ def trainModel(X, P):
     # pre-compute the playlist vectors
     Pv = vectorize(M, P)
 
-    fold        = numpy.inf
-
+    fold        = - numpy.inf
+    d           = {'funcalls': 0}
     for iteration in xrange(MAXITER):
 
+        f               = evaluateModel(M.mu, Pv)
+
+        delta           = f - fold
+        print (u"%5d: \u2112: %.5f, \u0394=%.5e, calls=%d" % (iteration, f, delta, d['funcalls'])).encode('utf-8')
+
+        if delta < TOLERANCE:
+            break
+
+        fold    = f
         dv_eta  = None
-        mu_new, f_hat, d = scipy.optimize.fmin_l_bfgs_b(    func    =   f_major, 
+
+        M.mu, f_hat, d = scipy.optimize.fmin_l_bfgs_b(    func    =   f_major, 
                                                             x0      =   M.mu, 
                                                             fprime  =   None, 
                                                             args    =   (Pv, M.mu),
                                                             bounds  =   [(0, None)] * len(M.mu))
-
-        f               = evaluateModel(M.mu, Pv)
-
-        print (u"%5d: \u2112: %.5f, \u0394=%.5e, calls=%d" % (iteration, f, f - fold, d['funcalls'])).encode('utf-8')
-
-        if numpy.abs(f - fold) < TOLERANCE:
-            break
-
-        fold    = f
-        M.mu    = mu_new
-
         pass
     
     M.mu        /= numpy.sum(M.mu)
