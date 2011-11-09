@@ -68,6 +68,27 @@ class FeatureMap(dict):
     def dimension(self):
         return len(self.__vocabulary)
 
+    def condense(self):
+        # Find all the used tags
+        used = [False] * self.dimension()
+        for (k, x) in self.iteritems():
+            for tag in x:
+                used[tag] = True
+
+        # Build a new featuremap with condensed representation
+        newvocab = []
+        for i in xrange(len(used)):
+            if used[i]:
+                newvocab.append(self.__vocabulary[i])
+            pass
+
+        F = FeatureMap(newvocab)
+        
+        # Populate new featuremap 
+        for (k, x) in self.iteritems():
+            F[k] = self.tagItem(x)
+            pass
+        return F
 #---#
 
 class Model(object):

@@ -43,15 +43,14 @@ def f_major(mu, *args):
     global dv_eta
     if dv_eta is None:
         # Compute dv_eta
-        dv_eta  = S * numpy.ones_like(eta) / numpy.sum(eta)
+        dv_eta  = numpy.zeros_like(eta)
         for pv in Pv:
             for (v1, v2) in pv:
                 dv_eta += v2 / numpy.dot(eta, v2)
                 pass
             pass
-        dv_eta /= S
+        dv_eta = dv_eta / S + eta / numpy.sum(eta)
         pass
-
 
     g       =   0
     dg      =   numpy.zeros_like(mu)
