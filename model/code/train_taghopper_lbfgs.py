@@ -16,6 +16,8 @@ import scipy.optimize
 import sys
 import cPickle as pickle
 
+BACKGROUND_MODEL    = '__MECHA DERP ZILLA__'
+BACKGROUND_MIN_PROB = 1e-5
 
 def f_obj(mu, Pv):
 
@@ -53,7 +55,14 @@ def vectorize(M, P):
 
 def trainModel(X, P):
 
-    M           = taghopper.Model(X)
+    M               = taghopper.Model(X)
+    weight_bounds   = [(0, None)] * len(M.mu)
+
+    v = X.getVocabIndex()
+    if BACKGROUND_MODEL in v:
+        weight_bounds[v[BACKGROUND_MODEL]] = (BACKGROUND_MIN_PROB, None)
+    else:
+        weight_bounds[v[BACKGROUND_MODEL.lower()]] = (BACKGROUND_MIN_PROB, None)
 
     print '%5d playlists' % len(P)
 
@@ -64,8 +73,8 @@ def trainModel(X, P):
                                                     x0      =   M.mu, 
                                                     fprime  =   None, 
                                                     args    =   (Pv,),
-                                                    bounds  =   [(0, None)] * len(M.mu),
-                                                    iprint  =   1)
+                                                    bounds  =   weight_bounds,
+                                                    iprint  =   0)
 
     print (u"\u2112: %.5f, calls=%d" % (f, d['funcalls'])).encode('utf-8')
 

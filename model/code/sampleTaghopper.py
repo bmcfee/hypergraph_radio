@@ -30,5 +30,7 @@ if __name__ == '__main__':
         songs = pickle.load(f)
     N = int(sys.argv[3])
 
+    M.mu[0] = 0
+    M.mu /= sum(M.mu)
     samplePlaylist(M, N, songs)
     pass

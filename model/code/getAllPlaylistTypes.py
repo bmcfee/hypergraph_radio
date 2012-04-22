@@ -17,7 +17,7 @@ Output pickle contains hash:
 import sys
 import cPickle as pickle
 
-MIN_LENGTH = 3
+MIN_LENGTH = 2
 
 CATEGORIES = [u'Alternating DJ', u'Ambient', u'Avant Garde', u'Blues', u'Break Up', u'Classical', u'Country', u'Cover', u'Dance/House', u'Depression', u'Drum & Bass', u'Drums', u'Drums and Bass', u'Electronic Music', u'Exercise', u'Experimental', u'Folk', u'Goth', u'Hardcore', u'Hip', u'Hip Hop', u'Indie', u'Indie Rock', u'Industrial', u'Jazz', u'Microsound', u'Mixed', u'Mixed Genre', u'Narrative', u'Punk', u'Reggae', u'Religious/Spiritual', u'Rhythm and Blues', u'Road Trip', u'Rock', u'Rock/Pop', u'Romantic', u'Single Artist', u'Skate/Thrash', u'Sleep', u'Techno', u'Theme', u'World Music']
 

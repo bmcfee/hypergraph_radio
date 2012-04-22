@@ -55,7 +55,7 @@ def getTags(dbc, F, tid, track_id):
 
     terms = [BACKGROUND_WORD]
     if track_id in tid:
-        cur.execute('''SELECT tag FROM tid_tag WHERE tid = ? ORDER BY val DESC limit 20''', (tid[track_id],))
+        cur.execute('''SELECT tag FROM tid_tag WHERE tid = ? and val > 0 ORDER BY val DESC limit 10''', (tid[track_id],))
         for (tag,) in cur:
             terms.append(F.tagnum(tag))
     return terms

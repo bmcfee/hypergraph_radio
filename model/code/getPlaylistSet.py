@@ -19,8 +19,10 @@ import cPickle as pickle
 
 # MIN_LENGTH = 4
 # BAD_CATEGORIES = set([u'Single Artist', u'Alternating DJ', u'Cover'])
-MIN_LENGTH = 3
-BAD_CATEGORIES = set([u'Single Artist', u'Cover'])
+# MIN_LENGTH = 3
+# BAD_CATEGORIES = set([u'Single Artist', u'Cover'])
+MIN_LENGTH = 2
+BAD_CATEGORIES = set()
 
 def loadlist(inpickle):
     X = []
