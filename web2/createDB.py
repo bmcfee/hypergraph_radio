@@ -50,6 +50,22 @@ def createSchema(dbc):
 
     pass
 
+
+def getTrackMeta(dbc, tracks_to_rdio):
+
+    cur = dbc.cursor()
+    artists = {}
+    songs   = {}
+    cur.execute('''SELECT track_id, title, song_id, artist_id, artist_name FROM songs''')
+
+    for (track_id, title, song_id, artist_id, artist_name) in cur:
+        if track_id not in tracks_to_rdio:
+            continue
+        artists[artist_id]   = artist_name
+        songs[song_id]      = (track_id, title, artist_id)
+        pass
+    return (artists, songs)
+
 def importSongs(dbc, additionalFiles):
 
     # 1. build track => rdio id map
@@ -61,55 +77,29 @@ def importSongs(dbc, additionalFiles):
             pass
         pass
 
-    # 2. build track => artist map
-    tracks_to_artists   = {}
-    artist_to_name      = {}
-    with open('%s/unique_artists.txt' % additionalFiles, 'r') as f:
-        for line in f:
-            (artist_id, mbid, track_id, artist_name) = line.strip().split('<SEP>', 4)
-            if track_id in tracks_to_rdio:
-                tracks_to_artists[track_id] = artist_id
-                artist_to_name[artist_id]   = unicode(artist_name, 'utf-8')
-            pass
-        pass
-
-    # 3. build song => track map
-    songs       = {}
-    with open('%s/unique_tracks.txt' % additionalFiles, 'r') as f:
-        for line in f:
-            (track_id, song_id, artist_name, title) = line.strip().split('<SEP>', 4)
-            if track_id in tracks_to_rdio:
-                songs[song_id] = (track_id, unicode(title, 'utf-8'))
-            pass
+    with sqlite3.connect('%s/track_metadata.db' % additionalFiles) as dbc_track:
+        (artists, songs) = getTrackMeta(dbc_track, tracks_to_rdio)
         pass
 
     # 4. insert into artist table
     cur = dbc.cursor()
-    cur.executemany('''INSERT INTO Artist (id, name) VALUES (?, ?)''', artist_to_name.iteritems())
+    cur.executemany('''INSERT INTO Artist (id, name) VALUES (?, ?)''', artists.iteritems())
 
     # 5. insert into song table
 
-    bad_songs = set()
     def songIterator():
         for song_id in songs:
-            (track_id, title) = songs[song_id]
-            if track_id not in tracks_to_artists:
-                bad_songs.add(song_id)
-                continue
+            (track_id, title, artist_id) = songs[song_id]
             rdio_id     = tracks_to_rdio[track_id]
-            artist_id   = tracks_to_artists[track_id]
             yield (song_id, rdio_id, artist_id, title)
         pass
 
     cur.executemany('''INSERT INTO Song (id, rdio_id, artist_id, title) VALUES (?, ?, ?, ?)''', songIterator())
 
-    for b in bad_songs:
-        del songs[b]
-
-    return set(songs.keys())
+    pass
 
 
-def importEdges(dbc, valid_songs, modelFile):
+def importEdges(dbc, modelFile):
 
     with open(modelFile, 'r') as f:
         G = pickle.load(f)['G']
@@ -146,8 +136,8 @@ def importEdges(dbc, valid_songs, modelFile):
 if __name__ == '__main__':
     with sqlite3.connect(sys.argv[1]) as dbc:
         createSchema(dbc)
-        valid_songs = importSongs(dbc, sys.argv[3])
-        importEdges(dbc, valid_songs, sys.argv[2])
+        importSongs(dbc, sys.argv[3])
+        importEdges(dbc, sys.argv[2])
         dbc.commit()
         pass
 

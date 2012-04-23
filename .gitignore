@@ -15,3 +15,4 @@
 server.ini
 *.pyc
 */data/*
+web2/hypergraph
