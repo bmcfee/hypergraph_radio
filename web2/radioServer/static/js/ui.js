@@ -148,9 +148,9 @@ $(function() {
         .autocomplete({
             source: function( request, response ) {
                 $.ajax({
-                    url:        "/search/",
+                    url:        "/search",
                     dataType:   "json",
-                    data:       { query: request.term },
+                    data:       { q: request.term },
                     success:    response 
                 });
             },

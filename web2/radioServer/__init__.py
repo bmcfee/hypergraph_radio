@@ -8,7 +8,7 @@ import flask
 
 import ConfigParser
 
-import rdio
+import rdio, search
 
 # build the app
 app = flask.Flask(__name__)
@@ -30,6 +30,7 @@ def loadConfig(serverIni):
     pass
 
 def run():
+    app.debug = app.config['Debug']
     app.run()
     pass
 
@@ -39,12 +40,19 @@ def run():
 @app.before_request
 def before_request():
     flask.g.db = sqlite3.connect(app.config['database'])
+
     # refresh the rdio key
     try: 
         flask.g.rdio.refresh()
     except:
         flask.g.rdio = rdio.rdio(app.config)
         pass
+
+    # set up the searcher
+    if not hasattr(flask.g, 'search'):
+        flask.g.search = search.Search(app.config)
+        pass
+
     pass
 
 @app.teardown_request
@@ -62,12 +70,13 @@ def index():
 def getRdioToken():
     return json.encode(flask.g.rdio.getToken())
 
+@app.route('/search', methods=['GET'])
+def searchDB():
+    return json.encode(flask.g.search.search(flask.request.args['q']))
+
 @app.route('/test')
 def index_test():
     cur = flask.g.db.cursor()
     cur.execute('''SELECT * FROM Artist INNER JOIN Song ON Artist.id = Song.artist_id LIMIT 10''')
     return json.encode([x for x in cur])
 
-@app.route('/search/<query>')
-def search(query):
-    return query
