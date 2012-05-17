@@ -1,0 +1,182 @@
+body, html { 
+    font-family:        helvetica, verdana, sans-serif; 
+    font-size:          10pt;
+    height:             100%;
+    overflow:           hidden;
+}
+
+body {
+    background-color:   #4488cc;
+    margin:             0px;
+    padding:            0px;
+}
+
+.ui-autocomplete {
+    max-height: 50%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.ui-autocomplete-loading { 
+    background:         white url('/i/loader.gif') right center no-repeat; 
+}
+
+#toolbar {
+    width:              100%;
+    text-align:         center;
+    margin:             0;
+}
+
+#album-art {
+    width:             100%;
+    margin:             0;
+    padding:            0;
+}
+
+#main, #searchbox {
+    width:              80%; 
+    margin:             0px 10%; 
+}
+
+#main {
+    height:             100%; 
+    background-color:   white;
+}
+
+#searchbox {
+    background-color:   #666666;
+    color:              white;
+    text-align:         right;
+    border-bottom:      solid 1px black;
+    font-weight:        bold;
+}
+
+#metadata {
+    width: 100%;
+    margin: 0px;
+    padding: 4px;
+}
+
+#playlistWidget {
+    width:              100%;
+    height:             75%;
+    overflow-x:         hidden;
+    overflow-y:         auto;
+    margin:             0px;
+    text-align:         left;
+    border:             1px solid black;
+}
+
+ul.playlist {
+    list-style-type:    none;
+    padding:            0;
+    margin:             0;
+}
+
+li.playlist, li.played, li.playing {
+    margin:             0;
+    padding:            4px;
+    border-top:         1px solid black;
+}
+li.playlist {
+    background-color:   #fafafa;
+}
+
+li.playlist:nth-child(1), li.played:nth-child(1) {
+    border-top:     0px;
+}
+
+li.playlist:nth-child(even), li.played:nth-child(even) {
+    background-color:   #f4f4f4;
+}
+
+li.played {
+    color:              #707070;
+}
+
+li.playing {
+    background-color:   #4488cc;
+    color:              white;
+}
+
+.artistName {
+    font-weight: bold;
+}
+.songTitle {
+    font-weight: normal;
+}
+.albumTitle {
+    font-weight: normal;
+}
+
+.hidden {
+    display: none;
+}
+
+#tags {
+    text-align: justify;
+    font-weight: bold;
+    color:      #4488cc;
+    margin-top: 4px;
+}
+
+#artist-image {
+    max-width: 200px;
+    max-height: 400px;
+    float: left;
+    margin: 0px 4px;
+}
+
+#artist-info {
+    padding: 8pt;
+    overflow-y: auto;
+    height: 80%;
+}
+
+#howto {
+    vertical-align: center;
+    text-align:     center;
+    height: 100%;
+    padding-top: 20%;
+    font-size:  14pt;
+}
+
+
+#activetags {
+    min-height:             8em;
+    overflow-x:             hidden;
+    overflow-y:             auto;
+}
+
+#tag-dialog {
+    text-align:             center;
+}
+
+#tagsearch {
+    width: 100%;
+}
+
+.tag-item {
+    background-color: #4488cc;
+    color: white;
+    font-weight: bold;
+    padding: 4pt;
+    margin: 2pt;
+    border-radius: 4pt;
+    max-width: 26em;
+    text-align: left;
+    float: left;
+}
+
+a.artist-tag:hover {
+    text-decoration: underline;
+}
+
+.update{
+    color: red;
+}
+#no-songs-message {
+        text-align: center;
+        padding: 8pt;
+}
+
+.ui-dialog-titlebar {display:none}

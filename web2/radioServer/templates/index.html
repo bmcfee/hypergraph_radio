@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+	<head>
+		<title>Markovoni Radio</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+        <link   rel     ="stylesheet"
+                href    ="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-darkness/jquery-ui.css"
+                type    ="text/css"
+                media   ="all"
+        />
+
+        <link   rel     ="stylesheet"
+                href    ="{{ url_for('static', 'css/radio.css') }}"
+                type    ="text/css"
+                media   ="all"
+        />
+
+        <script type="text/javascript" src="http://www.google.com/jsapi"></script> 
+        <script type="text/javascript"> google.load("swfobject", "2.2");    </script>
+        <script type="text/javascript"> google.load("jquery", "1.6");     </script>
+        <script type="text/javascript"> google.load("jqueryui", "1.8");  </script> 
+
+        <script type="text/javascript" src="{{ url_for('static', 'js/radio.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', 'js/ui.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', 'js/jquery.scrollTo-1.4.2-min.js') }}"></script>
+	</head>
+
+    <body>
+        <div id="searchbox">
+            <label for="search">Search</label>
+            <input id="search" style="width: 320px; margin-right: 8pt;"/>
+        </div>
+            
+        <div id="main">
+            <div style="float:right; clear: both;  width:320px; height: 100%; margin: 8pt;">
+                <div style="font-size: 8pt; float:right;">
+                    <button id="showtagdialog">Tag filter</button>
+                    <button id="autopilot">Auto-pilot</button>
+                    <button id="clear" >Clear playlist</button>
+                </div><div id="playlistWidget">
+                    <ul id="playlist" class="playlist"></ul>
+                    <button style="width: 100%;" id="expand">Expand playlist</button>
+                </div>
+            </div>
+
+            <div style="width: 200px; padding: 8pt; float: left;">
+                <div id="album-art">
+                    <img id="album-art-img" src="{{url_for('static', 'i/markovoni.png')}}" alt="" style="width:200px; height:200px;"/>
+                </div>
+
+                <div id="toolbar" class="ui-widget-header ui-corner-all">
+                    <button id="volume">    Mute        </button>
+                    <button id="previous">  Previous    </button>
+                    <button id="playpause"> Play/pause  </button>
+                    <button id="next">      Next        </button>
+                </div>
+
+                <div id="metadata">
+                    <div id="artist-name" class="artistName"></div>
+                    <div id="song-title"  class="songTitle"></div>
+                    <div id="album-title" class="albumTitle"></div>
+                </div>
+            
+                <div    class="ui-progressbar ui-widget ui-widget-content ui-corner-all" 
+                        style="width: 100%; height:10px;">
+                    <div    id      ="trackprogress" class   ="ui-progressbar-value"></div>
+                </div>
+
+                <div id="tags"></div>
+
+                <div id="player"></div>
+            </div>
+
+            <div id="howto">
+                Empty playlist?  Try searching for some music!
+            </div>
+            <div id="artist-info">
+                <img id="artist-image" />
+                <div style="font-weight: bold; text-decoration: underline;">
+                    Artist biography
+                </div>
+                <div id="artist-bio" style="text-align: left; padding: 4px;">
+                </div>
+                <input type="hidden" id="artist-info-artist_id" style="display: none;" />
+                <input type="hidden" id="artist-info-song_id" style="display: none;" />
+            </div>
+
+            <div id="tag-dialog">
+                <div id="no-songs-message" class="hidden">
+                    <h3>No songs could be found!</h3>
+                    Try removing some tags.
+                </div>
+                <input id="tagsearch" />
+                <div id="activetags">
+                    <h4 style="text-align:left">Songs must match:</h4>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
