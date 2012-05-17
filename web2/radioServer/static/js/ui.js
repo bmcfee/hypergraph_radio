@@ -193,7 +193,6 @@ $(function() {
         .button({ label: 'Tag filter', icons: {primary: 'ui-icon-plus'}, disabled: false})
         .click(showTagDialog);
 
-    initTagSearch();
     initRdioPlayer();
 });
 
@@ -265,25 +264,5 @@ function notify(message) {
                 resizable:      false });
     D.delay(1000).queue(function() {
         D.dialog("close");
-    });
-}
-
-function initTagSearch() {
-    var terms;
-
-    $.getJSON('/terms/', {}, function(data) {
-        $("#tagsearch")
-            .autocomplete({ 
-                source:     data, 
-                minLength:  2, 
-                closeOnEscape: false,
-                select:     function(e, ui) {
-                    if (ui.item) {
-                        addTerm(ui.item.value);
-                    }
-                    $(this).val('');
-                    return false;
-                },
-            });
     });
 }

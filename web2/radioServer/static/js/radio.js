@@ -57,7 +57,7 @@ function resetPlayerDisplay() {
     $("#artist-name")   .text('');
     $("#album-title")   .text('');
     $("#tags")          .text('');
-    $("#album-art-img") .attr('src', '/i/markovoni.png');
+    $("#album-art-img") .attr('src', '/static/i/markovoni.png');
     $("#artist-info")   .fadeOut('fast', function() {
                             $("#artist-image")  .attr('src', '');
                             $("#artist-bio")    .text('');
@@ -553,7 +553,7 @@ function initRdioPlayer() {
     resetPlayer();
 
     $.getJSON(
-        '/rdio/', 
+        '/rdio', 
         {}, 
         function(data) {
             if (data) {

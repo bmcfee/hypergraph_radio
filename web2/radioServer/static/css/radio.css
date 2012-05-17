@@ -6,7 +6,8 @@ body, html {
 }
 
 body {
-    background-color:   #4488cc;
+/*     background-color:   #4488cc; */
+    background-color:   #442244;
     margin:             0px;
     padding:            0px;
 }
@@ -17,7 +18,7 @@ body {
     overflow-y: auto;
 }
 .ui-autocomplete-loading { 
-    background:         white url('/i/loader.gif') right center no-repeat; 
+    background:         white url('/static/i/loader.gif') right center no-repeat; 
 }
 
 #toolbar {
