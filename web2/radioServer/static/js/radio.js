@@ -239,7 +239,7 @@ function enablePlaylistWidgets() {
 
 function loadSong(song_id) {
     $.getJSON(
-        '/song/', 
+        '/song', 
         {query: song_id}, 
         function(data) { 
             var startPlaying    = ($("li.playing").length == 0);
@@ -312,7 +312,7 @@ function askForSongs(node, replace) {
         after_id    = node.next().find('.song_id').val();
     }
 
-    $.post(  '/playlist/', 
+    $.post(  '/playlist', 
                 {
                     before:     before_id, 
                     after:      after_id,
@@ -476,7 +476,7 @@ function moveBack() {
 
 function getArtistInfo(song_id) {
 
-    $.getJSON('/artist/', {query: song_id}, function(data) {
+    $.getJSON('/artist', {query: song_id}, function(data) {
 
         var current_song_id = $("li.playing > input.song_id").val();
         if (data['song_id'] != current_song_id) {
@@ -502,7 +502,7 @@ function getArtistInfo(song_id) {
 }
 
 function getTags(song_id) {
-    $.getJSON('/tags/', {query: song_id}, function(data) { 
+    $.getJSON('/tags', {query: song_id}, function(data) { 
         var tagbox  = $("#tags");
         var std     = $("#showtagdialog");
 
