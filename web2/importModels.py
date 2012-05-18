@@ -8,14 +8,14 @@ import pprint
 def loadModels(infile):
 
     with open(infile, 'r') as f:
-        P = pickle.load(f)
+        weights = pickle.load(f)
         pass
 
-    W = {}
-    for k in P['weights']:
-        W[k] = P['weights'][k][0]
-        pass
-    return W
+#     W = {}
+#     for k in P['weights']:
+#         W[k] = P['weights'][k][0]
+#         pass
+    return {'Genre': weights['w']}
 
 
 def importWeights(dbc, weights):

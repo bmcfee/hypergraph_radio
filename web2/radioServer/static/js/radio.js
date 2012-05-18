@@ -56,7 +56,6 @@ function resetPlayerDisplay() {
     $("#song-title")    .text('');
     $("#artist-name")   .text('');
     $("#album-title")   .text('');
-    $("#tags")          .text('');
     $("#album-art-img") .attr('src', '/static/i/markovoni.png');
     $("#artist-info")   .fadeOut('fast', function() {
                             $("#artist-image")  .attr('src', '');
@@ -284,15 +283,6 @@ function deleteCurrentSong() {
     deleteSong(currentSong);
 }
 
-function getActiveTags() {
-    var taglist = [];
-
-    $(".tag-item-name").each(function() {
-        taglist.push($(this).val());
-    });
-
-    return taglist;
-}
 
 function getCurrentSongIDs() {
     var bad_ids     = [];
@@ -317,12 +307,10 @@ function askForSongs(node, replace) {
                     before:     before_id, 
                     after:      after_id,
                     not_list:   JSON.stringify(getCurrentSongIDs()),
-                    tag_filter: JSON.stringify(getActiveTags())
                 }, 
                 function(data, textStatus, jqXHR) { 
                     if (data.length == 0) {
                         // no songs!
-                        showTagDialog();
                         $("#no-songs-message")
                             .removeClass("hidden");
                         return;
@@ -501,35 +489,6 @@ function getArtistInfo(song_id) {
     });
 }
 
-function getTags(song_id) {
-    $.getJSON('/tags', {query: song_id}, function(data) { 
-        var tagbox  = $("#tags");
-        var std     = $("#showtagdialog");
-
-        $("#tags > a").remove();
-
-        $.each(data, function(i, v) {
-            var link = $("<a class='artist-tag'></a>")
-                            .text(v)
-                            .click(function() {
-                                if (addTerm(v)) {
-                                    // create a popup
-                                    
-                                    notify("Added <span style='font-weight: bold; color: #4488cc;'>" + v + "</span> to tag filter");
-                                    std.addClass("update");
-                                } else {
-                                    removeTerm(v);
-                                    notify("Removed <span style='font-weight: bold; color: red;'>" + v + "</span> from tag filter");
-                                    std.addClass("update");
-
-                                }
-                            });
-            tagbox.append(link);
-            tagbox.append(' ');
-        });
-    });
-}
-
 function updatePlayerFromList(changePlayer) {
     var playing_node    = $("li.playing");
     var rdio_id         = $("li.playing > input.rdio_id").val();
@@ -538,7 +497,6 @@ function updatePlayerFromList(changePlayer) {
     if (changePlayer && rdio_id != undefined) { 
         player.rdio_play(   rdio_id ); 
         
-        getTags(            song_id );
         getArtistInfo(      song_id );
 
         $("#playlistWidget").scrollTo($("li.playing"));

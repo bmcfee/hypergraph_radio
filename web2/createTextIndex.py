@@ -26,8 +26,8 @@ def createIndexWriter(indexPath):
 
     Schema = whoosh.fields.Schema(  song_id     =   whoosh.fields.ID(stored=True),
                                     artist_id   =   whoosh.fields.STORED,
-                                    title       =   whoosh.fields.TEXT(stored=True, field_boost=8.0, analyzer=A),
-                                    artist      =   whoosh.fields.TEXT(stored=True, field_boost=4.0, analyzer=A),
+                                    artist      =   whoosh.fields.TEXT(stored=True, field_boost=8.0, analyzer=A),
+                                    title       =   whoosh.fields.TEXT(stored=True, field_boost=4.0, analyzer=A),
                                     terms       =   whoosh.fields.KEYWORD(stored=True, scorable=True, commas=True))
 
     index = whoosh.index.create_in(indexPath, Schema)

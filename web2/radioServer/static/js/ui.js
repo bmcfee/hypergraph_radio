@@ -3,13 +3,12 @@
 
 var infiniteRadio   = true;
 var volumeOn        = true;
-var tagDialogOn     = false;
 
 var sliding         = false;
 
 // Handle keyboard events
 $(document).keydown(function (e) {
-    if ($("#search").is(":focus") || tagDialogOn) {
+    if ($("#search").is(":focus")) {
         return;
     }
 //     console.log(e.which);
@@ -172,87 +171,9 @@ $(function() {
                     .appendTo( ul );
         };
 
-
-    $( "#tag-dialog" )
-        .dialog({   autoOpen:   false, 
-                    modal:      true,
-                    title:      'Modify your playlist tag filter',
-                    buttons:    {
-                        "Clear tags": function() {
-                            $("#activetags > div.tag-item").remove();
-                        },
-                        Done: function() {
-                            $( this ).dialog( "close" );
-                        }
-                    },
-                    close: function(e, ui) {
-                        tagDialogOn = false;
-                    }
-                });
-    $( "#showtagdialog" )
-        .button({ label: 'Tag filter', icons: {primary: 'ui-icon-plus'}, disabled: false})
-        .click(showTagDialog);
-
     initRdioPlayer();
 });
 
-
-function showTagDialog() {
-    $("#no-songs-message")
-        .addClass("hidden");
-    tagDialogOn         = true;
-    $("#tag-dialog")
-        .dialog("open");
-    $("#showtagdialog")
-        .removeClass("update");
-    return false;
-}
-
-function tagExists(term) {
-
-    var match = false;
-
-    /* check for existing tag */
-    $("input.tag-item-name").each( function(i, E) {
-        if (term == E.value) {
-            match = true;
-            return false;
-        }
-    });
-
-    return match;
-}
-
-function addTerm(term) {
-    if (tagExists(term)) {
-        return false;
-    }
-
-    console.log('Adding term: ' + term);
-
-    var tagNode = $("<div class='tag-item'></div>");
-
-    tagNode.text(term);
-    var killButton = $("<button style='font-size: 5pt; float:right; margin-left: 4pt;'>Delete tag</button>");
-    killButton.button({text: false, icons: { primary: "ui-icon-close"}})
-        .click(function() {$(this).parent().remove();});
-    tagNode.append(killButton);
-
-    tagNode.append($('<input type="hidden" class="tag-item-name" />')
-                        .attr('value', term));
-    $("#activetags")
-        .append(tagNode);
-    return true;
-}
-
-function removeTerm(term) {
-    $("input.tag-item-name").each(function(i,E) {
-        if (term == E.value) {
-            $(E).parent().remove();
-            return false;
-        }
-    });
-}
 
 function notify(message) {
     var D = $('<div style="text-align: center;"></div>');

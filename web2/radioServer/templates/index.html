@@ -18,7 +18,7 @@
 
         <script type="text/javascript" src="http://www.google.com/jsapi"></script> 
         <script type="text/javascript"> google.load("swfobject", "2.2");    </script>
-        <script type="text/javascript"> google.load("jquery", "1.6");     </script>
+        <script type="text/javascript"> google.load("jquery", "1.7");     </script>
         <script type="text/javascript"> google.load("jqueryui", "1.8");  </script> 
 
         <script type="text/javascript" src="/static/js/radio.js"></script>
@@ -35,7 +35,6 @@
         <div id="main">
             <div style="float:right; clear: both;  width:320px; height: 100%; margin: 8pt;">
                 <div style="font-size: 8pt; float:right;">
-                    <button id="showtagdialog">Tag filter</button>
                     <button id="autopilot">Auto-pilot</button>
                     <button id="clear" >Clear playlist</button>
                 </div><div id="playlistWidget">
@@ -67,8 +66,6 @@
                     <div    id      ="trackprogress" class   ="ui-progressbar-value"></div>
                 </div>
 
-                <div id="tags"></div>
-
                 <div id="player"></div>
             </div>
 
@@ -86,16 +83,6 @@
                 <input type="hidden" id="artist-info-song_id" style="display: none;" />
             </div>
 
-            <div id="tag-dialog">
-                <div id="no-songs-message" class="hidden">
-                    <h3>No songs could be found!</h3>
-                    Try removing some tags.
-                </div>
-                <input id="tagsearch" />
-                <div id="activetags">
-                    <h4 style="text-align:left">Songs must match:</h4>
-                </div>
-            </div>
         </div>
     </body>
 </html>
