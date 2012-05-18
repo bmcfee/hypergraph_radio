@@ -88,24 +88,7 @@ def webSong():
     '''
         Given a song id, return the title, artist, and rdio_id
     '''
-    cur = flask.g.db.cursor()
-    cur.execute('''SELECT       Song.id         as song_id, 
-                                Song.rdio_id    as rdio_id, 
-                                Song.title      as title, 
-                                Artist.name     as artist
-                    FROM        Song
-                    INNER JOIN  Artist ON Song.artist_id = Artist.id
-                    WHERE       Song.id = ?
-                    LIMIT       1''', (flask.request.args['query'],))
-    try:
-        (song_id, rdio_id, title, artist) = cur.fetchone()
-        return json.encode( [   {   'song_id':  song_id, 
-                                    'rdio_id':  rdio_id, 
-                                    'title':    title, 
-                                    'artist':   artist}])
-    except:
-        return json.encode([])
-    pass
+    return json.encode([playlist.getSongInfo(flask.request.args['query'])])
 
 @app.route('/playlist', methods=['POST'])
 def webPlaylist():
