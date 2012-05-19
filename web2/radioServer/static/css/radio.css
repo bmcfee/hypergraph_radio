@@ -134,6 +134,16 @@ img.playing {
     height: 80%;
 }
 
+.artist-bio {
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+a:link{
+    color:      #729fcf;
+    font-weight: bold;
+}
+
 #howto {
     vertical-align: center;
     text-align:     center;

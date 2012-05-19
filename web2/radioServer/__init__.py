@@ -8,7 +8,7 @@ import flask
 
 import ConfigParser
 
-import rdio, search, playlist
+import rdio, search, playlist, en
 
 # build the app
 app = flask.Flask(__name__)
@@ -51,6 +51,11 @@ def before_request():
     # set up the searcher
     if not hasattr(flask.g, 'search'):
         flask.g.search = search.Search(app.config)
+        pass
+
+    # set up the echonest bindings
+    if not hasattr(flask.g, 'en'):
+        flask.g.en  = en.en(app.config)
         pass
 
     pass
@@ -99,6 +104,25 @@ def webPlaylist():
     not_list    = json.decode(flask.request.form.get('not_list', ''))
 
     return json.encode(playlist.nextSong(before, not_list))
+
+@app.route('/artistbio', methods=['GET'])
+def webArtistBio():
+    '''
+        Get the biography for an artist
+    '''
+    song_id = flask.request.args['song_id']
+    cur = flask.g.db.cursor()
+    try:
+        cur.execute('''SELECT artist_id FROM song WHERE song.id = ?''', (song_id,))
+        artist_id = cur.fetchone()[0]
+        bio = flask.g.en.bio(artist_id)
+        
+        biostr = flask.render_template('bio.html', biography=bio[0], attribution_url=bio[1], attribution=bio[2])
+        
+    except:
+        biostr = ''
+
+    return json.encode({'song_id': song_id, 'bio': biostr})
 
 @app.route('/test')
 def webTest():

@@ -57,6 +57,9 @@ function resetPlayerDisplay() {
     $("#artist-name")   .text('');
     $("#album-title")   .text('');
     $("#album-art-img") .attr('src', '/static/i/rawkhg.png');
+    $("#artist-info").fadeOut('fast', function() {
+        $("#artist-info").html('')
+    });
 }
 
 function previousTrack() {
@@ -389,7 +392,7 @@ function createSongNode(song) {
         .append(info)
         .append('<input type="hidden" name="rdio_id" class="rdio_id" value="' + song.rdio_id + '"/>')
         .append('<input type="hidden" name="song_id" class="song_id" value="' + song.song_id + '"/>')
-        .append('<input type="hidden" name="edge_name" class="song_id" value="' + song.edge + '"/>');
+        .append('<input type="hidden" name="edge_name" class="edge_name" value="' + song.edge + '"/>');
 
     li.find('button')
         .addClass('hidden');
@@ -479,32 +482,33 @@ function moveBack() {
     }
 }
 
-// function getArtistInfo(song_id) {
+function getArtistInfo(song_id) {
 
-//     $.getJSON('/artist', {query: song_id}, function(data) {
+    $.getJSON('/artistbio', {song_id: song_id}, function(data) {
 
-//         var current_song_id = $("li.playing > input.song_id").val();
-//         if (data['song_id'] != current_song_id) {
-//             return;
-//         }
+        var current_song_id = $("li.playing > input.song_id").val();
+        if (data['song_id'] != current_song_id) {
+            return;
+        }
 
-//         $("#artist-info").fadeOut('fast', function() {
+        $("#artist-info").fadeOut('fast', function() {
 //             $("#artist-image")
 //                 .attr("src", data['image']);
-//     
-//             $("#artist-bio")
-//                 .text(data['bio']);
+    
+            console.log(data['bio']);
+            $("#artist-info")
+                .html(data['bio']);
 
 //             $("#artist-info-artist_id")
 //                 .attr('value', data['artist_id']);
 //             $("#artist-info-song_id")
 //                 .attr('value', data['song_id']);
 
-//             $("#artist-info").fadeIn('fast');
+            $("#artist-info").fadeIn('fast');
 
-//         });
-//     });
-// }
+        });
+    });
+}
 
 function updatePlayerFromList(changePlayer) {
     var playing_node    = $("li.playing");
@@ -514,7 +518,7 @@ function updatePlayerFromList(changePlayer) {
     if (changePlayer && rdio_id != undefined) { 
         player.rdio_play(   rdio_id ); 
         
-//         getArtistInfo(      song_id );
+        getArtistInfo(      song_id );
 
         $("#playlistWidget").scrollTo($("li.playing"));
     }
