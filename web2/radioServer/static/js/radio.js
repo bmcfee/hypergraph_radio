@@ -56,12 +56,7 @@ function resetPlayerDisplay() {
     $("#song-title")    .text('');
     $("#artist-name")   .text('');
     $("#album-title")   .text('');
-    $("#album-art-img") .attr('src', '/static/i/markovoni.png');
-    $("#artist-info")   .fadeOut('fast', function() {
-                            $("#artist-image")  .attr('src', '');
-                            $("#artist-bio")    .text('');
-                        });
-
+    $("#album-art-img") .attr('src', '/static/i/rawkhg.png');
 }
 
 function previousTrack() {
@@ -132,7 +127,7 @@ radioListener.playingTrackChanged = function(playingTrack, sourcePosition) {
         resetPlayerDisplay();
         
         return;
-    } else if ( infiniteRadio && $("li.playing").next().length == 0 ) {
+    } else if ( $("li.playing").next().length == 0 ) {
         // we're on the last track, but in radio mode.. add another
         expandPlaylist();
     }
@@ -360,34 +355,41 @@ function replaceCurrentSong() {
 
 function createSongNode(song) {
 
-    var delButton = $('<button style="float: right;"/>')
+    var delButton = $('<button />')
         .text('Delete this song')
         .button({text: false, icons: {primary: 'ui-icon-close'}})
         .click(function() { deleteSong( $(this).parents('li') ); });
 
-    var addButton = $('<button style="float: right;"/>')
-        .text('Add a song')
+    var addButton = $('<button />')
+        .text('More songs like this')
         .button({text: false, icons: {primary: 'ui-icon-plusthick'}})
         .click(function() { askForSongs( $(this).parents('li'), false ); });
 
-    var replaceButton = $('<button style="float: right;"/>')
+    var replaceButton = $('<button />')
         .text('Replace this song')
         .button({text: false, icons: {primary: 'ui-icon-arrowreturnthick-1-w'}})
         .click(function() { askForSongs( $(this).parents('li'), true ); });
 
     var bs = $('<div style="float: right; font-size: 8pt;"></div>')
-                    .append(delButton)
-                    .append(replaceButton)
                     .append(addButton)
+                    .append(replaceButton)
+                    .append(delButton)
                     .buttonset();
+
+    var isplaying = $('<img src="/static/i/nowplaying.gif" class="hidden" style="float:right" />');
+
+    var info = $('<div></div>')
+        .append('<div class="artistName">' + song.artist + '</div>')
+        .append('<div class="songTitle">' + song.title + '</div>');
 
     var li = $('<li />')
         .addClass('playlist')
+        .append(isplaying)
         .append(bs)
-        .append('<div class="artistName">' + song.artist + '</div>')
-        .append('<div class="songTitle">' + song.title + '</div>')
+        .append(info)
         .append('<input type="hidden" name="rdio_id" class="rdio_id" value="' + song.rdio_id + '"/>')
-        .append('<input type="hidden" name="song_id" class="song_id" value="' + song.song_id + '"/>');
+        .append('<input type="hidden" name="song_id" class="song_id" value="' + song.song_id + '"/>')
+        .append('<input type="hidden" name="edge_name" class="song_id" value="' + song.edge + '"/>');
 
     li.find('button')
         .addClass('hidden');
@@ -406,9 +408,15 @@ function createSongNode(song) {
 
 function seekTo(node) {
     $("li.playing")
+        .find('img')
+        .addClass('hidden');
+    $("li.playing")
         .removeClass('playing')
         .addClass('playlist');
 
+    node
+        .find('img')
+        .removeClass('hidden');
     node
         .removeClass('playlist')
         .addClass('playing');
@@ -425,9 +433,15 @@ function moveForward() {
 
         if (next.length > 0) {
             currentlyPlaying
+                .find('img')
+                .addClass('hidden');
+            currentlyPlaying
                 .removeClass('playing')
                 .addClass('playlist');
 
+            next
+                .find('img')
+                .removeClass('hidden');
             next
                 .removeClass('playlist')
                 .addClass('playing');
@@ -435,6 +449,9 @@ function moveForward() {
             updatePlayerFromList(true);
         }
     } else {
+        $("li.playlist:first")
+            .find('img')
+            .removeClass('hidden');
         $("li.playlist:first")
             .removeClass('playlist')
             .addClass('playing');
@@ -462,32 +479,32 @@ function moveBack() {
     }
 }
 
-function getArtistInfo(song_id) {
+// function getArtistInfo(song_id) {
 
-    $.getJSON('/artist', {query: song_id}, function(data) {
+//     $.getJSON('/artist', {query: song_id}, function(data) {
 
-        var current_song_id = $("li.playing > input.song_id").val();
-        if (data['song_id'] != current_song_id) {
-            return;
-        }
+//         var current_song_id = $("li.playing > input.song_id").val();
+//         if (data['song_id'] != current_song_id) {
+//             return;
+//         }
 
-        $("#artist-info").fadeOut('fast', function() {
-            $("#artist-image")
-                .attr("src", data['image']);
-    
-            $("#artist-bio")
-                .text(data['bio']);
+//         $("#artist-info").fadeOut('fast', function() {
+//             $("#artist-image")
+//                 .attr("src", data['image']);
+//     
+//             $("#artist-bio")
+//                 .text(data['bio']);
 
-            $("#artist-info-artist_id")
-                .attr('value', data['artist_id']);
-            $("#artist-info-song_id")
-                .attr('value', data['song_id']);
+//             $("#artist-info-artist_id")
+//                 .attr('value', data['artist_id']);
+//             $("#artist-info-song_id")
+//                 .attr('value', data['song_id']);
 
-            $("#artist-info").fadeIn('fast');
+//             $("#artist-info").fadeIn('fast');
 
-        });
-    });
-}
+//         });
+//     });
+// }
 
 function updatePlayerFromList(changePlayer) {
     var playing_node    = $("li.playing");
@@ -497,7 +514,7 @@ function updatePlayerFromList(changePlayer) {
     if (changePlayer && rdio_id != undefined) { 
         player.rdio_play(   rdio_id ); 
         
-        getArtistInfo(      song_id );
+//         getArtistInfo(      song_id );
 
         $("#playlistWidget").scrollTo($("li.playing"));
     }

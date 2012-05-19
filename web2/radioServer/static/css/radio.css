@@ -1,13 +1,12 @@
 body, html { 
-    font-family:        helvetica, verdana, sans-serif; 
+    font-family:        'Cabin', helvetica, verdana, sans-serif; 
     font-size:          10pt;
     height:             100%;
     overflow:           hidden;
 }
 
 body {
-/*     background-color:   #4488cc; */
-    background-color:   #442244;
+    background-color:   black;
     margin:             0px;
     padding:            0px;
 }
@@ -18,7 +17,7 @@ body {
     overflow-y: auto;
 }
 .ui-autocomplete-loading { 
-    background:         white url('/static/i/loader.gif') right center no-repeat; 
+    background:         #eeeeec url('/static/i/loader.gif') right center no-repeat; 
 }
 
 #toolbar {
@@ -40,12 +39,13 @@ body {
 
 #main {
     height:             100%; 
-    background-color:   white;
+    background-color:   #2e3436;
+    color:              #eeeeec;
 }
 
 #searchbox {
-    background-color:   #666666;
-    color:              white;
+    background-color:   #555753;
+    color:              #eeeeec;
     text-align:         right;
     border-bottom:      solid 1px black;
     font-weight:        bold;
@@ -79,7 +79,8 @@ li.playlist, li.played, li.playing {
     border-top:         1px solid black;
 }
 li.playlist {
-    background-color:   #fafafa;
+    background-color:   #75507b;
+/*     background-color:   #5c3566; */
 }
 
 li.playlist:nth-child(1), li.played:nth-child(1) {
@@ -87,7 +88,8 @@ li.playlist:nth-child(1), li.played:nth-child(1) {
 }
 
 li.playlist:nth-child(even), li.played:nth-child(even) {
-    background-color:   #f4f4f4;
+/*     background-color:   #ad7fa8; */
+    background-color:   #555753;
 }
 
 li.played {
@@ -95,8 +97,14 @@ li.played {
 }
 
 li.playing {
-    background-color:   #4488cc;
-    color:              white;
+    background-color:   #ad7fa8;
+    color:              #eeeeec;
+}
+
+img.playlist {
+    display: none;
+}
+img.playing {
 }
 
 .artistName {
@@ -111,13 +119,6 @@ li.playing {
 
 .hidden {
     display: none;
-}
-
-#tags {
-    text-align: justify;
-    font-weight: bold;
-    color:      #4488cc;
-    margin-top: 4px;
 }
 
 #artist-image {
@@ -154,18 +155,6 @@ li.playing {
 
 #tagsearch {
     width: 100%;
-}
-
-.tag-item {
-    background-color: #4488cc;
-    color: white;
-    font-weight: bold;
-    padding: 4pt;
-    margin: 2pt;
-    border-radius: 4pt;
-    max-width: 26em;
-    text-align: left;
-    float: left;
 }
 
 a.artist-tag:hover {

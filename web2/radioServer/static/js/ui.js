@@ -1,7 +1,6 @@
 // CREATED:2011-09-19 09:00:10 by Brian McFee <bmcfee@cs.ucsd.edu>
 // UI control code for the radio 
 
-var infiniteRadio   = true;
 var volumeOn        = true;
 
 var sliding         = false;
@@ -66,20 +65,6 @@ $(document).keydown(function (e) {
     }
 });
 
-function toggleRadio(buttonNode) {
-
-    infiniteRadio ^= 1;
-
-    console.log("Infinite radio is now: " + infiniteRadio);
-    buttonNode
-        .button("option", "label", "Radio " + (infiniteRadio ? "ON" : "OFF"));
-
-    if (infiniteRadio && $("li.playing").length > 0 && $("li.playing").next().length == 0) {
-        expandPlaylist();
-    }
-
-}
-
 function toggleVolume(buttonNode) {
 
     volumeOn ^= 1;
@@ -124,9 +109,6 @@ $(function() {
     $( "#toolbar" )
         .buttonset();
 
-    $( "#autopilot" )
-        .button({ label: "Auto-pilot " + (infiniteRadio ? "ON" : "OFF"), icons: { primary: "ui-icon-signal-diag"}, disabled: false})
-        .click(function() {toggleRadio($(this));});
 
     $( "#expand" )
         .button({ text: false, icons: { primary: "ui-icon-triangle-1-s"}, disabled: true })
