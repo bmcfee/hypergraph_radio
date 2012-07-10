@@ -29,9 +29,8 @@ def loadConfig(serverIni):
         pass
     pass
 
-def run():
-    app.debug = True
-    app.run()
+def run(**kwargs):
+    app.run(**kwargs)
     pass
 
 
