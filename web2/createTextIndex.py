@@ -48,7 +48,8 @@ def createIndex(indexPath, dbc_artist, dbc_radio):
     cur = dbc_radio.cursor()
 
     cur.execute('''     SELECT      Song.id, Song.title, Artist.id, Artist.name 
-                        FROM        Song INNER JOIN Artist 
+                        FROM        Song 
+                        INNER JOIN  Artist 
                         ON          Song.artist_id = Artist.id''')
 
     for (song_id, song_title, artist_id, artist_name) in cur:

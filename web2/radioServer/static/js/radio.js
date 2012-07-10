@@ -56,7 +56,7 @@ function resetPlayerDisplay() {
     $("#song-title")    .text('');
     $("#artist-name")   .text('');
     $("#album-title")   .text('');
-    $("#album-art-img") .attr('src', '/static/i/rawkhg.png');
+    $("#album-art-img") .attr('src', '/static/i/logo.png');
     $("#artist-info").fadeOut('fast', function() {
         $("#artist-info").html('')
     });
