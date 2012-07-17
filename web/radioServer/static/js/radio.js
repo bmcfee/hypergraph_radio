@@ -302,8 +302,7 @@ function askForSongs(node, replace) {
 
     $.post(  '/playlist', 
                 {
-                    before:     before_id, 
-                    after:      after_id,
+                    seeds:      JSON.stringify([before_id]), 
                     not_list:   JSON.stringify(getCurrentSongIDs()),
                 }, 
                 function(data, textStatus, jqXHR) { 

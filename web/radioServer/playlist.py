@@ -1,11 +1,13 @@
 import flask
 import numpy, numpy.random
 
-def nextSong(before, not_list):
+def nextSong(seeds, not_list):
 
     MODEL_ID = 1
     # Get a cursor
     cur = flask.g.db.cursor()
+
+    before = seeds[numpy.random.randint(len(seeds))]
 
     # Get the edges and weights for the previous song
     cur.execute('''SELECT           song_to_edge.edge_id,

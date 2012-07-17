@@ -99,10 +99,10 @@ def webPlaylist():
     '''
         Choose the next song, given a current song and a list of forbidden songs
     '''
-    before      = flask.request.form.get('before', '')
+    seeds       = json.decode(flask.request.form.get('seeds', ''))
     not_list    = json.decode(flask.request.form.get('not_list', ''))
 
-    return json.encode(playlist.nextSong(before, not_list))
+    return json.encode(playlist.nextSong(seeds, not_list))
 
 @app.route('/artistbio', methods=['GET'])
 def webArtistBio():
