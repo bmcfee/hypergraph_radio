@@ -38,6 +38,8 @@ def run(**kwargs):
 
 @app.before_request
 def before_request():
+
+    # connect to the database
     flask.g.db = sqlite3.connect(app.config['database'])
 
     # refresh the rdio key
@@ -57,10 +59,19 @@ def before_request():
         flask.g.en  = en.en(app.config)
         pass
 
+    # build the session object
+    # TODO:   2012-07-19 11:46:26 by Brian McFee <bmcfee@cs.ucsd.edu>
+
     pass
 
 @app.teardown_request
 def teardown_request(exception):
+
+    # TODO:   2012-07-19 11:46:54 by Brian McFee <bmcfee@cs.ucsd.edu>
+    #  write-back the session object
+
+    #   close the database connection 
+
     if hasattr(flask.g, 'db'):
         flask.g.db.close()
         pass
