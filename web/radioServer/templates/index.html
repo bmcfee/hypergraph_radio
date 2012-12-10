@@ -1,80 +1,100 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
-	<head>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
 		<title>Radio</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 
-        <link   rel     ="stylesheet"
-                href    ="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-darkness/jquery-ui.css"
-                type    ="text/css"
-                media   ="all"
-        />
+        <link rel="stylesheet"      href="/static/bootstrap/css/cyborg-bootstrap.min.css">
 
-        <link   href='http://fonts.googleapis.com/css?family=Cabin:400,700,400italic' 
-                rel='stylesheet' 
-                type='text/css'
-        />
+        <style type="text/css">
+            body {
+                margin: 40px 0px;
+            }
+            .media {
+                padding: 4px 4px;
+                margin: 0;
+            }
+            .media-list > li:nth-child(odd) {
+                background-color:   #222;
+            }
+            .media-list > li:nth-child(even) {
+                background-color:   #444;
+            }
 
-        <link   rel     ="stylesheet"
-                href    ="/static/css/radio.css"
-                type    ="text/css"
-                media   ="all"
-        />
+            .playing {
+                background-color:   #ad7fa8 !important;
+                color:              #eeeeec !important;
+            }
 
-        <script type="text/javascript" src="http://www.google.com/jsapi"></script> 
-        <script type="text/javascript"> google.load("swfobject", "2.2");    </script>
-        <script type="text/javascript"> google.load("jquery", "1.7");     </script>
-        <script type="text/javascript"> google.load("jqueryui", "1.8");  </script> 
+            .hidden {
+                display: none;
+            }
+            .span6 {
+                padding: 0;
+                margin: 0;
+            }
 
-        <script type="text/javascript" src="/static/js/radio.js"></script>
-        <script type="text/javascript" src="/static/js/ui.js"></script>
-        <script type="text/javascript" src="/static/js/jquery.scrollTo-1.4.2-min.js"></script>
+        </style>
 	</head>
 
     <body>
-        <div id="searchbox">
-            <label for="search">Search</label>
-            <input id="search" style="width: 320px; margin-right: 8pt;"/>
+        <div class="navbar navbar-fixed-top">
+            <form class="form-search pull-right ajax">
+                <div class="input-append">
+                    <input type="text" class="span5 search-query" placeholder="Search for songs or artists">
+                    <button type="submit" class="btn"><i class="icon-search icon-white"></i></button>
+                </div>
+            </form>
         </div>
-            
-        <div id="main">
-            <div style="float:right; clear: both;  width:320px; height: 100%; margin: 8pt;">
-                <div id="playlistWidget">
-                    <ul id="playlist" class="playlist"></ul>
-                    <button style="width: 100%;" id="expand">Expand playlist</button>
-                </div>
-                <div style="font-size: 8pt; float:right;">
-                    <button id="clear" >Clear playlist</button>
-                </div>
-            </div>
 
-            <div style="width: 400px; padding: 8pt; float:right;">
+        <div class="container-fluid">
+            
+            <div class="span6 pull-left">
                 <div id="album-art">
-                    <img id="album-art-img" src="/static/i/logo.png" alt="" style="height:400px;"/>
+                    <img id="album-art-img" src="/static/i/logo.png" class="img-rounded span6" alt="" />
                 </div>
-
-                <div id="toolbar" class="ui-widget-header ui-corner-all">
-                    <button id="volume">    Mute        </button>
-                    <button id="previous">  Previous    </button>
-                    <button id="playpause"> Play/pause  </button>
-                    <button id="next">      Next        </button>
-                </div>
-
+                    
                 <div id="metadata">
-                    <div id="artist-name" class="artistName"></div>
-                    <div id="song-title"  class="songTitle"></div>
-                    <div id="album-title" class="albumTitle"></div>
+                    <div class="btn-toolbar pull-right">
+                        <div class="btn-group">
+                            <a class="btn disabled" id="volume"     ><i class="icon-volume-up icon-white"       alt="Mute"      ></i></a>
+                            <a class="btn disabled" id="previous"   ><i class="icon-chevron-left icon-white"    alt="Previous"  ></i></a>
+                            <a class="btn disabled" id="playpause"  ><i class="icon-play icon-white"            alt="Play/pause"></i></a>
+                            <a class="btn disabled" id="next"       ><i class="icon-chevron-right icon-white"   alt="Next"      ></i></a>
+                        </div>
+                    </div>
+
+                    <h3 id="song-title"  class="songTitle"></h3>
+                    <h4 id="artist-name" class="muted artistName"></h4>
+                    <h4 id="album-title" class="muted albumTitle"></h4>
                 </div>
             
-                <div    class="ui-progressbar ui-widget ui-widget-content ui-corner-all" 
-                        style="width: 100%; height:10px;">
-                    <div    id      ="trackprogress" class   ="ui-progressbar-value"></div>
-                </div>
+            </div>
 
-                <div id="player"></div>
+            <div class="span5">
+                <!-- Playlist goes here -->
+                <h4 class="hidden" id="playlist-header">Playlist</h4>
+                <ul class="media-list" id="playlist"></ul>
             </div>
-            <div style="width:300px; float: left" id="artist-info">
+
+            <div class="span5 pull-right">
+                <!-- Search results go here -->
+                <h4 class="hidden" id="search-header">Search results</h4>
+                <ul class="media-list" id="search-results"></ul>
             </div>
+
         </div>
+
+        <div id="player" class="hidden"></div>
     </body>
+
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script> 
+    <script type="text/javascript"> 
+        google.load("jquery", "1.7");
+        google.load("swfobject", "2.2");
+    </script>
+
+    <script type="text/javascript" src="/static/js/bootstrap-ajax.js"></script>
+    <script type="text/javascript" src="/static/js/radio.js"></script>
+    <script type="text/javascript" src="/static/js/ui.js"></script>
 </html>

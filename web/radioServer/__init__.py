@@ -84,6 +84,13 @@ def webIndex():
     '''
     return flask.render_template('index.html')
 
+@app.route('/old')
+def webIndexOld():
+    '''
+        Get the index page
+    '''
+    return flask.render_template('index-old.html')
+
 @app.route('/rdio')
 def webRdioToken():
     '''
