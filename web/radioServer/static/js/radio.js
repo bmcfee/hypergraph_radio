@@ -13,9 +13,11 @@ function playPauseMusic() {
 
     if (paused) {
         paused = false;
+        $('li.playing > img').removeClass('hidden');
         player.rdio_play();
     } else {
         paused = true;
+        $('li.playing > img').addClass('hidden');
         player.rdio_pause();
     }
 }
