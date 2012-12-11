@@ -57,7 +57,6 @@ function resetPlayer() {
 function resetPlayerDisplay() {
     $("#song-title")    .text('');
     $("#artist-name")   .text('');
-    $("#album-title")   .text('');
     $("#album-art-img") .attr('src', '/static/i/logo.png');
 }
 
@@ -147,9 +146,6 @@ radioListener.playingTrackChanged = function(playingTrack, sourcePosition) {
 
     $("#song-title")
         .text(playingTrack.name);
-
-    $("#album-title")
-        .text(playingTrack.album);
 
     $("#album-art-img")
         .attr('src', playingTrack.icon);
@@ -395,7 +391,7 @@ function createSongNode(song) {
         .append(controlBar)
         .append(isplaying)
         .append('<h5 class="media-heading">' + song.title + '</h5>')
-        .append('<h5 class="muted media-heading">' + song.artist + '</div>')
+        .append('<h6 class="media-heading">' + song.artist + '</h6>')
         .append('<input type="hidden" name="rdio_id" class="rdio_id" value="' + song.rdio_id + '"/>')
         .append('<input type="hidden" name="song_id" class="song_id" value="' + song.song_id + '"/>')
         .append('<input type="hidden" name="edge_name" class="edge_name" value="' + song.edge + '"/>');
