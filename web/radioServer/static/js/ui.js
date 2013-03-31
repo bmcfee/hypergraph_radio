@@ -33,12 +33,17 @@ $(function() {
     $("#next")
         .bind('click', nextTrack);
 
+    $("#hide-results")
+        .bind('click', function() {
+            $("#search-results > li").remove()
+            $("#search-box").addClass('hidden');
+        });
     $(".form-search").bind('submit', function() {
         var query = $(".search-query").val();
 
         //  clear the old search results, show a thinker
         $("#search-results > li").remove();
-        $("#search-header").addClass('hidden');
+        $("#search-box").addClass('hidden');
 
         $.getJSON(  
             '/search',
@@ -65,7 +70,7 @@ $(function() {
                         $(this).parent().remove();
                         
                         if (ul.children().length == 0) {
-                            $("#search-header")
+                            $("#search-box")
                                 .addClass('hidden');
                         }
                     });
@@ -82,7 +87,7 @@ $(function() {
                     /* add it to the search results */
                     li.appendTo(ul);
                 });
-                $("#search-header").removeClass('hidden');
+                $("#search-box").removeClass('hidden');
             }
         );
     });
