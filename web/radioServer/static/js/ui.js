@@ -5,68 +5,6 @@ var volumeOn        = true;
 
 var sliding         = false;
 
-// Handle keyboard events
-/*
-$(document).keydown(function (e) {
-    if ($("#search").is(":focus")) {
-        return;
-    }
-//     console.log(e.which);
-    switch (e.which) {
-
-        case 75:    // K        (up/prev)
-        case $.ui.keyCode.LEFT:
-            previousTrack();
-            e.preventDefault();
-            break;
-
-        case 191:   // /
-            $("#search").focus();
-            e.preventDefault();
-            break;
-    
-        case 88:    // X        (delete)
-            deleteCurrentSong();
-            e.preventDefault();
-            break;
-
-        case 74:    // J        (down/next)
-        case $.ui.keyCode.RIGHT:
-            nextTrack();
-            e.preventDefault();
-            break;
-
-        case $.ui.keyCode.DOWN:
-            break;
-        case $.ui.keyCode.UP:
-            break;
-
-        case 65:    // A        (append)
-            expandPlaylist();
-            e.preventDefault();
-            break;
-
-        case 73:    // I        (insert)
-            insertSong();
-            e.preventDefault();
-            break;
-
-        case 77:    // M        (mute)
-            toggleVolume($("#volume"));
-            break;
-
-        case 82:    // R        (replace)
-            replaceCurrentSong();
-            break;
-
-        case $.ui.keyCode.SPACE:
-            playPauseMusic();
-            e.preventDefault();
-            break
-    }
-});
-*/
-
 function toggleVolume() {
 
     volumeOn ^= 1;
@@ -85,14 +23,6 @@ function toggleVolume() {
 
 // Initialize control widgets and start the player
 $(function() {
-//     $( "#trackprogress" )
-//         .slider({   slide:      seekTrack, 
-//                     animate:    false, 
-//                     disabled:   true, 
-//                     range:      "min", 
-//                     start:      function() { sliding = true; },
-//                     stop:       function() { sliding = false;},
-//         });
 
     $("#previous")
         .bind('click', previousTrack);
@@ -102,11 +32,6 @@ $(function() {
         .bind('click', toggleVolume);
     $("#next")
         .bind('click', nextTrack);
-    /*
-    $( "#expand" )
-        .button({ text: false, icons: { primary: "ui-icon-triangle-1-s"}, disabled: true })
-        .click(expandPlaylist);
-    */
 
     $(".form-search").bind('submit', function() {
         var query = $(".search-query").val();

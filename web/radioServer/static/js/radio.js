@@ -48,10 +48,6 @@ function resetPlayer() {
         .addClass('disabled');
     $("#next")
         .addClass('disabled');
-//     $("#trackprogress")
-//         .slider("option", "disabled", true)
-//         .slider("option", "value", 0);
-
 }
 
 function resetPlayerDisplay() {
@@ -244,6 +240,7 @@ function addToPlaylist(song_id) {
 }
 
 function killSongNode(node) {
+    node.tooltip('destroy');
     node.remove();
 }
 
@@ -395,6 +392,20 @@ function createSongNode(song) {
         .append('<input type="hidden" name="rdio_id" class="rdio_id" value="' + song.rdio_id + '"/>')
         .append('<input type="hidden" name="song_id" class="song_id" value="' + song.song_id + '"/>')
         .append('<input type="hidden" name="edge_name" class="edge_name" value="' + song.edge + '"/>');
+
+    if ("prev" in song) {
+        li
+        .append('<input type="hidden" name="prev_artist" value="' + song.prev.artist + '"/>')
+        .append('<input type="hidden" name="prev_title" value="' + song.prev.title + '"/>');
+
+        li
+            .tooltip({
+                'title': 'From ' + song.prev.title  + 
+                         ' by ' + song.prev.artist + 
+                         ' via ' + song.edge,
+                'placement': 'right'
+                });
+    }
 
 
     li.bind('dblclick', function() { seekTo( $(this) ); });

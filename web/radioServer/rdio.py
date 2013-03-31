@@ -1,8 +1,6 @@
 import rdioapi
 import time
 
-import pprint
-
 class rdio(object):
     def __init__(self, cfg):
         self.api_key    = cfg['rdio_api_key']
@@ -23,6 +21,6 @@ class rdio(object):
             self.__init__(self.api_key, self.secret, self.domain, self.ttl)
         pass
 
-    def getToken(self):
+    def get_token(self):
         return {'playbackToken': self.token, 'domain': self.domain}
 

@@ -96,7 +96,7 @@ def webRdioToken():
     '''
         Get the Rdio token
     '''
-    return json.encode(flask.g.rdio.getToken())
+    return json.encode(flask.g.rdio.get_token())
 
 @app.route('/search', methods=['GET'])
 def webSearch():
