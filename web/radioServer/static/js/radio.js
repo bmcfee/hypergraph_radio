@@ -284,6 +284,9 @@ function askForSongs(node, replace) {
     if (node != null) {
         before_id   = node.find('.song_id').val();
         after_id    = node.next().find('.song_id').val();
+        if (replace && node.prev() != null) {
+            before_id = node.prev().find('.song_id').val();
+        }
     }
 
     $.post(  '/playlist', 
